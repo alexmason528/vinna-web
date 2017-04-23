@@ -1,4 +1,4 @@
-{% extends "base-3col.html" %}
+{% extends "base.html" %}
 {% load static %}
 {% load i18n %}
 {% get_current_language as LANGUAGE_CODE %}
@@ -83,7 +83,7 @@
                                     </div>
                                     <div class="clearfix" style="margin-bottom:40px;"></div>
                                     <label>{% trans "Please read carefully" %}</label>
-                                    <div class="field-outer">
+                                    <div class="field-outer" style="font-weight:300;color:#666666;">
                                         {% trans "You are about to become part of a team of Members, Promoters and Business Partners helping each other to bring prosperity into the community. By clicking on the button “Connect” you are going to get connected to the person who invited you to join Vinna and that connection will remain active from now on. Also, you accept the Terms of Use and Privacy Policy." %}
                                     </div>
 
@@ -109,8 +109,9 @@
 $('#registerform_connect').click(function() {
   $('#registerform').submit();
 });
-$('#file_chooser').click(function() {
-}
+$('#file_chooser_button').click(function() {
+  $('#file_chooser').trigger('click');
+});
 $('#file_chooser').change(function() {
   alert('uploading file');
 });

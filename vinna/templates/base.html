@@ -46,11 +46,10 @@
                 <ul>
                     <li><a href="#">{% trans "Home" %}</a></li>
                     <li><a href="#">{% trans "Business Directory" %}</a></li>
+                    {% if False %}
                     <li><a href="#">{% trans "Settings" %}</a></li>
-                </ul>
-            </div>
-          <div class="login-links">
-              <ul>
+                    {% endif %}
+                    {% if True %}
                   <li class="dropdown">
                       <a href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{% trans "Log In" %}</a>
                       <ul class="dropdown-menu login-form" aria-labelledby="dLabel">
@@ -195,7 +194,9 @@
                         </ul>
 
                     </li>
-                    <li><a href="#" class="become-member">{% trans "Register your Business" %}</a></li>
+                    {% endif %}
+
+                    <li><div class="button"><a href="/business/register" class="become-member">{% trans "Register your Business" %}</a></div></li>
                 </ul>
             </div>
             <div class="clear"></div>

@@ -40,12 +40,13 @@ header .logo { float:left; width:581px;}
 header .logo a.connect-member { float:right;font-size: 15px;color:#EE3A39;text-decoration: none; font-weight: 400;line-height: 44px;display: inline-block; outline:none;}
 header.inner-pages { margin:0px; border:0px; position:relative; z-index:9999; width:100%; }
 header .header-right { float:right; width:754px;  }
-header .header-right .main-menu { float:left; }
+header .header-right .main-menu { float:right; }
 header .header-right .main-menu ul { margin:0px; padding:0px; }
 header .header-right .main-menu ul li { margin:0px; padding:0px; display:inline-block; margin:0 45px 0 0; }
 header .header-right .main-menu ul li:last-child { margin:0px;}
 header .header-right .main-menu ul li a { font-size:15px; color:#666666; text-decoration:none; font-weight:400; line-height:44px;display:inline-block; }
 header .header-right .main-menu ul li a:hover ,header .header-right .main-menu ul li a.active{ color:#EE3A39;}
+/*
 header .header-right .login-links { float:right; }
 header .header-right .login-links ul li { margin:0px; padding:0px; display:inline-block; margin:0 32px 0 0; }
 header .header-right .login-links ul li:last-child { margin:0;}
@@ -53,6 +54,12 @@ header .header-right .login-links ul li a { font-size:15px; color:#666666; text-
 header .header-right .login-links ul li a:hover { color:#EE3A39;}
 header .header-right .login-links ul li a.become-member { padding:0 33.5px; border:1px solid #EE3A39; color:#EE3A39; letter-spacing:-0.3px; margin-top:2px; }
 header .header-right .login-links ul li a.become-member:hover { background:#EE3A39; color:#fff;}
+*/
+header .header-right .button a { font-size:15px; color:#666666; text-decoration:none; font-weight:400;line-height:42px; display:inline-block;}
+header .header-right .button a:hover { color:#EE3A39; }
+header .header-right .button a.become-member { padding:0 33.5px; border:1px solid #EE3A39; color:#EE3A39; letter-spacing:-0.3px; margin-top:2px; }
+header .header-right .button a.become-member:hover { background:#EE3A39; color:#fff;}
+
 
 /*--------------------------------Banner--------------------------------*/
 .banner {position:relative; margin:0 0 10px 0;}
@@ -83,7 +90,7 @@ header .header-right .login-links ul li a.become-member:hover { background:#EE3A
 .content-boxes .box-detail a:hover .overlay,.content-boxes .box-detail a:hover .overlay h3 { border-color:#EE3C39; color:#EE3C39;}
 
 /*--------------------------------Content--------------------------------*/
-.content { padding-bottom:460px;}
+.content { padding-bottom:50px;}
 .content .top-progres-bar { padding:0 23px; border-bottom:1px solid #d9d9d9; margin-bottom:63px; }
  .content .top-progres-bar .left-arrow.hidden { opacity:0; visibility:hidden; display:block !important;}
 .content .top-progres-bar .left-arrow a { background:url(../images/left-arrow.png) left center no-repeat; line-height:53px; font-size:20px; color:#666666; text-decoration:none; display:inline-block; padding-left:45px;letter-spacing:0px;  }
@@ -622,33 +629,32 @@ box-sizing:border-box; max-width:100%; }
 
 
 /* login form -------------------- */
-header .header-right .login-links ul.login-form { border-radius:0; border:1px solid #b3b3b3; width:355px; right:-25px; left:initial; z-index:99999; }
-header .header-right .login-links ul.login-form .loginform-outer { padding:60px 32px 25px 32px; }
-header .header-right .login-links ul.login-form:before { display:inline-block; content:""; background:url(../images/loginform-arrow.png) left top no-repeat;
-left:265px; right:0; margin:0 auto; width:13px; height:10px; z-index:2; top:-10px; position:absolute; }
-header .header-right .login-links ul.login-form li { display:block; text-align:left; }
-header .header-right .login-links ul.login-form h2 { text-align:center; color:#EE3A39; font-weight:700; font-size:20px; margin:0 0 50px 0; }
-header .header-right .login-links ul.login-form form .form-row { margin:0 0 42px 0; }
-header .header-right .login-links ul.login-form form .form-row:last-child { margin:0 !important; }
-header .header-right .login-links ul.login-form form .form-row2 { margin-bottom:20px; }
-header .header-right .login-links ul.login-form form .form-row input[type="text"], header .header-right .login-links ul.login-form form .form-row input[type="password"] { display:inline-block; width:100%; height:42px; padding:12px; border:1px solid #ccc; }
-header .header-right .login-links ul.login-form form .form-row input[type="text"]:focus, header .header-right .login-links ul.login-form form .form-row input[type="password"]:focus
+header .header-right .main-menu ul.login-form { border-radius:0; border:1px solid #b3b3b3; width:355px; right:-25px; left:initial; z-index:99999; }
+header .header-right .main-menu ul.login-form .loginform-outer { padding:60px 32px 25px 32px; }
+header .header-right .main-menu ul.login-form:before { display:inline-block; content:""; background:url(../images/loginform-arrow.png) left top no-repeat;left:265px; right:0; margin:0 auto; width:13px; height:10px; z-index:2; top:-10px; position:absolute; }
+header .header-right .main-menu ul.login-form li { display:block; text-align:left; }
+header .header-right .main-menu ul.login-form h2 { text-align:center; color:#EE3A39; font-weight:700; font-size:20px; margin:0 0 50px 0; }
+header .header-right .main-menu ul.login-form form .form-row { margin:0 0 42px 0; }
+header .header-right .main-menu ul.login-form form .form-row:last-child { margin:0 !important; }
+header .header-right .main-menu ul.login-form form .form-row2 { margin-bottom:20px; }
+header .header-right .main-menu ul.login-form form .form-row input[type="text"], header .header-right .main-menu ul.login-form form .form-row input[type="password"] { display:inline-block; width:100%; height:42px; padding:12px; border:1px solid #ccc; }
+header .header-right .main-menu ul.login-form form .form-row input[type="text"]:focus, header .header-right .main-menu ul.login-form form .form-row input[type="password"]:focus
 { outline:none; }
-header .header-right .login-links ul.login-form form .form-row p { text-align:center; color:#666; font-size:15px; line-height:30px; padding:0 20px; }
-header .header-right .login-links ul.login-form form .form-row span { font-size:15px; color:#989898; margin:0px; padding:0px;   font-weight:300; background:url(../images/password-checked.png) left center no-repeat; line-height:12px; padding-left:32px; width:21px; height:21px; background-size:contain; }
-header .header-right .login-links ul.login-form form .form-row label { margin:0px; cursor:pointer; }
-header .header-right .login-links ul.login-form form .form-row input[type="checkbox"] { display:none; }
-header .header-right .login-links ul.login-form form .form-row input[type="checkbox"]:checked + span { background:url(../images/password-uncheck.png) left center no-repeat; line-height:12px; padding-left:32px; width:21px; height:21px; background-size:contain; }
-header .header-right .login-links ul.login-form form a.forgot-passwordbtn { color:#EE3A39; font-size:15px; font-weight:300; line-height:42px; }
-header .header-right .login-links ul.login-form form a.login-btn { color:#fff; font-size:15px; font-weight:400; background-color:#EE3A39; line-height:42px; text-align:center;
+header .header-right .main-menu ul.login-form form .form-row p { text-align:center; color:#666; font-size:15px; line-height:30px; padding:0 20px; }
+header .header-right .main-menu ul.login-form form .form-row span { font-size:15px; color:#989898; margin:0px; padding:0px;   font-weight:300; background:url(../images/password-checked.png) left center no-repeat; line-height:12px; padding-left:32px; width:21px; height:21px; background-size:contain; }
+header .header-right .main-menu ul.login-form form .form-row label { margin:0px; cursor:pointer; }
+header .header-right .main-menu ul.login-form form .form-row input[type="checkbox"] { display:none; }
+header .header-right .main-menu ul.login-form form .form-row input[type="checkbox"]:checked + span { background:url(../images/password-uncheck.png) left center no-repeat; line-height:12px; padding-left:32px; width:21px; height:21px; background-size:contain; }
+header .header-right .main-menu ul.login-form form a.forgot-passwordbtn { color:#EE3A39; font-size:15px; font-weight:300; line-height:42px; }
+header .header-right .main-menu ul.login-form form a.login-btn { color:#fff; font-size:15px; font-weight:400; background-color:#EE3A39; line-height:42px; text-align:center;
 width:134px; transition:all 300ms; }
-header .header-right .login-links ul.login-form form a.login-btn:hover { background-color:#d00403; }
-header .header-right .login-links ul.login-form .loginform-outer2 { transition:all 300ms; display:none; padding:20px 32px 25px 32px; text-align:center; }
-header .header-right .login-links ul.login-form .loginform-outer2  img.login-thumbnail { text-align:center; margin:0 auto 25px auto; }
+header .header-right .main-menu ul.login-form form a.login-btn:hover { background-color:#d00403; }
+header .header-right .main-menu ul.login-form .loginform-outer2 { transition:all 300ms; display:none; padding:20px 32px 25px 32px; text-align:center; }
+header .header-right .main-menu ul.login-form .loginform-outer2  img.login-thumbnail { text-align:center; margin:0 auto 25px auto; }
 #forget-password { display:none; }
-header .header-right .login-links ul.login-form .form-row .reset-btnrow { text-align:center; }
-header .header-right .login-links ul.login-form form .form-row.reset-btnrow a.login-btn { float:none !important; }
-header .header-right .login-links ul.login-form .loginform-outer2 h3 { color:#666; font-size:15px; font-weight:700; text-align:left; padding-bottom:12px; }
+header .header-right .main-menu ul.login-form .form-row .reset-btnrow { text-align:center; }
+header .header-right .main-menu ul.login-form form .form-row.reset-btnrow a.login-btn { float:none !important; }
+header .header-right .main-menu ul.login-form .loginform-outer2 h3 { color:#666; font-size:15px; font-weight:700; text-align:left; padding-bottom:12px; }
 #reset-again .form-row { margin:0 0 20px 0; }
 #reset-again .form-row label { padding-left:15px; }
 #reset-again .form-row input[type="checkbox"]:checked + span, #reset-again .form-row span { background-size:auto; padding-left:19px; }
@@ -904,10 +910,10 @@ footer ul + ul { float:right;}
 @media only screen and (max-width:992px) {
 	header .logo { width: 275px; }
 	header .logo a.connect-member { font-size:13px; }
-	header .header-right .main-menu ul li,header .header-right .login-links ul li { margin:0 10px 0 0;}
-	header .header-right .main-menu ul li a, header .header-right .login-links ul li a { font-size:12px; }
+	header .header-right .main-menu ul li,header .header-right .main-menu ul li { margin:0 10px 0 0;}
+	header .header-right .main-menu ul li a, header .header-right .main-menu ul li a { font-size:12px; }
 	header .header-right { width:435px;}
-	header .header-right .login-links ul li a.become-member { font-size:12px; padding: 0 8px; }
+	header .header-right .main-menu ul li a.become-member { font-size:12px; padding: 0 8px; }
 	.content .top-progres-bar{ padding:0 10px;}
 	.content .top-progres-bar .left-arrow a ,.content .top-progres-bar .right-arrow a { font-size:16px;}
 	.content .top-progres-bar .middle-bar span { font-size:18px; letter-spacing:0px; margin-bottom:24px;}
