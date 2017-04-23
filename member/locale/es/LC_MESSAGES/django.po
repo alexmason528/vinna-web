@@ -1,0 +1,108 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-04-20 10:33-0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: templates/member/register.html:44
+msgid "Home"
+msgstr ""
+
+#: templates/member/register.html:45
+msgid "Business Directory"
+msgstr ""
+
+#: templates/member/register.html:46
+msgid "Settings"
+msgstr ""
+
+#: templates/member/register.html:52
+msgid "Log In"
+msgstr ""
+
+#: templates/member/register.html:56
+msgid "HELLO THERE!"
+msgstr "¡HOLA!"
+
+#: templates/member/register.html:70 templates/member/register.html:96
+msgid "Remember me"
+msgstr "Recuerda me"
+
+#: templates/member/register.html:76 templates/member/register.html:102
+msgid "Forgot my Password"
+msgstr ""
+
+#: templates/member/register.html:77 templates/member/register.html:103
+#: templates/member/register.html:119
+msgid "Login"
+msgstr ""
+
+#: templates/member/register.html:115
+msgid ""
+"Don’t worry, just fill in your email and we will send a link to help you "
+"reset your Password."
+msgstr ""
+
+#: templates/member/register.html:118
+msgid "Cancel"
+msgstr ""
+
+#: templates/member/register.html:128
+msgid ""
+"The Reset Link has been sent, please check your email and follow the "
+"instructions."
+msgstr ""
+
+#: templates/member/register.html:131
+msgid "Try Again"
+msgstr ""
+
+#: templates/member/register.html:137
+msgid "Reset your Password"
+msgstr ""
+
+#: templates/member/register.html:147
+msgid "8 - 15 characters"
+msgstr ""
+
+#: templates/member/register.html:157
+msgid "At least one letter"
+msgstr ""
+
+#: templates/member/register.html:167
+msgid "At least one number"
+msgstr ""
+
+#: templates/member/register.html:180
+msgid "Password must match"
+msgstr ""
+
+#: templates/member/register.html:186
+msgid "Reset"
+msgstr ""
+
+#: templates/member/register.html:195
+msgid "Register your Business"
+msgstr ""
+
+#: templates/member/register.html:211
+msgid "CREATE YOUR ACCOUNT"
+msgstr "CREA TU CUENTA"
+
+#: templates/member/register.html:227
+msgid "Language"
+msgstr "Lengua"
