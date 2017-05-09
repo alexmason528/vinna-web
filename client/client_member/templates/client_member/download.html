@@ -1,0 +1,54 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+<!-- Current language: {{ LANGUAGE_CODE }} -->
+{% block title %}Register to be Vinna Member{% endblock %}
+
+{% block content %}
+
+    
+        <!-- Bannner -->        
+        <section class="download-app-banner">
+           <img src="/static/images/download-banner.png" alt="" title="" >
+             <div class="app-banner-content">
+               <div class="app-container">
+                    <div class="app-right-content">
+                      <a href="#"><img src="/static/images/app-store.png" alt="" title="" ></a>
+                        <a href="#"><img src="/static/images/google-play.png" alt="" title="" ></a>
+                        <p>Receive a link to download the App on your device.</p>
+                        <form method="POST" action="#">
+                          {% csrf_token %}
+                          <input type="text" name="email" value="" placeholder="Email or Phone #" style="color:#000">
+                            <button type="submit">Send</button>
+                          
+                        </form>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+             </div>
+        </section>
+        
+        <!-- Content --> 
+        <section class="welcome-content">
+          <a href="#" style="display:none;">Enter Vinna</a>
+        </section>
+         
+
+
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+$('#registerform_connect').click(function() {
+  $('#registerform').submit();
+});
+$('#file_chooser_button').click(function() {
+  $('#file_chooser').trigger('click');
+});
+$('#file_chooser').change(function() {
+  alert('uploading file');
+});
+</script>
+{% endblock %}

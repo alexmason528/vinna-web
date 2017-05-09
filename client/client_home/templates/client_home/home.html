@@ -1,0 +1,78 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+
+{% block content %}
+        <!-- Bannner -->
+        <section class="banner">
+          <div id="carousel" class="carousel slide carousel-fade" data-ride="carousel">
+                <div class="carousel-inner" role="listbox">
+                    <div class="callbacks_container">
+                     <ul class="rslides" id="slider4">
+                        <li>
+                            <img src="{% static '/images/home-banner.png' %}" alt="" title="" >
+                        </li>
+                         <li>
+                            <img src="{% static '/images/home-banner.png' %}" alt="" title="" >
+                        </li>
+                        <li>
+                            <img src="{% static '/images/home-banner.png' %}" alt="" title="" >
+                        </li>
+                      </ul>
+                    </div>
+                </div>
+            </div>
+
+             <div class="banner-detail clearfix">
+               <div class="banner-box">
+                  <h2>{% trans "Buy" %}<span>{% trans "and Win" %}</span></h2>
+                    <p>{% trans "Look for Business Partners in our Directory, buy products and services from them and get a 2% instant refund." %}</p>
+                    <p>{% trans "Thanks to Local Businesses on our community, the money you spend is now a source of income. Vinna is not about points, rewards or coupons ... It's about going to places you love, buy the products and services you like and getting paid for it." %}</p>
+                    <a href="#"></a>
+                </div>
+                <div class="banner-box">
+                  <h2>Share <span>and Grow </span></h2>
+                    <p>{% trans "Everyone can join Vinna through you, from any money they spend on our Partners you receive an instant 5% payment." %}</p>
+                    <p>{% trans "We are already promoter. Movies, music, books, places, if we like, we recommend it but never get paid for doing it. Think about it. At Vinna, Business Partners want you to be part of the formula and they will pay you for promoting their products and services." %}</p>
+                    <a href="#"></a>
+                </div>
+                <div class="banner-box">
+                  <h2>{% trans "Help" %} <span>{% trans "and Change" %}</span></h2>
+                    <p>{% trans "In Vinna, Partners work with Members and Promoters helping each other bring prosperity into the community." %}</p>
+                    <p>{% trans "Our goal is to create the must powerful platform base on personal recommendation with zero money advance and 100% garanteed on results. Together we can change “Buy and Sale” for simply “Win and Win”" %}</p>
+                    <a href="#"></a>
+                </div>
+
+             </div>
+        </section>
+
+        <section class="home-content">
+          <div class="content-boxes">
+              <div class="box-detail">
+                  <img src="{% static '/images/how-work-thumbnail.png' %}" alt="" title="" >
+                    <a href="#">
+                      <div class="overlay">
+                            <h3>{% trans "HOW IT WORKS" %}</h3>
+                        </div>
+                    </a>
+                </div>
+                <div class="box-detail">
+                  <img src="{% static '/images/learn-share-thumbnail.png' %}" alt="" title="" >
+                    <a href="#">
+                      <div class="overlay">
+                            <h3>{% trans "LEARN TO SHARE" %}</h3>
+                        </div>
+                    </a>
+                </div>
+                <div class="box-detail">
+                  <img src="{% static '/images/help-thumbnail.png' %}" alt="" title="" >
+                    <a href="#">
+                      <div class="overlay">
+                            <h3>{% trans "WHY TO HELP" %}</h3>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+{% endblock %}

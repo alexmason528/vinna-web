@@ -25,16 +25,26 @@ SECRET_KEY = 'wx5(=7^kfbuzw7bxt7a9*72&3^kr4fjp)e6vfm*17+n$$26@h#'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['vinna.me','www.vinna.me','www.localhost','localhost']
-
 
 # Application definition
 
 INSTALLED_APPS = [
+    'rest_framework',
+    'rest_framework.authtoken',
+
     'core.apps.CoreConfig',
-    'account.apps.AccountConfig',
-    'member.apps.MemberConfig',
-    'business.apps.BusinessConfig',
+
+    'client.client_home',
+    'client.client_business',
+    'client.client_member',
+
+    'server.notifications',
+    'server.media',
+    'server.business',
+    'server.transactions',
+    'server.account',
+    'server.member',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,15 +54,21 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'vinna.middleware.disable_csrf_middleware',
+#    'subdomains.middleware.SubdomainURLRoutingMiddleware',
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+#    'vinna.middleware.basic_auth_middleware',
 ]
+
+
 
 ROOT_URLCONF = 'vinna.urls'
 
@@ -87,11 +103,8 @@ DATABASES = {
             'sql_mode': 'STRICT_ALL_TABLES',
             'init_command': 'SET default_storage_engine=INNODB',
         },
-        'NAME': 'vinna_main',
-        'USER': 'root',
-        'PASSWORD': 'root',
-        'HOST': '127.0.0.1',
-        'PORT': '8889',
+        'NAME': 'vinna_main','USER': 'root','PASSWORD': 'root','HOST': '127.0.0.1','PORT': '8889',
+#        'NAME':'vinna_main','USER':'vinna','PASSWORD':'vinna123!','HOST':'cpvlabs.cwdkozsu0mvg.us-east-1.rds.amazonaws.com','PORT': '3306',
     }
 }
 
@@ -112,6 +125,36 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+#        'rest_framework.permissions.IsAdminUser',
+        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',
+    ],
+    'PAGE_SIZE': 50,
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+#        'rest_framework.authentication.TokenAuthentication',
+    ),
+
+}
+
+
+PREPEND_WWW = True
+ALLOWED_HOSTS = ['www.test.vinna.me','test.vinna.me','www.dev.vinna.me','dev.vinna.me','vinna.me','www.vinna.me','www.localhost','localhost']
+APPEND_SLASH = True
+
+#ROOT_URLCONF = 'myproject.urls.account'
+
+# A dictionary of urlconf module paths, keyed by their subdomain.
+#SUBDOMAIN_URLCONFS = {
+#    None: 'myproject.urls.frontend',  # no subdomain, e.g. ``example.com``
+#    'www': 'myproject.urls.frontend',
+#    'api': 'myproject.urls.api',
+#}
 
 
 # Internationalization
@@ -136,12 +179,23 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/images/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static")
+    os.path.join(BASE_DIR, "static"),
+    os.path.join(BASE_DIR, "s"),
 ]
 
 FORMAT_MODULE_PATH = [
 ]
 
-APPEND_SLASH = True
 
-PREPEND_WWW = True
+
+BASICAUTH_USERNAME = 'vinna'
+BASICAUTH_PASSWORD = 'vinnatesting123!'
+
+
+EMAIL_HOST = 'email-smtp.us-east-1.amazonaws.com'
+EMAIL_HOST_USER = 'AKIAIHDE62KJU3KHNRNQ'
+EMAIL_HOST_PASSWORD = 'AkIUtnqmwXQQCMnsGnXvBT3CS/MLlOQmIfkG5Rv13rcc'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+#EMAIL_USE_SSL = True
+#EMAIL_PORT = 465

@@ -93,10 +93,10 @@ $(document).ready(function(){
   });
 
 	$( "#reset-againbtn" ).click(function(){
-    $( "#main-loginform" ).hide();
+    $( "#main-loginform" ).show();
     $( "#login-form2" ).hide();
     $( "#forget-password" ).hide();
-    $( "#reset-password" ).show();
+    $( "#reset-password" ).hide();
 
 //		$( "#reset-password" ).hide();
 //		$( "#reset-again" ).show();

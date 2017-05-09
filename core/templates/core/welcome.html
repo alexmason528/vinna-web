@@ -11,13 +11,13 @@
                     <div class="callbacks_container">
                      <ul class="rslides" id="slider4">
                         <li>
-                            <img src="static/images/home-banner.png" alt="" title="" >
+                            <img src="{% static '/images/home-banner.png' %}" alt="" title="" >
                         </li>
                        	<li>
-                            <img src="static/images/home-banner.png" alt="" title="" >
+                            <img src="{% static '/images/home-banner.png' %}" alt="" title="" >
                         </li>
                       	<li>
-                            <img src="static/images/home-banner.png" alt="" title="" >
+                            <img src="{% static '/images/home-banner.png' %}" alt="" title="" >
                         </li>
                       </ul>
                     </div>
@@ -50,7 +50,7 @@
         <section class="home-content">
         	<div class="content-boxes">
             	<div class="box-detail">
-                	<img src="static/images/how-work-thumbnail.png" alt="" title="" >
+                	<img src="{% static '/images/how-work-thumbnail.png' %}" alt="" title="" >
                     <a href="#">
                     	<div class="overlay">
                             <h3>{% trans "HOW IT WORKS" %}</h3>
@@ -58,7 +58,7 @@
                     </a>
                 </div>
                 <div class="box-detail">
-                	<img src="static/images/learn-share-thumbnail.png" alt="" title="" >
+                	<img src="{% static '/images/learn-share-thumbnail.png' %}" alt="" title="" >
                     <a href="#">
                     	<div class="overlay">
                             <h3>{% trans "LEARN TO SHARE" %}</h3>
@@ -66,7 +66,7 @@
                     </a>
                 </div>
                 <div class="box-detail">
-                	<img src="static/images/help-thumbnail.png" alt="" title="" >
+                	<img src="{% static '/images/help-thumbnail.png' %}" alt="" title="" >
                     <a href="#">
                     	<div class="overlay">
                             <h3>{% trans "WHY TO HELP" %}</h3>
@@ -76,5 +76,3 @@
             </div>
         </section>
 {% endblock %}
-
-{% block footer %}{% endblock %}

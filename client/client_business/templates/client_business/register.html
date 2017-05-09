@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+<!-- Current language: {{ LANGUAGE_CODE }} -->
+{% block title %}Register to be Vinna Member{% endblock %}
+
+{% block content %}
+        <!-- Content -->
+        <section class="content personal-reg">
+          <div class="container">
+              <ul class="bxslider">
+
+                    <li>
+                       <div class="top-progres-bar">
+                        <div class="middle-bar">
+                                <span>{% trans "CREATE PARTNER ACCOUNT" %}</span>
+                            </div>
+                            <div class="clear"></div>
+                        </div>
+                      <form id="registerform" action="" method="post">
+                        {% csrf_token %}
+                        <div class="create-account-step">
+<div style="position:relative;top:-50px;font-size:90%;text-align:center;font-weight:300;line-height:200%">
+{% trans "The first day of each month Vinna will require a payment for a total of ten porcent (10%) of the amount your business generate the month before throuhg our platform." %}
+<br>{% trans "Please have in mind that Vinna will require a payment only if and after your business has sell a product or service to garanty 100% result and cero risk to you." %}
+<br>{% trans "For more information and to learn all about payments and how it works please click" %} <a style="font-weight:300;font-size:100%;" href="#">{% trans "here" %}</a>.
+</div>
+                            <fieldset>
+                                <div class="one-column">
+                                    <div class="field-outer">
+                                        <label for="language">{% trans "About your Business" %}</label>
+                                        <select name="language">
+                                            <option>Category (click or type)</option>
+                                            <option value="">Category 1</option>
+                                        </select>
+                                    </div>
+                                    <div class="field-outer">
+                                      <input name="business_name" type="text" value="" placeholder="{% trans 'Business or Place Name' %}" >
+                                    </div>
+                                    <div class="field-outer">
+                                      <input name="tax_id" type="text" value="" placeholder="{% trans 'EIN / Tax ID Number' %}" >
+                                    </div>
+
+                                    <div class="field-outer">
+                                        <label for="email">{% trans "Email Address" %}</label>
+                                        <input name="email" type="email" value="" placeholder="{% trans 'Email' %}" >
+                                    </div>
+                                    <div class="field-outer">
+                                      <label for="phone">{% trans "Phone Number" %}</label>
+                                      <input name="phone" type="text" value="" placeholder="{% trans 'Phone Number' %}" >
+                                    </div>
+                                </div>
+                                <div class="one-column">
+                                    <div class="field-outer">
+                                        <label>{% trans "Business Address" %}</label>
+                                        <select name="country">
+                                            <option>{% trans "Country" %}</option>
+                                        </select>
+                                    </div>
+                                    <div class="field-outer">
+                                      <select name="state">
+                                          <option>{% trans "State" %}</option>
+                                      </select>
+                                    </div>
+                                    <div class="field-outer">
+                                      <select name="city">
+                                          <option>{% trans "City" %}</option>
+                                      </select>
+                                    </div>
+                                    <div class="field-outer">
+                                        <input name="zip" type="text" value="" placeholder="{% trans 'Zip Code'%}" >
+                                    </div>
+                                    <div class="field-outer">
+                                        <input name="address1" type="text" value="" placeholder="{% trans 'Address' %}" >
+                                    </div>
+                                    <div class="field-outer">
+                                        <input name="address2" type="text" value="" placeholder="{% trans 'Address Line 2' %}" >
+                                    </div>
+                                </div>
+                                <div class="one-column">
+                                  <div class="field-outer">
+                                      <label>{% trans "Bank Account" %}</label>
+                                      <input name="bank_name" type="text" value="" placeholder="{% trans 'Bank Name' %}" >
+                                  </div>
+                                  <div class="field-outer">
+                                      <input name="bank_account" type="text" value="" placeholder="{% trans 'Bank Account Number' %}" >
+                                  </div>
+                                  <div class="field-outer">
+                                      <input name="bank_routing" type="text" value="" placeholder="{% trans 'Routing Number' %}" >
+                                  </div>
+                                  <div class="field-outer">
+                                      <label>{% trans "Debit or Credit Card" %}</label>
+                                      <input name="cardholder_name" type="text" value="" placeholder="{% trans 'Cardholer\'s Name' %}" >
+                                  </div>
+                                  <div class="field-outer">
+                                      <input name="card_number" type="text" value="" placeholder="{% trans 'Card Number' %}" >
+                                  </div>
+                                  <div class="field-outer">
+                                    <div class="dob-field">
+                                      <div style="display:inline;margin-right:20px;">{% trans "Expiration" %}</div>
+                                      <input name="cc_month" type="text" value="" placeholder="{% trans 'Month' %}">
+                                      <input name="cc_year" type="text" value="" placeholder="{% trans 'Year' %}">
+                                    </div>
+                                  </div>
+                                  <div class="field-outer">
+                                      <a href="#">{% trans "What is this?" %}</a>
+                                      <input style="width:31%" name="cc_cvv" type="text" value="" placeholder="{% trans 'CVV' %}">
+                                  </div>
+
+
+                                    <ul>
+<!--                                        <li><a href="/" style="background-color:#fff; color:#EE3A39; display:inline; margin:27px;">{% trans "Cancel" %}</a></li> -->
+                                        <li style="float:right;"><a id="registerform_connect" href="#">{% trans "Register" %}</a></li>
+                                    </ul>
+                                </div>
+                            </fieldset>
+
+                        </div>
+                      </form>
+                  </li>
+
+                </ul>
+            </div>
+        </section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+$('#registerform_connect').click(function() {
+  $('#registerform').submit();
+});
+$('#file_chooser_button').click(function() {
+  $('#file_chooser').trigger('click');
+});
+$('#file_chooser').change(function() {
+  alert('uploading file');
+});
+</script>
+{% endblock %}

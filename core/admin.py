@@ -6,6 +6,5 @@ from core.models import State
 
 # Register your models here.
 admin.site.register(Language)
-
 admin.site.register(Country)
 admin.site.register(State)

@@ -1,0 +1,632 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+<!-- Current language: {{ LANGUAGE_CODE }} -->
+{% block title %}Register to be Vinna Member{% endblock %}
+
+{% block content %}
+    <!-- Bannner -->
+    <section class="member-banner business-profile">
+       <img src="/static/images/business-profilebanner.png" alt="" title="" >
+         <div class="businessprofile-content">
+          <div class="businessprofile-inner">
+              <div class="businessprofile-left pull-left">
+                  <h2>SPRESSO TOWN</h2>
+                    <h3>coffee shop</h3>
+                </div>
+                <div class="businessprofile-right pull-right">
+                  <div class="share-section">
+                      <span class="pull-left" data-toggle="modal" data-target="#myModal">Share</span>
+                        <img class="pull-right" src="/static/images/share-heart.png" alt="" title="" data-toggle="modal" data-target="#myModal2" >
+                      <div class="clearfix"></div>
+                    </div>
+                    <div class="like-list">
+                      <ul>
+                          <li><a href="#"><img src="static//static/images/star-icon.png" alt="" title="" ></a></li>
+                            <li><a href="#"><img src="/static/images/star-icon.png" alt="" title="" ></a></li>
+                            <li><a href="#"><img src="/static/images/star-icon.png" alt="" title="" ></a></li>
+                            <li><a href="#"><img src="/static/images/star-icon.png" alt="" title="" ></a></li>
+                            <li><a href="#"><img src="/static/images/star-icon.png" alt="" title="" ></a></li>
+                            <li>(25)</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+         </div>
+    </section>
+
+    <!-- Content -->
+    <section class="member-content">
+       <div class="member-container">
+          <div class="member-content-left businessprofile-left">
+                <div class="member-tabs-heading">
+                  <div>
+                      <!-- Nav tabs -->
+                        <ul class="nav nav-tabs" role="tablist">
+                          <li role="presentation" class="active">
+                              <a href="#home" aria-controls="home" role="tab" data-toggle="tab">
+                                <p>Hello</p>
+                              </a>
+                            </li>
+                          <li role="presentation">
+                              <a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">
+                                <p>In Touch</p>
+                              </a>
+                            </li>
+                            <li role="presentation">
+                              <a href="#Review" aria-controls="profile" role="tab" data-toggle="tab">
+                                <p>Review</p>
+                              </a>
+                            </li>
+                        </ul>
+                  </div>
+                </div>
+            </div>
+            <div class="member-content-right businessprofile-right">
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="home">
+                      <div class="businessprofile-intro">
+                          <p>Hi, we are Espresso Town and now members of the Vinna’s family.<br> We are a small place in the Los Angeles area,
+                            open since last year and our goal is to connect our customers with how wonderful it can be a simple coffee accompany those we love most.</p>
+                        </div>
+                        <div class="updates-content">
+                            <div class="steps-video">
+                                <a href="#"><img src="/static/images/step-video.png" alt="" title="" ></a>
+                            </div>
+                            <div class="steps-video">
+                                <a href="#"><img src="/static/images/step-video-2.png" alt="" title="" ></a>
+                            </div>
+                            <div class="steps-video">
+                                <a href="#"><img src="/static/images/step-video-3.png" alt="" title="" ></a>
+                            </div>
+                        </div>
+                        <div class="business-profilegallery">
+                          <div class='row'>
+                                <div class='col-md-12'>
+                                  <div class="carousel slide media-carousel" id="media">
+                                    <div class="carousel-inner">
+                                      <div class="item  active">
+                                        <div class="row">
+                                          <div class="gallerybox">
+                                            <a class="thumbnail" href="#"><img alt="" src="/static/images/businessprofile-thumb1.png"></a>
+                                          </div>
+                                          <div class="gallerybox">
+                                            <a class="thumbnail" href="#"><img alt="" src="/static/images/businessprofile-thumb2.png"></a>
+                                          </div>
+                                          <div class="gallerybox">
+                                            <a class="thumbnail" href="#"><img alt="" src="/static/images/businessprofile-thumb3.png"></a>
+                                          </div>
+                                          <div class="gallerybox">
+                                            <a class="thumbnail" href="#"><img alt="" src="/static/images/businessprofile-thumb4.png"></a>
+                                          </div>
+                                          <div class="gallerybox">
+                                            <a class="thumbnail" href="#"><img alt="" src="/static/images/businessprofile-thumb5.png"></a>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div class="item">
+                                        <div class="row">
+                                          <div class="gallerybox">
+                                            <a class="thumbnail" href="#"><img alt="" src="/static/images/businessprofile-thumb1.png"></a>
+                                          </div>
+                                          <div class="gallerybox">
+                                            <a class="thumbnail" href="#"><img alt="" src="/static/images/businessprofile-thumb2.png"></a>
+                                          </div>
+                                          <div class="gallerybox">
+                                            <a class="thumbnail" href="#"><img alt="" src="/static/images/businessprofile-thumb3.png"></a>
+                                          </div>
+                                          <div class="gallerybox">
+                                            <a class="thumbnail" href="#"><img alt="" src="/static/images/businessprofile-thumb4.png"></a>
+                                          </div>
+                                          <div class="gallerybox">
+                                            <a class="thumbnail" href="#"><img alt="" src="/static/images/businessprofile-thumb5.png"></a>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div class="item">
+                                        <div class="row">
+                                          <div class="gallerybox">
+                                            <a class="thumbnail" href="#"><img alt="" src="/static/images/businessprofile-thumb1.png"></a>
+                                          </div>
+                                          <div class="gallerybox">
+                                            <a class="thumbnail" href="#"><img alt="" src="/static/images/businessprofile-thumb2.png"></a>
+                                          </div>
+                                          <div class="gallerybox">
+                                            <a class="thumbnail" href="#"><img alt="" src="/static/images/businessprofile-thumb3.png"></a>
+                                          </div>
+                                          <div class="gallerybox">
+                                            <a class="thumbnail" href="#"><img alt="" src="/static/images/businessprofile-thumb4.png"></a>
+                                          </div>
+                                          <div class="gallerybox">
+                                            <a class="thumbnail" href="#"><img alt="" src="/static/images/businessprofile-thumb5.png"></a>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <a data-slide="prev" href="#media" class="left carousel-control"><img src="/static/images/businessprofile-arrow1.png" alt="" title="" ></a>
+                                    <a data-slide="next" href="#media" class="right carousel-control"><img src="/static/images/businessprofile-arrow2.png" alt="" title="" ></a>
+                                  </div>
+                                </div>
+                              </div>
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="profile">
+                      <div class="conntectus">
+                          <h2>Connect with us in our Social Sites</h2>
+                            <ul>
+                              <li><a href="#"><img src="/static/images/intouch-icon1.png" alt="" title="" ></a></li>
+                                <li><a href="#"><img src="/static/images/intouch-icon2.png" alt="" title="" ></a></li>
+                                <li><a href="#"><img src="/static/images/intouch-icon3.png" alt="" title="" ></a></li>
+                                <li><a href="#"><img src="/static/images/intouch-icon4.png" alt="" title="" ></a></li>
+                                <li><a href="#"><img src="/static/images/intouch-icon5.png" alt="" title="" ></a></li>
+                                <li><a href="#"><img src="/static/images/intouch-icon6.png" alt="" title="" ></a></li>
+                                <li><a href="#"><img src="/static/images/intouch-icon7.png" alt="" title="" ></a></li>
+                                <li><a href="#"><img src="/static/images/intouch-icon8.png" alt="" title="" ></a></li>
+                            </ul>
+                        </div>
+                        <div class="location">
+                          <h2>Give us a call or visit us in our Location</h2>
+                            <ul>
+                              <li class="phone">(805) 549 - 3111</li>
+                                <li class="address">50 Higuera Street, San Luis Obispo, CA 93401</li>
+                                <li><a href="#"><img src="/static/images/rank-icon.png" alt="" title="" ></a></li>
+                            </ul>
+                        </div>
+                        <div class="location business-hour">
+                          <h2>Here you have our Business Hours</h2>
+
+                        </div>
+                        <div class="statement-detail">
+                          <table cellpadding="4" cellspacing="4" style=" border-spacing: 10px;" >
+                              <thead>
+                                  <th>MONDAY</th>
+                                    <th>TUESDAY</th>
+                                    <th>WEDNESDAY</th>
+                                    <th>THURSDAY</th>
+                                    <th>FRIDAY</th>
+                                    <th>SATURDAY</th>
+                                    <th>SUNDAY</th>
+                                </thead>
+                                <tbody>
+                                  <tr>
+                                      <td>9:00 AM<br>to<br>9:30 PM</td>
+                                        <td>9:00 AM<br>to<br>9:30 PM</td>
+                                        <td>9:00 AM<br>to<br>9:30 PM</td>
+                                        <td>9:00 AM<br>to<br>9:30 PM</td>
+                                        <td>9:00 AM<br>to<br>9:30 PM</td>
+                                        <td>9:00 AM<br>to<br>6:00 PM</td>
+                                        <td>9:00 AM<br>to<br>3:30 PM</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="Review">
+                      <div class="textarea">
+                          <textarea name="" cols="" rows="3">Write your review</textarea>
+                        </div>
+                        <div class="review">
+                          <ul class="review-list pull-left">
+                              <li><a href="#"><img src="/static/images/reviewstar.png" alt="" title=""></a></li>
+                                <li><a href="#"><img src="/static/images/reviewstar.png" alt="" title=""></a></li>
+                                <li><a href="#"><img src="/static/images/reviewstar.png" alt="" title=""></a></li>
+                                <li><a href="#"><img src="/static/images/reviewstar.png" alt="" title=""></a></li>
+                                <li><a href="#"><img src="/static/images/reviewstar.png" alt="" title=""></a></li>
+                            </ul>
+                            <ul class="review-btn pull-right">
+                              <li><a href="#">cancel</a></li>
+                                <li><a href="#">send</a></li>
+                            </ul>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="review-box">
+                          <div class="review-left pull-left">
+                              <div class="review-thumbnail pull-left">
+                                  <img src="/static/images/review-thumbnail.png" alt="" title="" >
+                                </div>
+                                <div class="reviewleft-inner pull-left">
+                                  <h3>Monik Bozz</h3>
+                                    <p>The best place for been arrownd friends and have a good time... Recomended!!!!</p>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="review-right pull-right">
+                              <a class="rank-icon pull-right" href="#"><img src="/static/images/rank-icon.png" alt="" title="" ></a>
+                                <div class="clearfix"></div>
+                                <ul class="like-list">
+                                  <li><img src="/static/images/like-icon.png" alt="" title="" ></li>
+                                    <li><span>19</span></li>
+                                </ul>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="clear"></div>
+         </div>
+    </section>
+
+    <!-- modal pop up -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog connectmember_popup" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+            <div class="connectmember_form share_popup">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#SOCIAL" aria-controls="home" role="tab" data-toggle="tab">SOCIAL</a></li>
+                    <li role="presentation"><a href="#EMAIL" aria-controls="profile" role="tab" data-toggle="tab">EMAIL</a></li>
+                    <li role="presentation"><a href="#MESSAGE" aria-controls="messages" role="tab" data-toggle="tab">MESSAGE</a></li>
+                    <li role="presentation"><a href="#TEXT" aria-controls="messages" role="tab" data-toggle="tab">TEXT</a></li>
+                    <li role="presentation"><a href="#LINK" aria-controls="messages" role="tab" data-toggle="tab">LINK</a></li>
+                </ul>
+                <!-- Tab panes -->
+                  <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="SOCIAL">
+                        <div class="member_forminner share_popupinner">
+                            <div class="forminner_row">
+                              <ul class="social_list">
+                                  <li>
+                                      <a href="#">
+                                          <img src="/static/images/share_icon1.png" alt="" title="" class="socialshare_icon" >
+                                          <img src="/static/images/share_editicon.png" alt="" title="" class="socialshare_editicon" >
+                                        </a>
+                                    </li>
+                                    <li>
+                                      <a href="#">
+                                          <img src="/static/images/share_icon2.png" alt="" title="" class="socialshare_icon" >
+                                          <img src="/static/images/share_editicon.png" alt="" title="" class="socialshare_editicon" >
+                                        </a>
+                                    </li>
+                                    <li>
+                                      <a href="#">
+                                          <img src="/static/images/share_icon3.png" alt="" title="" class="socialshare_icon" >
+                                          <img src="/static/images/share_editicon.png" alt="" title="" class="socialshare_editicon" >
+                                        </a>
+                                    </li>
+                                    <li>
+                                      <a href="#">
+                                          <img src="/static/images/share_icon4.png" alt="" title="" class="socialshare_icon" >
+                                          <img src="/static/images/share_editicon.png" alt="" title="" class="socialshare_editicon" >
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="forminner_row sharepopup_row">
+                                <textarea rows='4'>Hey there!&#013;&#010;Frank has shared with you our page on Vinna.&#013;&#010;Thanks Frank, It is an honor to do business with you.&#013;&#010;Spresso Town</textarea>
+                            </div>
+                            <div class="forminner_row sharepopup_row">
+                              <img class="share_popupthumb" src="/static/images/share_emailthumbnail.png" alt="" title="" >
+                                <a href="#" class="share_popupemail">www.vinna.me/business/spressotown</a>
+                            </div>
+                            <div class="forminner_row sharepopup_row">
+                                <input type="button" class="pull-left" value="cancel">
+                                <input type="button" class="pull-right" value="share">
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="EMAIL">
+                        <div class="member_forminner">
+                            <div class="forminner_row">
+                                <label>To:</label>
+                                <input type="text" placeholder="Use comma (,) to add more than one email address">
+                            </div>
+                            <div class="forminner_row">
+                                <label>Subject:</label>
+                                <input class="subject" type="text" placeholder="Information about Vinna">
+                            </div>
+                            <div class="forminner_row">
+                                <textarea rows='4'>Hey there!&#013;&#010;Frank has shared with you our page on Vinna.&#013;&#010;Thanks Frank, It is an honor to do business with you.&#013;&#010;Spresso Town</textarea>
+                            </div>
+                            <div class="forminner_row">
+                              <img class="share_popupthumb" src="/static/images/share_emailthumbnail.png" alt="" title="" >
+                                <a href="#" class="share_popupemail">www.vinna.me/business/spressotown</a>
+                            </div>
+                            <div class="forminner_row">
+                                <input type="button" class="pull-left" value="cancel">
+                                <input type="button" class="pull-right" value="share">
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="MESSAGE">
+                        <div class="member_forminner share_popupinner">
+                            <div class="forminner_row">
+                              <ul class="social_list social_list2">
+                                  <li>
+                                      <a href="#">
+                                          <img src="/static/images/share_icon5.png" alt="" title="" class="socialshare_icon" >
+                                        </a>
+                                    </li>
+                                    <li>
+                                      <a href="#">
+                                          <img src="/static/images/share_icon6.png" alt="" title="" class="socialshare_icon" >
+                                        </a>
+                                    </li>
+                                    <li>
+                                      <a href="#">
+                                          <img src="/static/images/share_icon7.png" alt="" title="" class="socialshare_icon" >
+                                        </a>
+                                    </li>
+                                    <li>
+                                      <a href="#">
+                                          <img src="/static/images/share_icon8.png" alt="" title="" class="socialshare_icon" >
+                                        </a>
+                                    </li>
+                                    <li>
+                                      <a href="#">
+                                          <img src="/static/images/share_icon9.png" alt="" title="" class="socialshare_icon" >
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="forminner_row sharepopup_row">
+                                <label>To:</label>
+                                <input type="text" placeholder="Use comma (,) to add more than one email address">
+                            </div>
+                            <div class="forminner_row sharepopup_row">
+                                <textarea rows='4'>Hey there!&#013;&#010;Frank has shared with you our page on Vinna.&#013;&#010;Thanks Frank, It is an honor to do business with you.&#013;&#010;Spresso Town</textarea>
+                            </div>
+                            <div class="forminner_row sharepopup_row">
+                              <img class="share_popupthumb" src="/static/images/share_emailthumbnail.png" alt="" title="" >
+                                <a href="#" class="share_popupemail">www.vinna.me/business/spressotown</a>
+                            </div>
+                            <div class="forminner_row sharepopup_row">
+                                <input type="button" class="pull-left" value="cancel">
+                                <input type="button" class="pull-right" value="share">
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="TEXT">
+                        <div class="member_forminner">
+                            <div class="forminner_row">
+                                <label>To:</label>
+                                <input type="text" placeholder="Use comma (,) to add more than one email address">
+                            </div>
+                            <div class="forminner_row">
+                                <textarea rows='5'>Hey there!&#013;&#010;Frank has shared with you our page on Vinna.&#013;&#010;Thanks Frank, It is an honor to do business with you.&#013;&#010;Spresso Town</textarea>
+                            </div>
+                            <div class="forminner_row">
+                                <input type="button" class="pull-left" value="cancel">
+                                <input type="button" class="pull-right" value="share">
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="LINK">
+                        <div class="member_forminner">
+                          <form action="" method="get">
+                              <div class="sociallink_row">
+                                  <input type="text" placeholder="http://vinna.me/business/spressotown" class="pull-left" >
+                                    <input type="button" value="copy link" class="pull-right" >
+                                    <div class="clearfix"></div>
+                              </div>
+                                <div class="sociallink_row">
+                                  <input type="text" placeholder="iframe src=http://bit.ly/9Sorg2" class="pull-left" >
+                                    <input type="button" value="copy embed" class="pull-right" >
+                                    <div class="clearfix"></div>
+                              </div>
+                                <div class="sociallink_row">
+                                  <input type="button" value="copy embed" class="pull-left" >
+                                    <input type="button" value="done" class="pull-right" >
+                                    <div class="clearfix"></div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                  </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- modal pop up2 -->
+    <div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog media_preview" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+            <div class="media_preview_left pull-left">
+              <ul>
+                  <li>
+                      <a href="#">
+                          <img src="/static/images/media-icon1.png" alt="" title="" class="pull-left" >
+                            <span class="pull-right">120</span>
+                            <div class="clearfix"></div>
+                        </a>
+                    </li>
+                    <li>
+                      <a href="#">
+                          <img src="/static/images/media-icon2.png" alt="" title="" class="pull-left" >
+                            <span class="pull-right">51</span>
+                            <div class="clearfix"></div>
+                        </a>
+                    </li>
+                    <li>
+                      <a href="#">
+                          <img src="/static/images/media-icon3.png" alt="" title="" class="pull-left" >
+                            <span class="pull-right">12</span>
+                            <div class="clearfix"></div>
+                        </a>
+                    </li>
+                    <li>
+                      <a href="#">
+                          <img src="/static/images/media-icon4.png" alt="" title="" class="pull-left" >
+                            <span class="pull-right">8</span>
+                            <div class="clearfix"></div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="mediapreview_mainthumb pull-left" id="main" role="main">
+              <section class="slider">
+                <div id="slider" class="flexslider main_slider">
+                  <ul class="slides">
+                    <li>
+                        <img src="/static/images/media-mainthumbnail.png" />
+                    </li>
+                    <li>
+                        <img src="/static/images/media-mainthumbnail.png" />
+                    </li>
+                    <li>
+                        <img src="/static/images/media-mainthumbnail.png" />
+                    </li>
+                    <li>
+                        <img src="/static/images/media-mainthumbnail.png" />
+                    </li>
+                    <li>
+                        <img src="/static/images/media-mainthumbnail.png" />
+                    </li>
+                    <li>
+                        <img src="/static/images/media-mainthumbnail.png" />
+                    </li>
+                    <li>
+                        <img src="/static/images/media-mainthumbnail.png" />
+                    </li>
+                    <li>
+                        <img src="/static/images/media-mainthumbnail.png" />
+                    </li>
+                    <li>
+                        <img src="/static/images/media-mainthumbnail.png" />
+                    </li>
+                    <li>
+                        <img src="/static/images/media-mainthumbnail.png" />
+                    </li>
+                  </ul>
+                </div>
+      <div class="mediapreview_gallerytabs">
+                  <!-- Nav tabs -->
+                  <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#PHOTOS" aria-controls="prefrences" role="tab" data-toggle="tab">PHOTOS</a></li>
+                    <li role="presentation"><a href="#VIDEOS" aria-controls="information" role="tab" data-toggle="tab">VIDEOS</a></li>
+                  </ul>
+                  <!-- Tab panes -->
+                  <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="PHOTOS">
+                        <div id="carousel" class="flexslider">
+                          <ul class="slides">
+                            <li>
+                                <img src="/static/images/media-thumbnail1.png" />
+                            </li>
+                            <li>
+                                <img src="/static/images/media-thumbnail2.png" />
+                            </li>
+                            <li>
+                                <img src="/static/images/media-thumbnail3.png" />
+                            </li>
+                            <li>
+                                <img src="/static/images/media-thumbnail4.png" />
+                            </li>
+                            <li>
+                                <img src="/static/images/media-thumbnail5.png" />
+                            </li>
+                            <li>
+                                <img src="/static/images/media-thumbnail6.png" />
+                            </li>
+                            <li>
+                                <img src="/static/images/media-thumbnail7.png" />
+                            </li>
+                            <li>
+                                <img src="/static/images/media-thumbnail8.png" />
+                            </li>
+                            <li>
+                                <img src="/static/images/media-thumbnail9.png" />
+                            </li>
+                            <li>
+                                <img src="/static/images/media-thumbnail10.png" />
+                            </li>
+                            <li>
+                                <img src="/static/images/media-thumbnail1.png" />
+                            </li>
+                            <li>
+                                <img src="/static/images/media-thumbnail2.png" />
+                            </li>
+                            <li>
+                                <img src="/static/images/media-thumbnail3.png" />
+                            </li>
+                            <li>
+                                <img src="/static/images/media-thumbnail4.png" />
+                            </li>
+                            <li>
+                                <img src="/static/images/media-thumbnail5.png" />
+                            </li>
+                            <li>
+                                <img src="/static/images/media-thumbnail6.png" />
+                            </li>
+                            <li>
+                                <img src="/static/images/media-thumbnail7.png" />
+                            </li>
+                            <li>
+                                <img src="/static/images/media-thumbnail8.png" />
+                            </li>
+                            <li>
+                                <img src="/static/images/media-thumbnail9.png" />
+                            </li>
+                            <li>
+                                <img src="/static/images/media-thumbnail10.png" />
+                            </li>
+                          </ul>
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="VIDEOS">
+                        <div id="carousel2" class="flexslider">
+                          <ul class="slides">
+                            <li>
+                                <img src="/static/images/media-thumbnail4.png" />
+                            </li>
+                            <li>
+                                <img src="/static/images/media-thumbnail5.png" />
+                            </li>
+                            <li>
+                                <img src="/static/images/media-thumbnail1.png" />
+                            </li>
+                            <li>
+                                <img src="/static/images/media-thumbnail2.png" />
+                            </li>
+                            <li>
+                                <img src="/static/images/media-thumbnail3.png" />
+                            </li>
+                            <li>
+                                <img src="/static/images/media-thumbnail6.png" />
+                            </li>
+                            <li>
+                                <img src="/static/images/media-thumbnail7.png" />
+                            </li>
+                            <li>
+                                <img src="/static/images/media-thumbnail8.png" />
+                            </li>
+                            <li>
+                                <img src="/static/images/media-thumbnail9.png" />
+                            </li>
+                            <li>
+                                <img src="/static/images/media-thumbnail10.png" />
+                            </li>
+                          </ul>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+            <div class="media_preview_right pull-left">
+                <h2>Our Service, the best value</h2>
+                <p>For us, Service is the must important value and you will feel at home. Pass by our location and let us show you how much we apreciate your visit.</p>
+                <div class="share_btn_outer">
+                  <img src="/static/images/share-heart.png" alt="" title="" class="share_likebtn">
+                    <div class="clearfix"></div>
+                    <a href="#" class="pull-left share_btn">share</a>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+</div>
+{% endblock %}

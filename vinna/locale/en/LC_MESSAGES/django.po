@@ -1,0 +1,106 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-04-24 08:42-0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: templates/base-3col.html:47 templates/base.html:47
+msgid "Home"
+msgstr ""
+
+#: templates/base-3col.html:48 templates/base.html:48
+msgid "Business Directory"
+msgstr ""
+
+#: templates/base-3col.html:49 templates/base.html:50
+msgid "Settings"
+msgstr ""
+
+#: templates/base-3col.html:55 templates/base.html:54
+msgid "Log In"
+msgstr ""
+
+#: templates/base-3col.html:59 templates/base.html:58
+msgid "HELLO THERE!"
+msgstr ""
+
+#: templates/base-3col.html:73 templates/base-3col.html:99
+#: templates/base.html:72 templates/base.html:99
+msgid "Remember me"
+msgstr ""
+
+#: templates/base-3col.html:79 templates/base-3col.html:105
+#: templates/base.html:78 templates/base.html:105
+msgid "Forgot my Password"
+msgstr ""
+
+#: templates/base-3col.html:80 templates/base-3col.html:106
+#: templates/base-3col.html:122 templates/base.html:79 templates/base.html:106
+#: templates/base.html:122
+msgid "Login"
+msgstr ""
+
+#: templates/base-3col.html:118 templates/base.html:118
+msgid ""
+"Don’t worry, just fill in your email and we will send a link to help you "
+"reset your Password."
+msgstr ""
+
+#: templates/base-3col.html:121 templates/base.html:121
+msgid "Cancel"
+msgstr ""
+
+#: templates/base-3col.html:131 templates/base.html:131
+msgid ""
+"The Reset Link has been sent, please check your email and follow the "
+"instructions."
+msgstr ""
+
+#: templates/base-3col.html:134 templates/base.html:134
+msgid "Try Again"
+msgstr ""
+
+#: templates/base-3col.html:140 templates/base.html:140
+msgid "Reset your Password"
+msgstr ""
+
+#: templates/base-3col.html:150 templates/base.html:150
+msgid "8 - 15 characters"
+msgstr ""
+
+#: templates/base-3col.html:160 templates/base.html:160
+msgid "At least one letter"
+msgstr ""
+
+#: templates/base-3col.html:170 templates/base.html:170
+msgid "At least one number"
+msgstr ""
+
+#: templates/base-3col.html:183 templates/base.html:183
+msgid "Password must match"
+msgstr ""
+
+#: templates/base-3col.html:189 templates/base.html:189
+msgid "Reset"
+msgstr ""
+
+#: templates/base-3col.html:198
+msgid "Register your Business"
+msgstr ""
+
+#: templates/base.html:200
+msgid "Join Now"
+msgstr ""

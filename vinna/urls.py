@@ -1,5 +1,7 @@
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.conf import settings
+from django.conf.urls.static import static
 
 """vinna URL Configuration
 
@@ -20,9 +22,19 @@ from django.conf.urls import url
 from django.contrib import admin
 
 urlpatterns = [
-    url(r'^account/', include('account.urls')),
-    url(r'^member/', include('member.urls')),
-    url(r'^business/', include('business.urls')),
-    url(r'^', include('core.urls')),
-    url(r'^admin/', admin.site.urls),
-]
+
+    url(r'^api/account/', include('server.account.urls')),
+    url(r'^api/member/', include('server.member.urls')),
+    url(r'^api/business/', include('server.business.urls')),
+
+    url(r'^purple/admin/', admin.site.urls),
+
+    url(r'^business/', include('client.client_business.urls')),
+    url(r'^member/', include('client.client_member.urls')),
+
+
+#    url(r'^about/', include('client.client_member.urls')),
+#    url(r'^contact/', include('client.client_member.urls')),
+
+#    url(r'^', include('client.client_home.urls')),
+] # + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static('/', document_root='angularjs/src')

@@ -1,0 +1,344 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+<!-- Current language: {{ LANGUAGE_CODE }} -->
+{% block title %}{% trans "Register to be Vinna Member" %}{% endblock %}
+
+{% block content %}
+
+        <!-- Content -->
+        <section class="member-content">
+        	 <div class="member-container businessdirectory-outer">
+                <div class="member-content-right">
+                	<div class="search-form">
+                        <div class="search-statement">
+                            <input type="text" value="" placeholder="Where? (city or zip code)" style="border-radius:0px; -moz-border-radius:0px; -webkit-border-radius:0px; font-weight:300" >
+                            <div class="input-group dropdown">
+                              <input type="text" class="form-control countrycode dropdown-toggle" value="Category (click or type)" style="border-radius:0px; -moz-border-radius:0px; -webkit-border-radius:0px;font-weight:300">
+                              <ul class="dropdown-menu">
+                              	<li>
+                              		<div class="selectbox-detail" id="selectbox-detail">
+                                    	<ul>
+                                            <li>
+                                            	<a href="#" data-value="Animal Shelter">
+                                            		<span class="pull-left">A</span>
+                                                    <h2 class="pull-left">Animal Shelter</h2>
+                                                </a>
+                                            </li>
+                                            <li>
+                                            	<a href="#" data-value="Automotive Business">
+                                            		<span class="pull-left">B</span>
+                                                    <hr class="seperator pull-left">
+                                                    <div class="clearfix"></div>
+                                                </a>
+                                            </li>
+                                            <li>
+                                            	<a href="#" data-value="Automotive Business">
+                                                	<span class="pull-left">C</span>
+                                                    <h2 class="pull-left">Automotive Business</h2>
+                                                    <div class="clearfix"></div>
+                                                </a>
+                                            </li>
+                                            <li>
+                                            	<a href="#" data-value="Auto Body Shop">
+                                                	<span class="pull-left">D</span>
+                                                    <h2 class="pull-left">Auto Body Shop</h2>
+                                                    <div class="clearfix"></div>
+                                                </a>
+                                            </li>
+                                            <li>
+                                            	<a href="#" data-value="Auto Dealer">
+                                                	<span class="pull-left">E</span>
+                                                    <h2 class="pull-left">Auto Dealer</h2>
+                                                    <div class="clearfix"></div>
+                                                </a>
+                                            </li>
+                                            <li>
+                                            	<a href="#" data-value="Auto PartsStore">
+                                                	<span class="pull-left">F</span>
+                                                    <h2 class="pull-left">Auto PartsStore</h2>
+                                                    <div class="clearfix"></div>
+                                                </a>
+                                            </li>
+                                            <li>
+                                            	<a href="#" data-value="Auto Rental">
+                                                	<span class="highlighted pull-left">G</span>
+                                                    <h2 class="pull-left">Auto Rental</h2>
+                                                    <div class="clearfix"></div>
+                                                </a>
+                                            </li>
+                                            <li>
+                                            	<a href="#" data-value="Auto Repair">
+                                                	<span class="pull-left">H</span>
+                                                    <h2 class="pull-left">Auto Repair</h2>
+                                                    <div class="clearfix"></div>
+                                                </a>
+                                            </li>
+                                            <li>
+                                            	<a href="#" data-value="Auto Wash">
+                                                	<span class="pull-left">I</span>
+                                                    <h2 class="pull-left">Auto Wash</h2>
+                                                    <div class="clearfix"></div>
+                                                </a>
+                                            </li>
+                                            <li>
+                                            	<a href="#" data-value="Gas Station">
+                                                	<span class="pull-left">J</span>
+                                                    <h2 class="pull-left">Gas Station</h2>
+                                                    <div class="clearfix"></div>
+                                                </a>
+                                            </li>
+                                            <li>
+                                            	<a href="#" data-value="Motorcycle Dealer">
+                                                	<span class="highlighted pull-left">K</span>
+                                                    <h2 class="pull-left">Motorcycle Dealer</h2>
+                                                    <div class="clearfix"></div>
+                                                </a>
+                                            </li>
+                                            <li class="seperator-full">
+                                            	<a href="#" data-value="">
+                                                	<span class="pull-left"></span>
+                                                    <hr class="seperator pull-left">
+                                                    <div class="clearfix"></div>
+                                                </a>
+                                            </li>
+                                            <li>
+                                            	<a href="#" data-value="Motorcycle Repair">
+                                                	<span class="pull-left">L</span>
+                                                    <h2 class="pull-left">Motorcycle Repair</h2>
+                                                    <div class="clearfix"></div>
+                                                </a>
+                                            </li>
+                                            <li>
+                                            	<a href="#" data-value="Child Care">
+                                                	<span class="pull-left">M</span>
+                                                    <h2 class="pull-left">Child Care</h2>
+                                                    <div class="clearfix"></div>
+                                                </a>
+                                            </li>
+                                            <li class="seperator-full">
+                                            	<a href="#">
+                                                	<span class="pull-left"></span>
+                                                    <hr class="seperator pull-left">
+                                                    <div class="clearfix"></div>
+                                                </a>
+                                            </li>
+                                            <li>
+                                            	<a href="#" data-value="Dry Cleaning or Laundry">
+                                                	<span class="pull-left">N</span>
+                                                    <h2 class="pull-left">Dry Cleaning or Laundry</h2>
+                                                    <div class="clearfix"></div>
+                                                </a>
+                                            </li>
+                                            <li>
+                                            	<a href="#" data-value="Emergency Service">
+                                                	<span class="pull-left">O</span>
+                                                    <h2 class="pull-left">Emergency Service</h2>
+                                                    <div class="clearfix"></div>
+                                                </a>
+                                            </li>
+                                            <li class="seperator-full">
+                                            	<a href="#">
+                                                	<span class="pull-left"></span>
+                                                    <hr class="seperator pull-left">
+                                                    <div class="clearfix"></div>
+                                                </a>
+                                            </li>
+                                            <li>
+                                            	<a href="#" data-value="Fire Station">
+                                                	<span class="pull-left">P</span>
+                                                    <h2 class="pull-left">Fire Station</h2>
+                                                    <div class="clearfix"></div>
+                                                </a>
+                                            </li>
+                                            <li>
+                                            	<a href="#" data-value="Hospital">
+                                                	<span class="pull-left">Q</span>
+                                                    <h2 class="pull-left">Hospital</h2>
+                                                    <div class="clearfix"></div>
+                                                </a>
+                                            </li>
+                                            <li>
+                                            	<a href="#" data-value="Police Station">
+                                                	<span class="pull-left">R</span>
+                                                    <h2 class="pull-left">Police Station</h2>
+                                                    <div class="clearfix"></div>
+                                                </a>
+                                            </li>
+                                            <li>
+                                            	<a href="#">
+                                                	<span class="pull-left">S</span>
+                                                    <hr class="seperator pull-left">
+                                                    <div class="clearfix"></div>
+                                                </a>
+                                            </li>
+                                            <li>
+                                            	<a href="#" data-value="Employment Agency">
+                                                	<span class="pull-left">T</span>
+                                                    <h2 class="pull-left">Employment Agency</h2>
+                                                    <div class="clearfix"></div>
+                                                </a>
+                                            </li>
+                                            <li>
+                                            	<a href="#" data-value="Employment Agency">
+                                                	<span class="pull-left">U</span>
+                                                    <h2 class="pull-left">Employment Agency</h2>
+                                                    <div class="clearfix"></div>
+                                                </a>
+                                            </li>
+                                            <li class="seperator-full">
+                                            	<a href="#">
+                                                	<span class="pull-left"></span>
+                                                    <hr class="seperator pull-left">
+                                                    <div class="clearfix"></div>
+                                                </a>
+                                            </li>
+                                            <li>
+                                            	<a href="#" data-value="Entertainment Business">
+                                                	<span class="pull-left">V</span>
+                                                    <h2 class="pull-left">Entertainment Business</h2>
+                                                    <div class="clearfix"></div>
+                                                </a>
+                                            </li>
+                                            <li>
+                                            	<a href="#" data-value="Adult Entertainment">
+                                                	<span class="pull-left">W</span>
+                                                    <h2 class="pull-left">Adult Entertainment</h2>
+                                                    <div class="clearfix"></div>
+                                                </a>
+                                            </li>
+                                            <li>
+                                            	<a href="#" data-value="Amusement Park">
+                                                	<span class="pull-left">X</span>
+                                                    <h2 class="pull-left">Amusement Park</h2>
+                                                    <div class="clearfix"></div>
+                                                </a>
+                                            </li>
+                                            <li>
+                                            	<a href="#" data-value="Art Gallery">
+                                                	<span class="pull-left">Y</span>
+                                                    <h2 class="pull-left">Art Gallery</h2>
+                                                    <div class="clearfix"></div>
+                                                </a>
+                                            </li>
+                                            <li>
+                                            	<a href="#" data-value="Casino">
+                                                	<span class="pull-left">Z</span>
+                                                    <h2 class="pull-left">Casino</h2>
+                                                    <div class="clearfix"></div>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                	</div>
+                                </li>
+                              </ul>
+                              <span role="button" class="input-group-addon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                              	<span class="caret"></span>
+                              </span>
+                            </div>
+                            <!--<input type="text" value="" placeholder="Category (click or type)" >-->
+                            <input type="text" value="" placeholder="Search (business name or phone)"  style="border-radius:0px; -moz-border-radius:0px; -webkit-border-radius:0px; font-weight:300" >
+                        </div>
+                    	<input type="submit" value="Search" >
+                    </div>
+                    <div class="businessdirectory-list">
+                        <ul>
+                          {% for item in "abcdef" %}
+                            <li class="businessdirectory-group" id="businessdirectory-group-item-{{ forloop.counter }}">
+                                <a href="detail/">
+                                    <div class="businessdirectory-thumbnail">
+                                        <img src="/static/images/business-directorythumbnail.png" alt="" title="" class="img-responsive">
+                                    </div>
+                                    <ul class="directorylist-overlay1">
+                                        <li class="pull-left">
+                                            <h2>FLORENTINNA</h2>
+                                            <h3>Flower Shop</h3>
+                                        </li>
+                                        <li class="pull-right">
+                                            <ul>
+                                                <li><img src="/static/images/star-icon.png" alt=""></li>
+                                                <li><img src="/static/images/star-icon.png" alt=""></li>
+                                                <li><img src="/static/images/star-icon.png" alt=""></li>
+                                                <li><img src="/static/images/star-icon2.png" alt=""></li>
+                                                <li><img src="/static/images/star-icon2.png" alt=""></li>
+                                                <li style="top:2px;">(25)</li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                    <ul id="directorylist-overlay-hover-{{ forloop.counter }}" class="directorylist-overlay-hover directorylist-overlay" style="display:none;">
+                                        <li class="directoryicon1">
+                                        	<span>
+                                                <div class="directorylist-tooltip">
+                                                    <p><a href="tel:713-457-5216">(713) 457 5216</a></p>
+                                                </div>
+                                            </span>
+                                        </li>
+                                        <li class="directoryicon2">
+                                        	<span>
+                                                <div class="directorylist-tooltip directorylist-tooltip2">
+                                                    <p><a target="_blank" href="https://www.google.com/maps/search/{{ "14547 North Bay Street, Houston, TX 77084"|urlencode }}">14547 North Bay Street, Houston, TX 77084</a></p>
+                                                </div>
+                                            </span>
+                                        </li>
+                                        <li class="directoryicon3">
+                                        	<span>
+                                                <div class="directorylist-tooltip directorylist-tooltip3">
+                                                    <ul>
+                                                        <li><img src="/static/images/social-icon1.png" alt="" title="" ></li>
+                                                        <li><img src="/static/images/social-icon2.png" alt="" title="" ></li>
+                                                        <li><img src="/static/images/social-icon3.png" alt="" title="" ></li>
+                                                        <li><img src="/static/images/social-icon4.png" alt="" title="" ></li>
+                                                        <li><img src="/static/images/social-icon5.png" alt="" title="" ></li>
+                                                    </ul>
+                                                </div>
+                                            </span>
+                                        </li>
+                                        <li class="directoryicon4"><span></span></li>
+                                    </ul>
+                                </a>
+                            </li>
+                          {% endfor %}
+
+                            <div class="clearfix"></div>
+                        </ul>
+                    </div>
+                </div>
+                <div class="clear"></div>
+             </div>
+        </section>
+{% endblock %}
+
+
+
+{% block footer %}{% endblock %}
+
+{% block scripts %}
+<script>
+var hovering = false;
+{% for item in "abcdef" %}
+$("#businessdirectory-group-item-{{ forloop.counter }}").on('mouseover', function(obj) {
+  hovering = true;
+  {% for all in "abcdef" %}
+    {% if forloop.counter != forloop.parentloop.counter %}
+  if ($("#directorylist-overlay-hover-{{ forloop.counter }}").is(":visible"))
+    $("#directorylist-overlay-hover-{{ forloop.counter }}").slideUp();
+    {% endif %}
+  {% endfor %}
+
+  if (!$("#directorylist-overlay-hover-{{ forloop.counter }}").is(":visible"))
+    $("#directorylist-overlay-hover-{{ forloop.counter }}").slideDown();
+});
+{% endfor %}
+
+{% for item in "abcdef" %}
+$("#businessdirectory-group-item-{{ forloop.counter }}").on('mouseout', function(obj) {
+  hovering = false;
+  setTimeout(function() {
+    if (hovering == false && $("#directorylist-overlay-hover-{{ forloop.counter }}").is(":visible"))
+      $("#directorylist-overlay-hover-{{ forloop.counter }}").slideUp();
+  }, 200);
+});
+{% endfor %}
+</script>
+{% endblock %}

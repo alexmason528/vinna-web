@@ -1,0 +1,138 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+<!-- Current language: {{ LANGUAGE_CODE }} -->
+{% block title %}Register to be Vinna Member{% endblock %}
+
+{% block content %}
+        <!-- Content -->
+        <section class="content personal-reg">
+          <div class="container">
+              <ul class="bxslider">
+
+                    <li>
+                       <div class="top-progres-bar">
+                        <div class="middle-bar">
+                                <span>{% trans "CREATE MEMBER ACCOUNT" %}</span>
+                            </div>
+                            <div class="clear"></div>
+                        </div>
+                      <form id="registerform" action="." method="post">
+                        {% csrf_token %}
+                        <div class="create-account-step">
+                            <fieldset>
+                                <div class="one-column">
+                                    <div class="field-outer">
+                                        <label for="language">{% trans "Language" %}</label>
+                                        {{ form_account.errors.language }}
+                                        <select name="language">
+                                            <option>Click to Select</option>
+{% for language in languages %}
+                                            <option value="{{ language.id }}">{{ language.text }}</option>
+{% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="field-outer">
+                                        <label>{% trans "Are you a robot?" %}</label>
+                                        <div class="g-recaptcha" data-sitekey="6LdMJB4UAAAAAAPvuLcdE8JFT77qIdLFdlrPsFDd"></div>
+                                    </div>
+
+                                </div>
+                                <div class="one-column">
+                                    <label for="firstname">{% trans "Your Information" %}</label>
+                                    <div class="field-outer">
+                                        {{ form_user.errors.first_name }}
+                                        {{ form_user.first_name }}
+                                    </div>
+                                    <div class="field-outer">
+                                        {{ form_user.errors.last_name }}
+                                        {{ form_user.last_name }}
+                                    </div>
+                                    <div class="field-outer">
+                                        {{ form_user.errors.email }}
+                                        {{ form_user.email }}
+                                        <!--
+                                        <input name="email" type="email" value="" placeholder="{% trans 'Email' %}" >
+                                        -->
+                                    </div>
+                                    <div class="field-outer">
+                                        {{ form_account.errors.phone }}
+                                        {{ form_account.phone }}
+                                    </div>
+                                    <div class="field-outer">
+                                        {{ form_user.errors.password }}
+                                        {{ form_user.password }}
+                                    <!--
+                                        <input name="password1" type="text" value="" placeholder="{% trans 'Password' %}" >
+                                        -->
+                                    </div>
+                                    <div class="field-outer">
+                                        {{ form_user.errors.password_confirm }}
+                                        {{ form_user.password_confirm }}
+                                    <!--
+                                        <input name="password2" type="text" value="" placeholder="{% trans 'Re-enter Password' %}" >
+                                        -->
+                                    </div>
+                                    <label>{% trans "Date of Birth" %}</label>
+                                    <div class="dob-field">
+                                      {{ form_account.errors.dob }}
+                                      {{ form_account.errors.dob_month }}
+                                      {{ form_account.errors.dob_day }}
+                                      {{ form_account.errors.dob_year }}
+                                      {{ form_account.dob_month }}
+                                      {{ form_account.dob_day }}
+                                      {{ form_account.dob_year }}
+                                      <p>{% trans "You must be at least 16 years old" %}</p>
+                                    </div>
+
+                                </div>
+                                <div class="one-column">
+                                    <div class="" style="font-weight:300;color:#666666;">
+                                      {% if False %}
+                                      <img src="profile photo" style="cursor:pointer;cursor:hand;float:left;width:120px;height:120px;margin-right:15px;" >
+                                      {% else %}
+                                      <div id="file_chooser_button" style="cursor:pointer;cursor:hand;float:left;width:120px;height:120px;margin-right:15px;text-align: center;color:#EE3A39;font-weight:bold;border:1px solid #cdcdcd;">
+                                        <span style=" display: block;position: relative;top: 50%;transform: translateY(-50%);">Upload Picture
+                                      </div>
+                                      <input id="file_chooser" style="position:absolute;top:-100px;" type="file">
+                                      {% endif %}
+                                      {% trans "Your Profile Picture is your ID on Vinna, Business Partners will use it to identified you on each transaction." %}
+                                    </div>
+                                    <div class="clearfix" style="margin-bottom:40px;"></div>
+                                    <label>{% trans "Please read carefully" %}</label>
+                                    <div class="field-outer" style="font-weight:300;color:#666666;">
+                                        {% trans "You are about to become part of a team of Members, Promoters and Business Partners helping each other to bring prosperity into the community. By clicking on the button “Connect” you are going to get connected to the person who invited you to join Vinna and that connection will remain active from now on. Also, you accept the Terms of Use and Privacy Policy." %}
+                                    </div>
+
+                                    <ul>
+                                        <li><a href="/" style="background-color:#fff; color:#EE3A39; display:inline; margin:27px;">{% trans "Cancel" %}</a></li>
+                                        <li style="float:right;"><a id="registerform_connect" href="#">{% trans "Connect" %}</a></li>
+                                        <input type="submit" style="position:absolute; top:-50px;">
+                                    </ul>
+                                </div>
+                            </fieldset>
+
+                        </div>
+                      </form>
+                  </li>
+
+                </ul>
+            </div>
+        </section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+$('#registerform_connect').click(function() {
+  $('#registerform').submit();
+});
+$('#file_chooser_button').click(function() {
+  $('#file_chooser').trigger('click');
+});
+$('#file_chooser').change(function() {
+  alert('uploading file');
+});
+</script>
+{% endblock %}
