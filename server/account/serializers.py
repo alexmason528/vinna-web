@@ -14,11 +14,6 @@ class AccountSerializer(serializers.HyperlinkedModelSerializer):
         model = Account
         fields = ('first_name','last_name','phone', 'dob', 'gender', 'profile_photo_url', 'roles')
 
-        # extra_kwargs = {
-        #     'url': {'view_name': 'accounts', 'lookup_field': 'account_name'},
-        #     'language': {'view_name':'language-detail', 'lookup_field': 'code'}
-        # }
-
     def create(self, validated_data):
         roles = None
         if 'roles' in validated_data:
@@ -26,7 +21,7 @@ class AccountSerializer(serializers.HyperlinkedModelSerializer):
 
         account = Account.objects.create(**validated_data)
 
-        if 'roles' is not None:
+        if roles is not None:
             for role in roles:
                 AccountPartnerRole.objects.create(account=account, **role)
 

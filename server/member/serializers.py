@@ -4,41 +4,36 @@ from .models import Member, MemberPaymentInfo
 
 class MemberPaymentInfoSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = AccountPartnerRole
+        model = MemberPaymentInfo
         fields = ('type', 'text', 'token')
 
 class MemberSerializer(serializers.HyperlinkedModelSerializer):
-    roles = AccountPartnerRoleSerializer(many=True, required=False)
+    payment_infos = MemberPaymentInfoSerializer(required=False)
 
     class Meta:
-        model = Account
-        fields = ('mailing_address_1','mailing_address_2','phone', 'dob', 'gender', 'profile_photo_url', 'roles')
-
-        # extra_kwargs = {
-        #     'url': {'view_name': 'accounts', 'lookup_field': 'account_name'},
-        #     'language': {'view_name':'language-detail', 'lookup_field': 'code'}
-        # }
+        model = Member
+        fields = ('mailing_address_1','mailing_address_2','mailing_address_city', 'mailing_address_zip', 'security_hash', 'ssn_token', 'payment_infos')
 
     def create(self, validated_data):
-        roles = None
-        if 'roles' in validated_data:
-            roles = validated_data.pop('roles')
+        payment_infos = None
+        if 'payment_infos' in validated_data:
+            payment_infos = validated_data.pop('payment_infos')
 
-        account = Account.objects.create(**validated_data)
+        member = Member.objects.create(**validated_data)
 
-        if 'roles' is not None:
-            for role in roles:
-                AccountPartnerRole.objects.create(account=account, **role)
+        if payment_infos is not None:
+            for payment_info in payment_infos:
+                MemberPaymentInfo.objects.create(member=member, **payment_info)
 
-        return account
+        return member
 
     def update(self, instance, validated_data):
-        instance.first_name = validated_data.get('first_name', instance.first_name)
-        instance.last_name = validated_data.get('last_name', instance.last_name)
-        instance.phone = validated_data.get('phone', instance.phone)
-        instance.dob = validated_data.get('dob', instance.dob)
-        instance.gender = validated_data.get('gender', instance.gender)
-        instance.profile_photo_url = validated_data.get('profile_photo_url', instance.profile_photo_url)
+        instance.mailing_address_1 = validated_data.get('mailing_address_1', instance.mailing_address_1)
+        instance.mailing_address_2 = validated_data.get('mailing_address_1', instance.mailing_address_2)
+        instance.mailing_address_city = validated_data.get('mailing_address_city', instance.mailing_address_city)
+        instance.mailing_address_zip = validated_data.get('mailing_address_zip', instance.mailing_address_zip)
+        instance.security_hash = validated_data.get('security_hash', instance.security_hash)
+        instance.ssn_token = validated_data.get('ssn_token', instance.ssn_token)
 
         instance.save()
 

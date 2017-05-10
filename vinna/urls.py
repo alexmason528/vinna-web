@@ -35,6 +35,8 @@ urlpatterns = [
     url(r'^api/member/', include('server.member.urls')),
     url(r'^api/business/', include('server.business.urls')),
 
+    url(r'^api/core/', include('core.urls')),
+    
     url(r'^purple/admin/', admin.site.urls),
 
     url(r'^business/', include('client.client_business.urls')),
