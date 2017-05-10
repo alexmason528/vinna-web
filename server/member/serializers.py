@@ -1,18 +1,18 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
-from .models import Account, AccountPartnerRole
+from .models import Member, MemberPaymentInfo
 
-class AccountPartnerRoleSerializer(serializers.HyperlinkedModelSerializer):
+class MemberPaymentInfoSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = AccountPartnerRole
-        fields = ('role_name', 'role_description')
+        fields = ('type', 'text', 'token')
 
-class AccountSerializer(serializers.HyperlinkedModelSerializer):
+class MemberSerializer(serializers.HyperlinkedModelSerializer):
     roles = AccountPartnerRoleSerializer(many=True, required=False)
 
     class Meta:
         model = Account
-        fields = ('first_name','last_name','phone', 'dob', 'gender', 'profile_photo_url', 'roles')
+        fields = ('mailing_address_1','mailing_address_2','phone', 'dob', 'gender', 'profile_photo_url', 'roles')
 
         # extra_kwargs = {
         #     'url': {'view_name': 'accounts', 'lookup_field': 'account_name'},

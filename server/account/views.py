@@ -12,31 +12,44 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.views import APIView
 
-from .models import Account
+from .models import Account, AccountPartnerRole
 from core.models import Language
-from .serializers import AccountSerializer
+from .serializers import AccountSerializer, AccountPartnerRoleSerializer
 from django.shortcuts import get_object_or_404
 from django.views.generic.edit import View
 from rest_framework.authtoken.models import Token
 
 
-@permission_classes((IsAuthenticated,))
+# @permission_classes((IsAuthenticated,))
+
 class AccountView(APIView):
 
+	@api_view(['GET', 'POST'])
+	def account_collection(request):
+		if request.method == 'GET':
+			accounts = Account.objects.all()
+			serializer = AccountSerializer(accounts, many=True)
+			return Response(serializer.data)
+		
+		elif request.method == 'POST':
+			serializer = AccountSerializer(data=request.data)
+			if serializer.is_valid():
+				serializer.save()
+				return Response(serializer.data, status=status.HTTP_201_CREATED)
+			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @api_view(['GET'])
-    def account_detail(request, userid):
-        if request.user.id != int(userid):
-            userid = -1
+	@api_view(['PUT','GET'])
+	def account_element(request, userid):
+		if request.method == 'GET':	
+			account = get_object_or_404(Account, pk=userid)
+			serializer = AccountSerializer(account)
+			return Response(serializer.data)
 
-        user = get_object_or_404(User, id=userid)
-        account = get_object_or_404(Account, user=user)
-
-#        try:
-#            user = User.objects.get(id=userid)
-#        except User.DoesNotExist:
-#            return HttpResponse(status=404)
-
-        serializer = AccountSerializer(account, context={'request': request})
-
-        return JsonResponse(serializer.data)
+		elif request.method == 'PUT':
+			account = get_object_or_404(Account, pk=userid)
+			serializer = AccountSerializer(account, data=request.data, partial=True)
+			if serializer.is_valid():
+				serializer.save()
+				return Response(serializer.data)
+			else:
+				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

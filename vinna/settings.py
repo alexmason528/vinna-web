@@ -103,7 +103,7 @@ DATABASES = {
             'sql_mode': 'STRICT_ALL_TABLES',
             'init_command': 'SET default_storage_engine=INNODB',
         },
-        'NAME': 'vinna_main','USER': 'root','PASSWORD': 'root','HOST': '127.0.0.1','PORT': '8889',
+        'NAME': 'vinna_main','USER': 'root','PASSWORD': '','HOST': '127.0.0.1','PORT': '3306',
 #        'NAME':'vinna_main','USER':'vinna','PASSWORD':'vinna123!','HOST':'cpvlabs.cwdkozsu0mvg.us-east-1.rds.amazonaws.com','PORT': '3306',
     }
 }
@@ -128,8 +128,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-#        'rest_framework.permissions.IsAdminUser',
-        'rest_framework.permissions.IsAuthenticated',
+        # 'rest_framework.permissions.IsAdminUser',
+        # 'rest_framework.permissions.IsAuthenticated',
         'rest_framework.permissions.AllowAny',
     ],
     'PAGE_SIZE': 50,
@@ -142,8 +142,7 @@ REST_FRAMEWORK = {
 
 }
 
-
-PREPEND_WWW = True
+PREPEND_WWW = False
 ALLOWED_HOSTS = ['www.test.vinna.me','test.vinna.me','www.dev.vinna.me','dev.vinna.me','vinna.me','www.vinna.me','www.localhost','localhost']
 APPEND_SLASH = True
 
