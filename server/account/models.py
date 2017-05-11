@@ -27,6 +27,10 @@ class Account(models.Model):
 #    tos_accept_date = models.DateTimeField('Terms of Service Accept Date')
 #    tos_accept_version = models.CharField(max_length=15)
 
+    def __str__(self):
+        return self.first_name+' '+self.last_name
+        
+
 class AccountPartnerRole(models.Model):
     account = models.ForeignKey(Account, related_name = 'accountpartnerroles', on_delete=models.CASCADE)
     role_name = models.CharField(max_length=25)
@@ -34,3 +38,5 @@ class AccountPartnerRole(models.Model):
 
     #  target_type = models.CharField(max_length=12)
     #  target_id = models.ForeignKey('partner.')
+    def __str__(self):
+        return self.account.first_name+' '+self.account.last_name+' ('+self.role_name+')'

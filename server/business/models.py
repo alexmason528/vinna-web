@@ -4,9 +4,15 @@ from django.db import models
 class Category(models.Model):
     text = models.CharField(max_length=50)
 
+    def __str__(self):
+        return self.text
+
 class SubCategory(models.Model):
     category = models.ForeignKey(Category)
-    text = models.CharField(max_length=50)  
+    text = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.text
 
 class Business(models.Model):
     account = models.ForeignKey('account.Account')
@@ -29,6 +35,9 @@ class Business(models.Model):
 
     last_modified_date = models.DateTimeField('Last Modified', auto_now=True)
 
+    def __str__(self):
+        return self.text+' ('+self.account.first_name+' '+self.account.last_name+')'
+
 class BusinessSocial(models.Model):
     business = models.ForeignKey(Business)
 
@@ -36,6 +45,9 @@ class BusinessSocial(models.Model):
     twitter_link = models.CharField(max_length=50)
     instagram_link = models.CharField(max_length=50)
     linkedin_link = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.business.text+' Social'
 
 
 class BusinessBillingInfo(models.Model):
@@ -52,3 +64,6 @@ class BusinessBillingInfo(models.Model):
     zip = models.CharField(max_length=20)
     address1 = models.CharField(max_length=40)
     address2 = models.CharField(max_length=40)
+
+    def __str__(self):
+        return self.business.text+' ('+self.type+', '+self.text+')'
