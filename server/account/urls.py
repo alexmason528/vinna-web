@@ -6,7 +6,7 @@ from rest_framework_jwt.views import verify_jwt_token
 
 from . import views
 
-app_name = 'accounts_api'
+app_name = 'account'
 
 urlpatterns = [
     #url(r'^details/$', views.account_list, name='list'),

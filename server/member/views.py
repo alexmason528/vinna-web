@@ -13,7 +13,6 @@ from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.views import APIView
 
 from .models import Member, MemberPaymentInfo
-from core.models import Language
 from .serializers import MemberSerializer, MemberPaymentInfoSerializer
 from django.shortcuts import get_object_or_404
 from django.views.generic.edit import View
@@ -39,14 +38,14 @@ class MemberView(APIView):
 			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 	@api_view(['PUT','GET'])
-	def member_element(request, userid):
+	def member_element(request, id):
 		if request.method == 'GET':	
-			member = get_object_or_404(Member, pk=userid)
+			member = get_object_or_404(Member, pk=id)
 			serializer = MemberSerializer(member)
 			return Response(serializer.data)
 
 		elif request.method == 'PUT':
-			member = get_object_or_404(Member, pk=userid)
+			member = get_object_or_404(Member, pk=id)
 			serializer = MemberSerializer(member, data=request.data, partial=True)
 			if serializer.is_valid():
 				serializer.save()

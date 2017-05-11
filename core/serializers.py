@@ -21,13 +21,7 @@ class StateSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('id', 'abbrev', 'text', 'language_id', 'country_id')
 
     def create(self, validated_data):
-        language_id = validated_data.pop('language_id')
-        country_id = validated_data.pop('country_id')
-
-        language = Language.objects.get(pk=language_id)
-        country = Country.objects.get(pk=country_id)
-
-        state = State.objects.create(language=language, country=country, **validated_data)
+        state = State.objects.create(**validated_data)
         return state
 
     def update(self, instance, validated_data):

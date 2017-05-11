@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 from .models import Account, AccountPartnerRole
+from core.models import State, Language, Country
+from core.serializers import StateSerializer, LanguageSerializer, CountrySerializer
 
 class AccountPartnerRoleSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -9,10 +11,12 @@ class AccountPartnerRoleSerializer(serializers.HyperlinkedModelSerializer):
 
 class AccountSerializer(serializers.HyperlinkedModelSerializer):
     roles = AccountPartnerRoleSerializer(many=True, required=False)
-
+    user_id = serializers.IntegerField(required=True)
+    language_id = serializers.IntegerField(required=True)
+    
     class Meta:
         model = Account
-        fields = ('first_name','last_name','phone', 'dob', 'gender', 'profile_photo_url', 'roles')
+        fields = ('user_id', 'first_name','last_name', 'language_id', 'phone', 'dob', 'gender', 'profile_photo_url', 'roles')
 
     def create(self, validated_data):
         roles = None
