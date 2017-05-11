@@ -31,7 +31,7 @@ class CountryView(APIView):
 			return Response(serializer.data)
 		
 		elif request.method == 'POST':
-			serializer = CountrySerializer(data=request.data)
+			serializer = CountrySerializer(data=request.data, many=True)
 			if serializer.is_valid():
 				serializer.save()
 				return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -64,7 +64,7 @@ class StateView(APIView):
 			return Response(serializer.data)
 		
 		elif request.method == 'POST':
-			serializer = StateSerializer(data=request.data, partial=True)
+			serializer = StateSerializer(data=request.data, many=True, partial=True)
 			if serializer.is_valid():
 				serializer.save()
 				return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -97,7 +97,7 @@ class LanguageView(APIView):
 			return Response(serializer.data)
 		
 		elif request.method == 'POST':
-			serializer = LanguageSerializer(data=request.data)
+			serializer = LanguageSerializer(data=request.data, many=True)
 			if serializer.is_valid():
 				serializer.save()
 				return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -113,8 +113,9 @@ class LanguageView(APIView):
 		elif request.method == 'PUT':
 			language = get_object_or_404(Language, pk=languageid)
 			serializer = LanguageSerializer(language, data=request.data, partial=True)
+
 			if serializer.is_valid():
-				serializer.save()
 				return Response(serializer.data)
+				serializer.save()
 			else:
 				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

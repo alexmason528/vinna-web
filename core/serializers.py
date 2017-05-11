@@ -3,7 +3,7 @@ from rest_framework import serializers
 from .models import Language, Country, State
 
 class LanguageSerializer(serializers.HyperlinkedModelSerializer):
-    id = serializers.IntegerField(required=True)
+    id = serializers.IntegerField(required=False)
     code = serializers.CharField(required=False)
     english_text = serializers.CharField(required=False)
     text = serializers.CharField(required=False)
@@ -13,28 +13,28 @@ class LanguageSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('id', 'code', 'english_text', 'text')
 
 class StateSerializer(serializers.HyperlinkedModelSerializer):
-    language = LanguageSerializer(required=False, read_only=True)
+    language_id = serializers.IntegerField(required=True)
     country_id = serializers.IntegerField(required=True)
-    
+
     class Meta:
         model = State
-        fields = ('id', 'country', 'abbrev', 'text', 'language', 'country_id')
+        fields = ('id', 'abbrev', 'text', 'language_id', 'country_id')
 
     def create(self, validated_data):
-        lang = validated_data.pop('language')
+        language_id = validated_data.pop('language_id')
         country_id = validated_data.pop('country_id')
 
-        language = Language.objects.get(pk=lang['id'])
+        language = Language.objects.get(pk=language_id)
         country = Country.objects.get(pk=country_id)
 
         state = State.objects.create(language=language, country=country, **validated_data)
         return state
 
     def update(self, instance, validated_data):
-        instance.code = validated_data.get('code', instance.code)
-        instance.english_text = validated_data.get('english_text', instance.english_text)
+        instance.abbrev = validated_data.get('abbrev', instance.abbrev)
         instance.text = validated_data.get('text', instance.text)
-        instance.language = validated_data.get('language', instance.language)
+        instance.language_id = validated_data.get('language_id', instance.language_id)
+        instance.country_id = validated_data.get('country_id', instance.country_id)
 
         instance.save()
 
