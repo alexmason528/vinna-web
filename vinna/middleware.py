@@ -106,7 +106,6 @@ def authenticate_jwt(get_response):
             auth = request.META.get('HTTP_AUTHORIZATION')
             prefix, token = auth.split(' ');
             ip = get_ip(request)
-            ip ='123.123.123.123'
             userlog = UserLog.objects.get(current_token=token)
             if ip != userlog.ip:
                 msg = 'User account is disabled.'
