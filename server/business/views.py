@@ -12,7 +12,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.views import APIView
 
-from .models import Category, SubCategory, Business, BusinessSocial, BusinessBillingInfo
+from .models import Category, SubCategory, Business, BusinessBillingInfo
 from .serializers import CategorySerializer, SubCategorySerializer, BusinessSerializer, BusinessBillingInfoSerializer
 from django.shortcuts import get_object_or_404
 from django.views.generic.edit import View
@@ -53,5 +53,26 @@ class BusinessView(APIView):
 			else:
 				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class BusinessBillingInfoView(APIView):
 
-
+	@api_view(['GET', 'POST', 'PUT'])
+	def business_billing_info(request, id):
+		if request.method == 'GET':
+			billing_info = get_object_or_404(BusinessBillingInfo, business=id)
+			serializer = BusinessBillingInfoSerializer(billing_info)
+			return Response(serializer.data)
+		elif request.method == 'POST':
+			request.data['business_id'] = id;
+			serializer = BusinessBillingInfoSerializer(data=request.data)
+			if serializer.is_valid():
+				serializer.save()
+				return Response(serializer.data, status=status.HTTP_201_CREATED)
+			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+		elif request.method == 'PUT':
+			billing_info = get_object_or_404(BusinessBillingInfo, business_id=id)
+			serializer = BusinessBillingInfoSerializer(billing_info, data=request.data, partial=True)
+			if serializer.is_valid():
+				serializer.save()
+				return Response(serializer.data)
+			else:
+				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

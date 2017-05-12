@@ -6,7 +6,7 @@ from django.conf import settings
 # Account. Holds Base account information for Employees
 #    and for adding support for businesses to support multiple accounts in the future.
 class Account(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     language = models.ForeignKey('core.Language')
 
     first_name = models.CharField(max_length=50)

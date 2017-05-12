@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
-from .models import Category, SubCategory, Business, BusinessSocial, BusinessBillingInfo
+from .models import Category, SubCategory, Business, BusinessBillingInfo
 
 class CategorySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -13,21 +13,16 @@ class SubCategorySerializer(serializers.HyperlinkedModelSerializer):
         model = SubCategory
         fields = ('category_id', 'text')
 
-class BusinessSocialSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = BusinessSocial
-        fields = ('facebook_link', 'twitter_link', 'instagram_link', 'linkedin_link')
-
 
 class BusinessBillingInfoSerializer(serializers.HyperlinkedModelSerializer):
     country_id = serializers.IntegerField(required=True)
     state_id = serializers.IntegerField(required=True)
+    business_id = serializers.IntegerField(required=True)
     class Meta:
         model = BusinessBillingInfo
-        fields = ('active', 'type', 'text', 'token', 'country_id', 'state_id', 'zip', 'address1', 'address2')
+        fields = ('business_id', 'active', 'type', 'text', 'token', 'country_id', 'state_id', 'zip', 'address1', 'address2')
 
 class BusinessSerializer(serializers.HyperlinkedModelSerializer):
-    social = BusinessSocialSerializer(required=False)
     billing_info = BusinessBillingInfoSerializer(required=False)
     account_id = serializers.IntegerField(required=True)
     category_id = serializers.IntegerField(required=True)
@@ -37,21 +32,15 @@ class BusinessSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Business
-        fields = ('account_id', 'text', 'taxid', 'country_id', 'state_id', 'zip', 'address1', 'address2','email', 'phone', 'category_id', 'sub_category_id', 'security_hash', 'ssn_token', 'social', 'billing_info')
+        fields = ('account_id', 'text', 'taxid', 'country_id', 'state_id', 'zip', 'address1', 'address2','email', 'phone', 'category_id', 'sub_category_id', 'security_hash', 'ssn_token', 'billing_info')
 
     def create(self, validated_data):
-        social,billing_info = None, None
-
-        if 'social' in validated_data:
-            social = validated_data.pop('social')
+        billing_info = None
 
         if 'billing_info' in validated_data:
             billing_info = validated_data.pop('billing_info')
 
         business = Business.objects.create(**validated_data)
-
-        if social is not None:
-            BusinessSocial.objects.create(business=business, **social)
 
         if billing_info is not None:
             BusinessBillingInfo.objects.create(business=business, **billing_info)
@@ -65,8 +54,8 @@ class BusinessSerializer(serializers.HyperlinkedModelSerializer):
         instance.country_id = validated_data.get('country_id', instance.country_id)
         instance.state_id = validated_data.get('state_id', instance.state_id)
         instance.zip = validated_data.get('zip', instance.zip)
-        instance.address_1 = validated_data.get('address_1', instance.address_1)
-        instance.address_2 = validated_data.get('address_2', instance.address_2)
+        instance.address1 = validated_data.get('address1', instance.address1)
+        instance.address2 = validated_data.get('address2', instance.address2)
         instance.email = validated_data.get('email', instance.email)
         instance.phone = validated_data.get('phone', instance.phone)
         instance.category_id = validated_data.get('category_id', instance.category_id)

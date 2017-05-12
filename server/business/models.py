@@ -15,7 +15,7 @@ class SubCategory(models.Model):
         return self.text
 
 class Business(models.Model):
-    account = models.ForeignKey('account.Account')
+    account = models.OneToOneField('account.Account', on_delete=models.CASCADE)
 
     text = models.CharField(max_length=50)
     taxid = models.CharField(max_length=15)
@@ -26,6 +26,10 @@ class Business(models.Model):
     address2 = models.CharField(max_length=40)
     email = models.CharField(max_length=50)
     phone = models.CharField(max_length=25)
+    facebook_link = models.CharField(max_length=50, null=True, blank=True)
+    twitter_link = models.CharField(max_length=50, null=True, blank=True)
+    instagram_link = models.CharField(max_length=50, null=True, blank=True)
+    linkedin_link = models.CharField(max_length=50, null=True, blank=True)
 
     category = models.ForeignKey(Category)
     sub_category = models.ForeignKey(SubCategory)
@@ -38,20 +42,8 @@ class Business(models.Model):
     def __str__(self):
         return self.text+' ('+self.account.first_name+' '+self.account.last_name+')'
 
-class BusinessSocial(models.Model):
-    business = models.ForeignKey(Business)
-
-    facebook_link = models.CharField(max_length=50)
-    twitter_link = models.CharField(max_length=50)
-    instagram_link = models.CharField(max_length=50)
-    linkedin_link = models.CharField(max_length=50)
-
-    def __str__(self):
-        return self.business.text+' Social'
-
-
 class BusinessBillingInfo(models.Model):
-    business = models.ForeignKey(Business)
+    business = models.OneToOneField(Business, on_delete=models.CASCADE)
 
     active = models.BooleanField();
 

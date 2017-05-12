@@ -1,8 +1,6 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 from .models import Account, AccountPartnerRole
-from core.models import State, Language, Country
-from core.serializers import StateSerializer, LanguageSerializer, CountrySerializer
 
 class AccountPartnerRoleSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:

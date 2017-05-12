@@ -1,9 +1,10 @@
 # Create your models here.
 from django.db import models
+from server.media.models import Image
 
 class Member(models.Model):
 #  language = models.ForeignKey(Language) # No Language setting per Registration nor Member. Detect from browser or device.
-    account = models.ForeignKey('account.Account')
+    account = models.OneToOneField('account.Account', on_delete=models.CASCADE)
 
     mailing_address_1 = models.CharField(max_length=40)
     mailing_address_2 = models.CharField(max_length=40)
@@ -11,6 +12,7 @@ class Member(models.Model):
     mailing_address_state = models.ForeignKey('core.State')
     mailing_address_zip = models.CharField(max_length=20)
     mailing_address_country = models.ForeignKey('core.Country')
+    profile_image = models.OneToOneField(Image, null=True)
 
     security_hash = models.CharField(max_length=32)
     ssn_token = models.CharField(max_length=10)
