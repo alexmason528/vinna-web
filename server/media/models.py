@@ -1,8 +1,6 @@
 from django.db import models
 from server.business.models import Business
 
-# Create your models here.
-
 class Image(models.Model):
     hash = models.CharField(max_length=100)
     s3_url = models.CharField(max_length=100)
@@ -38,3 +36,4 @@ class BusinessVideo(models.Model):
 
     def __str__(self):
         return self.unique_code
+        

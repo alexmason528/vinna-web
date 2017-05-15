@@ -1,10 +1,6 @@
 from django.db import models
 from django.conf import settings
 
-# Create your models here.
-
-# Account. Holds Base account information for Employees
-#    and for adding support for businesses to support multiple accounts in the future.
 class Account(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     language = models.ForeignKey('core.Language')
@@ -40,3 +36,4 @@ class AccountPartnerRole(models.Model):
     #  target_id = models.ForeignKey('partner.')
     def __str__(self):
         return self.account.first_name+' '+self.account.last_name+' ('+self.role_name+')'
+        

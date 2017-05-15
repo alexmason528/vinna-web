@@ -2,8 +2,12 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
-from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token, verify_jwt_token
-from .views import custom_obtain_jwt_token, custom_verify_jwt_token
+
+from rest_framework import routers
+from rest_framework_jwt.views import refresh_jwt_token
+
+from .views import custom_obtain_jwt_token, custom_verify_jwt_token, UserViewSet, GroupViewSet
+
 
 """vinna URL Configuration
 
@@ -21,15 +25,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 
-from rest_framework import routers
-from .views import UserViewSet, GroupViewSet
 
+# Wire up our API using automatic URL routing.
+# Additionally, we include login URLs for the browsable API.
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'groups', GroupViewSet)
 
-# Wire up our API using automatic URL routing.
-# Additionally, we include login URLs for the browsable API.
 
 urlpatterns = [
 
@@ -48,10 +50,9 @@ urlpatterns = [
 
     url(r'^', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    # url(r'^api-token-auth/', obtain_jwt_token),
     url(r'^api-token-auth/', custom_obtain_jwt_token),
-    url(r'^api-token-refresh/', custom_verify_jwt_token),
-    url(r'^api-token-verify/', verify_jwt_token),
+    url(r'^api-token-refresh/', refresh_jwt_token),
+    url(r'^api-token-verify/', custom_verify_jwt_token),
 
 #    url(r'^about/', include('client.client_member.urls')),
 #    url(r'^contact/', include('client.client_member.urls')),

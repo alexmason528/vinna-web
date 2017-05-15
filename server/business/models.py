@@ -1,6 +1,5 @@
 from django.db import models
 
-# Create your models here.
 class Category(models.Model):
     text = models.CharField(max_length=50)
 
@@ -59,3 +58,4 @@ class BusinessBillingInfo(models.Model):
 
     def __str__(self):
         return self.business.text+' ('+self.type+', '+self.text+')'
+        

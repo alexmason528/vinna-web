@@ -3,7 +3,6 @@ from django.db import models
 from server.media.models import Image
 
 class Member(models.Model):
-#  language = models.ForeignKey(Language) # No Language setting per Registration nor Member. Detect from browser or device.
     account = models.OneToOneField('account.Account', on_delete=models.CASCADE)
 
     mailing_address_1 = models.CharField(max_length=40)
