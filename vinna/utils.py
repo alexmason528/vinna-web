@@ -20,8 +20,6 @@ from rest_framework import exceptions
 from ipware.ip import get_real_ip, get_ip
 from core.models import UserLog
 from socket import gethostname, gethostbyname 
-from bottle import request
-
 
 
 def get_secret_key(payload=None):
@@ -39,12 +37,11 @@ def get_secret_key(payload=None):
         return key
     return api_settings.JWT_SECRET_KEY
 
-def payload_handler(user):
+def payload_handler(user, request):
     username_field = get_username_field()
     username = get_username(user)
-    print(os.environ) 
     
-    ip = '127.0.0.1'
+    ip = get_ip(request)
     
     warnings.warn(
         'The following fields will be removed in the future: '
@@ -106,7 +103,7 @@ def encode_handler(payload):
 
     return token
 
-def decode_handler(token):
+def decode_handler(token, request):
     options = {
         'verify_exp': api_settings.JWT_VERIFY_EXPIRATION,
     }
@@ -125,8 +122,8 @@ def decode_handler(token):
     )
 
     token_ip = decoded_token['ip']
-    current_ip = '127.0.0.1'
-
+    # current_ip = '127.0.0.1'
+    current_ip = get_ip(request)
 
     if token_ip != current_ip:
         raise exceptions.AuthenticationFailed('Invalid token')

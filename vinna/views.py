@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
-from .serializers import UserSerializer, GroupSerializer
-
+from .serializers import UserSerializer, GroupSerializer, CustomJSONWebTokenSerializer, CustomVerificationBaseSerializer
+from rest_framework_jwt.views import JSONWebTokenAPIView
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -17,3 +17,16 @@ class GroupViewSet(viewsets.ModelViewSet):
     """
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
+
+class CustomObtainJSONWebToken(JSONWebTokenAPIView):
+    serializer_class = CustomJSONWebTokenSerializer
+
+class CustomVerifyJSONWebToken(JSONWebTokenAPIView):
+    """
+    API View that checks the veracity of a token, returning the token if it
+    is valid.
+    """
+    serializer_class = CustomVerificationBaseSerializer
+
+custom_obtain_jwt_token = CustomObtainJSONWebToken.as_view()
+custom_verify_jwt_token = CustomVerifyJSONWebToken.as_view()
