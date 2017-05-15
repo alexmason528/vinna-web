@@ -43,6 +43,8 @@ urlpatterns = [
     url(r'^business/', include('client.client_business.urls')),
     url(r'^member/', include('client.client_member.urls')),
 
+    url(r'^stripe/', include('server.stripe.urls')),
+
     url(r'^', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^api-token-auth/', obtain_jwt_token),

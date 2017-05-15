@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'server.transactions',
     'server.account',
     'server.member',
+    'server.stripe',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -56,7 +57,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'vinna.middleware.disable_csrf_middleware',
-    'vinna.middleware.authenticate_jwt',
 #    'subdomains.middleware.SubdomainURLRoutingMiddleware',
 
     'django.middleware.security.SecurityMiddleware',
@@ -146,13 +146,13 @@ REST_FRAMEWORK = {
 
 JWT_AUTH = {
     'JWT_ENCODE_HANDLER':
-    'rest_framework_jwt.utils.jwt_encode_handler',
+    'vinna.utils.encode_handler',
 
     'JWT_DECODE_HANDLER':
-    'rest_framework_jwt.utils.jwt_decode_handler',
+    'vinna.utils.decode_handler',
 
     'JWT_PAYLOAD_HANDLER':
-    'rest_framework_jwt.utils.jwt_payload_handler',
+    'vinna.utils.payload_handler',
 
     'JWT_PAYLOAD_GET_USER_ID_HANDLER':
     'rest_framework_jwt.utils.jwt_get_user_id_from_payload_handler',
@@ -234,3 +234,5 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 #EMAIL_USE_SSL = True
 #EMAIL_PORT = 465
+
+STRIPE_API_KEY = 'sk_test_BQokikJOvBiI2HlWgH4olfQ2'
