@@ -10,8 +10,8 @@ from rest_framework.views import APIView
 
 from vinna.authentication import CustomJSONWebTokenAuthentication
 
-from .models import Member
-from .serializers import MemberSerializer
+from .models import Member, MemberPaymentInfo
+from .serializers import MemberSerializer, MemberPaymentInfoSerializer
 
 @permission_classes(IsAuthenticated, )
 @authentication_classes(CustomJSONWebTokenAuthentication, )
@@ -47,3 +47,39 @@ class MemberView(APIView):
 				return Response(serializer.data)
 			else:
 				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class MemberPaymentInfoView(APIView):
+
+	@api_view(['GET', 'POST'])
+	def member_payment_info_collection(request, id):
+		if request.method == 'GET':
+			member_payment_infos = MemberPaymentInfo.objects.filter(member_id = id)
+			serializer = MemberPaymentInfoSerializer(member_payment_infos, many=True)
+			return Response(serializer.data)
+		
+		elif request.method == 'POST':
+			serializer = MemberPaymentInfoSerializer(data=request.data)
+			if serializer.is_valid():
+				serializer.save()
+				return Response(serializer.data, status=status.HTTP_201_CREATED)
+			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+	@api_view(['PUT','GET', 'DELETE'])
+	def member_payment_info_element(request, id, pinfo_id):
+		if request.method == 'GET':	
+			member_payment_info = get_object_or_404(MemberPaymentInfo, pk=pinfo_id)
+			serializer = MemberPaymentInfoSerializer(member_payment_info)
+			return Response(serializer.data)
+
+		elif request.method == 'PUT':
+			member_payment_info = get_object_or_404(MemberPaymentInfo, pk=pinfo_id)
+			serializer = MemberPaymentInfoSerializer(member_payment_info, data=request.data, partial=True)
+			if serializer.is_valid():
+				serializer.save()
+				return Response(serializer.data)
+			else:
+				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+		elif request.method == 'DELETE':
+			member_payment_info = get_object_or_404(MemberPaymentInfo, pk=pinfo_id)
+			member_payment_info.delete()

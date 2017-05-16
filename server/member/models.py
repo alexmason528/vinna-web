@@ -11,7 +11,7 @@ class Member(models.Model):
     mailing_address_state = models.ForeignKey('core.State')
     mailing_address_zip = models.CharField(max_length=20)
     mailing_address_country = models.ForeignKey('core.Country')
-    profile_image = models.OneToOneField(Image, null=True)
+    profile_image = models.OneToOneField(Image, null=True, blank=True)
 
     security_hash = models.CharField(max_length=32)
     ssn_token = models.CharField(max_length=10)

@@ -34,15 +34,48 @@ class AccountView(APIView):
 			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 	@api_view(['PUT','GET'])
-	def account_element(request, userid):
+	def account_element(request, id):
 		if request.method == 'GET':	
-			account = get_object_or_404(Account, pk=userid)
+			account = get_object_or_404(Account, pk=id)
 			serializer = AccountSerializer(account)
 			return Response(serializer.data)
 
 		elif request.method == 'PUT':
-			account = get_object_or_404(Account, pk=userid)
+			account = get_object_or_404(Account, pk=id)
 			serializer = AccountSerializer(account, data=request.data, partial=True)
+			if serializer.is_valid():
+				serializer.save()
+				return Response(serializer.data)
+			else:
+				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AccountPartnerRoleView(APIView):
+
+	@api_view(['GET', 'POST'])
+	def account_collection(request):
+		if request.method == 'GET':
+			account_partner_roles = AccountPartnerRole.objects.all()
+			serializer = AccountPartnerRoleSerializer(account_partner_roles, many=True)
+			return Response(serializer.data)
+		
+		elif request.method == 'POST':
+			serializer = AccountPartnerRoleSerializer(data=request.data)
+			if serializer.is_valid():
+				serializer.save()
+				return Response(serializer.data, status=status.HTTP_201_CREATED)
+			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+	@api_view(['PUT','GET'])
+	def account_element(request, id):
+		if request.method == 'GET':	
+			account_partner_role = get_object_or_404(AccountPartnerRole, pk=id)
+			serializer = AccountPartnerRoleSerializer(account_partner_role)
+			return Response(serializer.data)
+
+		elif request.method == 'PUT':
+			account_partner_role = get_object_or_404(AccountPartnerRole, pk=id)
+			serializer = AccountPartnerRoleSerializer(account_partner_role, data=request.data, partial=True)
 			if serializer.is_valid():
 				serializer.save()
 				return Response(serializer.data)

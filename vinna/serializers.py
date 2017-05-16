@@ -4,6 +4,8 @@ from calendar import timegm
 
 from django.contrib.auth import authenticate, get_user_model
 from django.utils.translation import ugettext as _
+from django.contrib.auth.models import User, Group
+
 from rest_framework import serializers
 
 from rest_framework_jwt.settings import api_settings
@@ -27,15 +29,7 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('url', 'name')
 
 class CustomJSONWebTokenSerializer(Serializer):
-    """
-    Serializer class used to validate a username and password.
-    'username' is identified by the custom UserModel.USERNAME_FIELD.
-    Returns a JSON Web Token that can be used to authenticate later calls.
-    """
     def __init__(self, *args, **kwargs):
-        """
-        Dynamically add the USERNAME_FIELD to self.fields.
-        """
         super(CustomJSONWebTokenSerializer, self).__init__(*args, **kwargs)
 
         self.fields[self.username_field] = serializers.CharField()
@@ -74,9 +68,6 @@ class CustomJSONWebTokenSerializer(Serializer):
             raise serializers.ValidationError(msg)
 
 class CustomVerificationBaseSerializer(Serializer):
-    """
-    Abstract serializer used for verifying and refreshing JWTs.
-    """
     token = serializers.CharField()
 
     def validate(self, attrs):
@@ -84,8 +75,6 @@ class CustomVerificationBaseSerializer(Serializer):
         raise NotImplementedError(msg)
 
     def _check_payload(self, token):
-        # Check payload valid (based off of JSONWebTokenAuthentication,
-        # may want to refactor)
         try:
             payload = jwt_decode_handler(token, self.contenxt['request'])
         except jwt.ExpiredSignature:
@@ -104,7 +93,6 @@ class CustomVerificationBaseSerializer(Serializer):
             msg = _('Invalid payload.')
             raise serializers.ValidationError(msg)
 
-        # Make sure user exists
         try:
             user = User.objects.get_by_natural_key(username)
         except User.DoesNotExist:

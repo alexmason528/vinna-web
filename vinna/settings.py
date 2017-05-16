@@ -30,14 +30,17 @@ DEBUG = True
 # Application definition
 
 INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+
     'rest_framework',
     'rest_framework.authtoken',
 
     'core.apps.CoreConfig',
-
-    'client.client_home',
-    'client.client_business',
-    'client.client_member',
 
     'server.notification',
     'server.media',
@@ -47,12 +50,9 @@ INSTALLED_APPS = [
     'server.member',
     'server.stripe',
 
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'client.client_home',
+    'client.client_business',
+    'client.client_member',
 ]
 
 MIDDLEWARE = [
@@ -130,13 +130,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+        # 'rest_framework.permissions.IsAuthenticated',
         # 'rest_framework.permissions.IsAdminUser',
-        # 'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.AllowAny',
     ],
     'PAGE_SIZE': 50,
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'vinna.authentication.CustomJSONWebTokenAuthentication',
+        # 'vinna.authentication.CustomJSONWebTokenAuthentication',
         # 'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         # 'rest_framework.authentication.SessionAuthentication',
         # 'rest_framework.authentication.BasicAuthentication',

@@ -1,6 +1,16 @@
 from django.db import models
 from django.conf import settings
 
+class AccountPartnerRole(models.Model):
+    role_name = models.CharField(max_length=25)
+    role_description = models.CharField(max_length=50)
+
+    #  target_type = models.CharField(max_length=12)
+    #  target_id = models.ForeignKey('partner.')
+
+    def __str__(self):
+        return self.role_name
+ 
 class Account(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     language = models.ForeignKey('core.Language')
@@ -12,6 +22,7 @@ class Account(models.Model):
     gender = models.CharField(choices=((u'F',u'Female'),(u'M',u'Male')), max_length=1)
     profile_photo_url = models.CharField(max_length=100, null=True, blank=True)
     last_modified_date = models.DateTimeField('Last Modified', auto_now=True)
+    partner_roles = models.ManyToManyField(AccountPartnerRole, through='AccountPartnerRoleList')
 
 #    language = models.ForeignKey(Language) # No Language setting per Registration nor Member. Detect from browser or device.
 #    email = models.CharField(max_length=75)
@@ -25,15 +36,7 @@ class Account(models.Model):
 
     def __str__(self):
         return self.first_name+' '+self.last_name
-        
 
-class AccountPartnerRole(models.Model):
-    account = models.ForeignKey(Account, related_name = 'accountpartnerroles', on_delete=models.CASCADE)
-    role_name = models.CharField(max_length=25)
-    role_description = models.CharField(max_length=50)
-
-    #  target_type = models.CharField(max_length=12)
-    #  target_id = models.ForeignKey('partner.')
-    def __str__(self):
-        return self.account.first_name+' '+self.account.last_name+' ('+self.role_name+')'
-        
+class AccountPartnerRoleList(models.Model):
+    account = models.ForeignKey(Account)
+    partner_role = models.ForeignKey(AccountPartnerRole)
