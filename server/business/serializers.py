@@ -1,5 +1,16 @@
+import stripe
+
+from django.conf import settings
+from django.shortcuts import get_object_or_404
+
 from rest_framework import serializers
+
 from .models import Category, SubCategory, Business, BusinessBillingInfo
+from core.serializers import StripeManagedAccountSerializer, StripeBankAccountSerializer
+
+# import datetime
+
+stripe.api_key = settings.STRIPE_API_KEY
 
 class CategorySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -11,7 +22,6 @@ class SubCategorySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = SubCategory
         fields = ('category_id', 'text')
-
 
 class BusinessBillingInfoSerializer(serializers.HyperlinkedModelSerializer):
     country_id = serializers.IntegerField(required=True)
@@ -28,16 +38,32 @@ class BusinessSerializer(serializers.HyperlinkedModelSerializer):
     sub_category_id = serializers.IntegerField(required=True)
     country_id = serializers.IntegerField(required=True)
     state_id = serializers.IntegerField(required=True)
+    stripe_account_info = StripeManagedAccountSerializer(write_only=True, required=True)
+    managed_account_token = serializers.CharField(read_only=True)
 
     class Meta:
         model = Business
-        fields = ('account_id', 'text', 'taxid', 'country_id', 'state_id', 'zip', 'address1', 'address2','email', 'phone', 'category_id', 'sub_category_id', 'security_hash', 'ssn_token', 'billing_info')
+        fields = ('account_id', 'text', 'taxid', 'country_id', 'state_id', 'zip', 'address1', 'address2','email', 'phone', 'category_id', 'sub_category_id', 'managed_account_token', 'security_hash', 'ssn_token', 'stripe_account_info', 'billing_info')
 
     def create(self, validated_data):
+        sa_info = validated_data.pop('stripe_account_info')
+
+        response = None
+        try:
+            response = stripe.Account.create(
+                managed=True,
+                email=sa_info['email']
+            )
+        except Exception as e:
+            pass
+
         billing_info = None
 
         if 'billing_info' in validated_data:
             billing_info = validated_data.pop('billing_info')
+
+        if response is not None:
+            validated_data['managed_account_token'] = response['id']
 
         business = Business.objects.create(**validated_data)
 

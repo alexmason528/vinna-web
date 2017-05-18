@@ -58,6 +58,7 @@ class MemberPaymentInfoView(APIView):
 			return Response(serializer.data)
 		
 		elif request.method == 'POST':
+			request.data['member_id'] = id
 			serializer = MemberPaymentInfoSerializer(data=request.data)
 			if serializer.is_valid():
 				serializer.save()

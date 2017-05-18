@@ -4,7 +4,7 @@ from calendar import timegm
 
 from django.contrib.auth import authenticate, get_user_model
 from django.utils.translation import ugettext as _
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 
 from rest_framework import serializers
 
@@ -17,16 +17,6 @@ jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 jwt_decode_handler = api_settings.JWT_DECODE_HANDLER
 jwt_get_username_from_payload = api_settings.JWT_PAYLOAD_GET_USERNAME_HANDLER
-
-class UserSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = User
-        fields = ('url', 'username', 'email', 'groups')
-
-class GroupSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Group
-        fields = ('url', 'name')
 
 class CustomJSONWebTokenSerializer(Serializer):
     def __init__(self, *args, **kwargs):

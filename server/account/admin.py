@@ -1,12 +1,12 @@
 from django.contrib import admin
-from .models import Account, AccountPartnerRole
+from .models import Account, AccountPartnerRole, AccountPartnerRoleList
 
 class AccountPartnerRoleListInline(admin.StackedInline):
-    model = Account.partner_roles.through
+    model = AccountPartnerRoleList
+    extra = 1
 
 class AccountAdmin(admin.ModelAdmin):
     inlines = (AccountPartnerRoleListInline,)
-    exclude = ('partner_roles',)
 
 class AccountPartnerRoleAdmin(admin.ModelAdmin):
     inlines = (AccountPartnerRoleListInline,)

@@ -1,4 +1,6 @@
 from django.db import models
+from core.models import Country, State
+from server.account.models import Account
 
 class Category(models.Model):
     text = models.CharField(max_length=50)
@@ -14,12 +16,12 @@ class SubCategory(models.Model):
         return self.text
 
 class Business(models.Model):
-    account = models.OneToOneField('account.Account', on_delete=models.CASCADE)
+    account = models.OneToOneField(Account, on_delete=models.CASCADE)
 
     text = models.CharField(max_length=50)
     taxid = models.CharField(max_length=15)
-    country = models.ForeignKey('core.Country')
-    state = models.ForeignKey('core.State')
+    country = models.ForeignKey(Country)
+    state = models.ForeignKey(State)
     zip = models.CharField(max_length=20)
     address1 = models.CharField(max_length=40)
     address2 = models.CharField(max_length=40)
@@ -33,6 +35,8 @@ class Business(models.Model):
     category = models.ForeignKey(Category)
     sub_category = models.ForeignKey(SubCategory)
 
+    managed_account_token = models.CharField(max_length=50)
+    
     security_hash = models.CharField(max_length=32)
     ssn_token = models.CharField(max_length=10)
 
@@ -42,7 +46,7 @@ class Business(models.Model):
         return self.text+' ('+self.account.first_name+' '+self.account.last_name+')'
 
 class BusinessBillingInfo(models.Model):
-    business = models.OneToOneField(Business, on_delete=models.CASCADE)
+    business = models.ForeignKey(Business, on_delete=models.CASCADE)
 
     active = models.BooleanField();
 
@@ -50,8 +54,8 @@ class BusinessBillingInfo(models.Model):
     text = models.CharField(max_length=5)
     token = models.CharField(max_length=70)
 
-    country = models.ForeignKey('core.Country')
-    state = models.ForeignKey('core.State')
+    country = models.ForeignKey(Country)
+    state = models.ForeignKey(State)
     zip = models.CharField(max_length=20)
     address1 = models.CharField(max_length=40)
     address2 = models.CharField(max_length=40)

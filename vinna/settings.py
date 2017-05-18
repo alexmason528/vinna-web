@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 
 import os
 import datetime
+import stripe
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -48,7 +49,6 @@ INSTALLED_APPS = [
     'server.transactions',
     'server.account',
     'server.member',
-    'server.stripe',
 
     'client.client_home',
     'client.client_business',
@@ -236,4 +236,5 @@ EMAIL_PORT = 587
 #EMAIL_USE_SSL = True
 #EMAIL_PORT = 465
 
-STRIPE_API_KEY = 'sk_test_BQokikJOvBiI2HlWgH4olfQ2'
+STRIPE_API_KEY = 'sk_test_RWKnLTTuJgU5Tzc3Gltv5zzH'
+STRIPE_PUBLIC_KEY = 'pk_test_vSXaN8PlxDIA9SRDrvPyNllu'

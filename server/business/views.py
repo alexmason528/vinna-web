@@ -51,8 +51,8 @@ class BusinessView(APIView):
 
 class BusinessBillingInfoView(APIView):
 
-	@api_view(['GET', 'POST', 'PUT'])
-	def business_billing_info(request, id):
+	@api_view(['GET', 'POST'])
+	def business_billing_info_collection(request, id):
 		if request.method == 'GET':
 			billing_info = get_object_or_404(BusinessBillingInfo, business=id)
 			serializer = BusinessBillingInfoSerializer(billing_info)
@@ -64,6 +64,13 @@ class BusinessBillingInfoView(APIView):
 				serializer.save()
 				return Response(serializer.data, status=status.HTTP_201_CREATED)
 			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+	@api_view(['GET', 'PUT'])
+	def business_billing_info_element(request, id, binfo_id):
+		if request.method == 'GET':
+			billing_info = get_object_or_404(BusinessBillingInfo, business=id)
+			serializer = BusinessBillingInfoSerializer(billing_info)
+			return Response(serializer.data)
 		elif request.method == 'PUT':
 			billing_info = get_object_or_404(BusinessBillingInfo, business_id=id)
 			serializer = BusinessBillingInfoSerializer(billing_info, data=request.data, partial=True)

@@ -6,7 +6,7 @@ from django.conf.urls.static import static
 from rest_framework import routers
 from rest_framework_jwt.views import refresh_jwt_token
 
-from .views import custom_obtain_jwt_token, custom_verify_jwt_token, UserViewSet, GroupViewSet
+from .views import custom_obtain_jwt_token, custom_verify_jwt_token
 
 
 """vinna URL Configuration
@@ -28,9 +28,7 @@ Including another URLconf
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
-router = routers.DefaultRouter()
-router.register(r'users', UserViewSet)
-router.register(r'groups', GroupViewSet)
+
 
 
 urlpatterns = [
@@ -46,9 +44,6 @@ urlpatterns = [
     url(r'^business/', include('client.client_business.urls')),
     url(r'^member/', include('client.client_member.urls')),
 
-    url(r'^stripe/', include('server.stripe.urls')),
-
-    url(r'^', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^api-token-auth/', custom_obtain_jwt_token),
     url(r'^api-token-refresh/', refresh_jwt_token),
