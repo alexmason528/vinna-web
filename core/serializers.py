@@ -25,7 +25,7 @@ class StripeCreditCardExternalAccountSerializer(serializers.Serializer):
 
 class StripeManagedAccountSerializer(serializers.Serializer):
     country = serializers.CharField(max_length=3, required=False)
-    email = serializers.EmailField(max_length=100)
+    email = serializers.EmailField()
 
 class StripeBankAccountSerializer(serializers.Serializer):
 	external_account = StripeBankAccountExternalAccountSerializer()

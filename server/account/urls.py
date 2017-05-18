@@ -5,11 +5,10 @@ from . import views
 app_name = 'account'
 
 urlpatterns = [
-    #url(r'^details/$', views.account_list, name='list'),
-    # url(r'^(?P<id>[0-9]+)/account_role/(?P<pinfo_id>[0-9]+)/$', views.MemberPaymentInfoView.member_payment_info_element, name='member_payment_info_element'),
-    # url(r'^(?P<id>[0-9]+)/account_role/$', views.MemberPaymentInfoView.member_payment_info_collection, name='member_payment_info_collection'),
-    url(r'^(?P<id>[0-9]+)/$', views.AccountView.account_element, name='account_element'),
-    url(r'^', views.AccountView.account_collection, name='account_collection'),
+    url(r'account/(?P<id>[0-9]+)/$', views.AccountView.account_element, name='account_element'),
+    url(r'account/', views.AccountView.account_collection, name='account_collection'),
+    url(r'role/(?P<id>[0-9]+)/$', views.RoleView.role_element, name='role_element'),
+    url(r'role/', views.RoleView.role_collection, name='role_collection'),
     
     #url(r'^$', views.index, name='index'),
 

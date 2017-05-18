@@ -1,15 +1,15 @@
 from django.contrib import admin
-from .models import Account, AccountPartnerRole, AccountPartnerRoleList
+from .models import Account, Role, AccountRole
 
-class AccountPartnerRoleListInline(admin.StackedInline):
-    model = AccountPartnerRoleList
+class AccountRoleListInline(admin.StackedInline):
+    model = AccountRole
     extra = 1
 
 class AccountAdmin(admin.ModelAdmin):
-    inlines = (AccountPartnerRoleListInline,)
+    inlines = (AccountRoleListInline,)
 
-class AccountPartnerRoleAdmin(admin.ModelAdmin):
-    inlines = (AccountPartnerRoleListInline,)
+class RoleAdmin(admin.ModelAdmin):
+    inlines = (AccountRoleListInline,)
 
-admin.site.register(AccountPartnerRole)
+admin.site.register(Role)
 admin.site.register(Account, AccountAdmin)

@@ -10,9 +10,10 @@ from core.serializers import StripeManagedAccountSerializer, StripeBankAccountSe
 stripe.api_key = settings.STRIPE_API_KEY
 
 class MemberPaymentInfoSerializer(serializers.HyperlinkedModelSerializer):
-    bankaccount_info = StripeBankAccountSerializer(write_only=True)
+    member_id = serializers.IntegerField(read_only=True)
+    type = serializers.CharField(read_only=True)
     token = serializers.CharField(read_only=True)
-    member_id = serializers.IntegerField(required=True)
+    bankaccount_info = StripeBankAccountSerializer(write_only=True)
 
     class Meta:
         model = MemberPaymentInfo
@@ -31,18 +32,19 @@ class MemberPaymentInfoSerializer(serializers.HyperlinkedModelSerializer):
             external_account = ba_info['external_account']
         )
 
+        validated_data['type'] = 'bank'
         validated_data['token'] = response['id']
         member_payment_info = MemberPaymentInfo.create(**validated_data)
 
         return member_payment_info
 
 class MemberSerializer(serializers.HyperlinkedModelSerializer):
-    payment_infos = MemberPaymentInfoSerializer(required=False, many=True)
-    account_id = serializers.IntegerField(required=True)
+    account_id = serializers.IntegerField(read_only=True)
     mailing_address_state_id = serializers.IntegerField(required=True)
     mailing_address_country_id = serializers.IntegerField(required=True)
     stripe_account_info = StripeManagedAccountSerializer(write_only=True)
     managed_account_token = serializers.CharField(read_only=True)
+    payment_infos = MemberPaymentInfoSerializer(read_only=True, many=True)
 
     class Meta:
         model = Member
@@ -50,19 +52,11 @@ class MemberSerializer(serializers.HyperlinkedModelSerializer):
 
     def create(self, validated_data):
         sa_info = validated_data.pop('stripe_account_info')
-
-        response = None
-
-        try:
-            response = stripe.Account.create(
-                managed=True,
-                email=sa_info['email']
-            )
-        except Exception as e:
-            pass
-
-        if response is not None:
-            validated_data['managed_account_token'] = response['id']
+        response = stripe.Account.create(
+            managed=True,
+            email=sa_info['email']
+        )
+        validated_data['managed_account_token'] = response['id']
 
         payment_infos = None
         if 'payment_infos' in validated_data:
@@ -76,16 +70,16 @@ class MemberSerializer(serializers.HyperlinkedModelSerializer):
 
         return member
 
-    # def update(self, instance, validated_data):
-    #     instance.mailing_address_1 = validated_data.get('mailing_address_1', instance.mailing_address_1)
-    #     instance.mailing_address_2 = validated_data.get('mailing_address_2', instance.mailing_address_2)
-    #     instance.mailing_address_city = validated_data.get('mailing_address_city', instance.mailing_address_city)
-    #     instance.mailing_address_state = validated_data.get('mailing_address_state', instance.mailing_address_state)
-    #     instance.mailing_address_zip = validated_data.get('mailing_address_zip', instance.mailing_address_zip)
-    #     instance.mailing_address_country = validated_data.get('mailing_address_country', instance.mailing_address_country)
-    #     instance.security_hash = validated_data.get('security_hash', instance.security_hash)
-    #     instance.ssn_token = validated_data.get('ssn_token', instance.ssn_token)
+    def update(self, instance, validated_data):
 
-    #     instance.save()
+        sa_info = None
+        if 'stripe_account_info' in validated_data:
+            sa_info = validated_data.pop('stripe_account_info')
 
-    #     return instance
+        for item in validated_data:
+            if Member._meta.get_field(item):
+                setattr(instance, item, validated_data[item])
+       
+        instance.save()
+
+        return instance

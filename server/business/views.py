@@ -54,8 +54,8 @@ class BusinessBillingInfoView(APIView):
 	@api_view(['GET', 'POST'])
 	def business_billing_info_collection(request, id):
 		if request.method == 'GET':
-			billing_info = get_object_or_404(BusinessBillingInfo, business=id)
-			serializer = BusinessBillingInfoSerializer(billing_info)
+			billing_infos = BusinessBillingInfo.objects.filter(business_id=id)
+			serializer = BusinessBillingInfoSerializer(billing_infos, many=True)
 			return Response(serializer.data)
 		elif request.method == 'POST':
 			request.data['business_id'] = id;
@@ -65,17 +65,20 @@ class BusinessBillingInfoView(APIView):
 				return Response(serializer.data, status=status.HTTP_201_CREATED)
 			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-	@api_view(['GET', 'PUT'])
+	@api_view(['GET', 'PUT', 'DELETE'])
 	def business_billing_info_element(request, id, binfo_id):
 		if request.method == 'GET':
-			billing_info = get_object_or_404(BusinessBillingInfo, business=id)
+			billing_info = get_object_or_404(BusinessBillingInfo, pk=binfo_id)
 			serializer = BusinessBillingInfoSerializer(billing_info)
 			return Response(serializer.data)
 		elif request.method == 'PUT':
-			billing_info = get_object_or_404(BusinessBillingInfo, business_id=id)
+			billing_info = get_object_or_404(BusinessBillingInfo, pk=binfo_id)
 			serializer = BusinessBillingInfoSerializer(billing_info, data=request.data, partial=True)
 			if serializer.is_valid():
 				serializer.save()
 				return Response(serializer.data)
 			else:
 				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+		elif request.method == 'DELETE':
+			biling_info = get_object_or_404(BusinessBillingInfo, pk=binfo_id)
+			billing_info.delete()

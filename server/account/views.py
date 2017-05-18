@@ -11,8 +11,8 @@ from rest_framework.views import APIView
 
 from vinna.authentication import CustomJSONWebTokenAuthentication
 
-from .models import Account, AccountPartnerRole
-from .serializers import AccountSerializer, AccountPartnerRoleSerializer
+from .models import Account, Role
+from .serializers import RoleSerializer, AccountListSerializer, AccountCreateSerializer
 
 @permission_classes(IsAuthenticated, )
 @authentication_classes(CustomJSONWebTokenAuthentication, )
@@ -23,11 +23,12 @@ class AccountView(APIView):
 	def account_collection(request):
 		if request.method == 'GET':
 			accounts = Account.objects.all()
-			serializer = AccountSerializer(accounts, many=True)
+			serializer = AccountListSerializer(accounts, many=True)
+			print(accounts)
 			return Response(serializer.data)
 		
 		elif request.method == 'POST':
-			serializer = AccountSerializer(data=request.data)
+			serializer = AccountCreateSerializer(data=request.data)
 			if serializer.is_valid():
 				serializer.save()
 				return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -37,12 +38,12 @@ class AccountView(APIView):
 	def account_element(request, id):
 		if request.method == 'GET':	
 			account = get_object_or_404(Account, pk=id)
-			serializer = AccountSerializer(account)
+			serializer = AccountListSerializer(account)
 			return Response(serializer.data)
 
 		elif request.method == 'PUT':
 			account = get_object_or_404(Account, pk=id)
-			serializer = AccountSerializer(account, data=request.data, partial=True)
+			serializer = AccountCreateSerializer(account, data=request.data, partial=True)
 			if serializer.is_valid():
 				serializer.save()
 				return Response(serializer.data)
@@ -50,34 +51,38 @@ class AccountView(APIView):
 				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class AccountPartnerRoleView(APIView):
+class RoleView(APIView):
 
 	@api_view(['GET', 'POST'])
-	def account_collection(request):
+	def role_collection(request):
 		if request.method == 'GET':
-			account_partner_roles = AccountPartnerRole.objects.all()
-			serializer = AccountPartnerRoleSerializer(account_partner_roles, many=True)
+			roles = Role.objects.all()
+			serializer = RoleSerializer(roles, many=True)
 			return Response(serializer.data)
 		
 		elif request.method == 'POST':
-			serializer = AccountPartnerRoleSerializer(data=request.data)
+			serializer = RoleSerializer(data=request.data)
 			if serializer.is_valid():
 				serializer.save()
 				return Response(serializer.data, status=status.HTTP_201_CREATED)
 			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-	@api_view(['PUT','GET'])
-	def account_element(request, id):
+	@api_view(['PUT','GET', 'DELETE'])
+	def role_element(request, id):
 		if request.method == 'GET':	
-			account_partner_role = get_object_or_404(AccountPartnerRole, pk=id)
-			serializer = AccountPartnerRoleSerializer(account_partner_role)
+			role = get_object_or_404(Role, pk=id)
+			serializer = RoleSerializer(role)
 			return Response(serializer.data)
 
 		elif request.method == 'PUT':
-			account_partner_role = get_object_or_404(AccountPartnerRole, pk=id)
-			serializer = AccountPartnerRoleSerializer(account_partner_role, data=request.data, partial=True)
+			role = get_object_or_404(Role, pk=id)
+			serializer = RoleSerializer(role, data=request.data, partial=True)
 			if serializer.is_valid():
 				serializer.save()
 				return Response(serializer.data)
 			else:
 				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+		elif request.method == 'DELETE':
+			role = get_object_or_404(Role, pk=id)
+			role.delete()
