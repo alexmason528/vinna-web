@@ -35,7 +35,7 @@ class Business(models.Model):
     category = models.ForeignKey(Category)
     sub_category = models.ForeignKey(SubCategory)
 
-    managed_account_token = models.CharField(max_length=50)
+    managed_account_token = models.CharField(max_length=50, null=True, blank=True)
     
     security_hash = models.CharField(max_length=32)
     ssn_token = models.CharField(max_length=10)
@@ -52,7 +52,7 @@ class BusinessBillingInfo(models.Model):
 
     type = models.CharField(max_length=10) # bank, debit, mail
     text = models.CharField(max_length=5)
-    token = models.CharField(max_length=70)
+    token = models.CharField(max_length=70, null=True, blank=True)
 
     country = models.ForeignKey(Country)
     state = models.ForeignKey(State)

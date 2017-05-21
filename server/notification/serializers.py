@@ -5,4 +5,4 @@ class NotificationSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Notification
-        fields = ('title', 'category', 'message')
+        fields = ('title', 'category', 'message', 'state')
