@@ -2,6 +2,8 @@ from django.utils.decorators import method_decorator
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
+
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
@@ -11,7 +13,8 @@ from rest_framework.views import APIView
 from vinna.authentication import CustomJSONWebTokenAuthentication
 
 from .models import Member, MemberPaymentInfo
-from .serializers import MemberSerializer, MemberPaymentInfoSerializer
+from server.purchase.models import Purchase
+from .serializers import MemberSerializer, MemberPaymentInfoSerializer, MemberPurchaseSerializer
 
 @permission_classes(IsAuthenticated, )
 @authentication_classes(CustomJSONWebTokenAuthentication, )
@@ -84,3 +87,17 @@ class MemberPaymentInfoView(APIView):
 		elif request.method == 'DELETE':
 			member_payment_info = get_object_or_404(MemberPaymentInfo, pk=pinfo_id)
 			member_payment_info.delete()
+
+class MemberPurchaseView(APIView):
+	@api_view(['GET'])
+	def member_purchase_collection(request, id):
+		if request.method == 'GET':
+			purchases = Purchase.objects.filter(Q(member_id=id) | Q(member_referral_id=id))
+			serializer = MemberPurchaseSerializer(purchases, many=True)
+			return Response(serializer.data)
+
+	@api_view(['GET'])
+	def member_purchase_element(request, id, purchase_id):
+		purchase = get_object_or_404(Purchase, pk=purchase_id)
+		serializer = MemberPurchaseSerializer(purchase)
+		return Response(serializer.data)

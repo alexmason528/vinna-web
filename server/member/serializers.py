@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 
 from rest_framework import serializers
 from .models import Member, MemberPaymentInfo
+from server.purchase.models import Purchase
 from core.serializers import StripeManagedAccountSerializer, StripeBankAccountSerializer
 
 stripe.api_key = settings.STRIPE_API_KEY
@@ -83,3 +84,8 @@ class MemberSerializer(serializers.HyperlinkedModelSerializer):
         instance.save()
 
         return instance
+
+class MemberPurchaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Purchase
+        fields = '__all__'

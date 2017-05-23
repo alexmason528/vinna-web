@@ -7,6 +7,7 @@ from rest_framework import serializers
 
 from .models import Category, SubCategory, Business, BusinessBillingInfo
 from core.serializers import StripeManagedAccountSerializer, StripeBankAccountSerializer, StripeCreditCardSerializer
+from server.purchase.models import Purchase
 
 stripe.api_key = settings.STRIPE_API_KEY
 
@@ -217,3 +218,17 @@ class BusinessSerializer(serializers.HyperlinkedModelSerializer):
         instance.save()
 
         return instance
+
+class BusinessPurchaseSerializer(serializers.HyperlinkedModelSerializer):
+    member_id = serializers.IntegerField(write_only=True)
+    business_id = serializers.IntegerField(write_only=True)
+    class Meta:
+        model = Purchase
+        fields = ('void_date', 'amount', 'member_id', 'business_id')
+
+    def update(self, instance, validated_data):
+        setattr(instance, 'void_date', validated_data['void_date'])
+        instance.save()
+
+        return instance
+

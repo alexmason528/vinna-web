@@ -12,7 +12,8 @@ from rest_framework.views import APIView
 from vinna.authentication import CustomJSONWebTokenAuthentication
 
 from .models import Business, BusinessBillingInfo
-from .serializers import BusinessSerializer, BusinessBillingInfoSerializer, BusinessBillingBankInfoSerializer, BusinessBillingCreditInfoSerializer
+from .serializers import BusinessSerializer, BusinessBillingInfoSerializer, BusinessBillingBankInfoSerializer, BusinessBillingCreditInfoSerializer, BusinessPurchaseSerializer
+from server.purchase.models import Purchase
 
 @permission_classes(IsAuthenticated, )
 @authentication_classes(CustomJSONWebTokenAuthentication, )
@@ -106,3 +107,36 @@ class BusinessBillingInfoView(APIView):
 		elif request.method == 'DELETE':
 			biling_info = get_object_or_404(BusinessBillingInfo, pk=binfo_id)
 			billing_info.delete()
+
+class BusinessPurchaseView(APIView):
+	
+	@api_view(['GET', 'POST'])
+	def business_purchase_collection(request, id):
+		if request.method == 'GET':
+			b_purchases = Purchase.objects.filter(business_id = id)
+			serializer = BusinessPurchaseSerializer(b_purchases, many=True)
+			return Response(serializer.data)
+		
+		elif request.method == 'POST':
+			request.data['business_id'] = id
+			serializer = BusinessPurchaseSerializer(data=request.data)
+			if serializer.is_valid():
+				serializer.save()
+				return Response(serializer.data, status=status.HTTP_201_CREATED)
+			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+	@api_view(['GET', 'PUT'])
+	def business_purchase_element(request, id, purchase_id):
+		if request.method == 'GET':	
+			purchase = get_object_or_404(Purchase, pk=purchase_id)
+			serializer = BusinessPurchaseSerializer(purchase)
+			return Response(serializer.data)
+
+		elif request.method == 'PUT':
+			purchase = get_object_or_404(Purchase, pk=purchase_id)
+			serializer = BusinessPurchaseSerializer(purchase, data=request.data, partial=True)
+			if serializer.is_valid():
+				serializer.save()
+				return Response(serializer.data)
+			else:
+				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

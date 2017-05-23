@@ -16,7 +16,7 @@ class SubCategory(models.Model):
         return self.text
 
 class Business(models.Model):
-    account = models.OneToOneField(Account, on_delete=models.CASCADE)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
 
     text = models.CharField(max_length=50)
     taxid = models.CharField(max_length=15)

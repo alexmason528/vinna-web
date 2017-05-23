@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     'server.notification',
     'server.media',
     'server.business',
-    'server.transactions',
+    'server.purchase',
     'server.account',
     'server.member',
 
