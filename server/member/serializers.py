@@ -86,7 +86,7 @@ class MemberSerializer(serializers.HyperlinkedModelSerializer):
         if 'referral_link' in validated_data:
             validated_data.pop('referral_link')
 
-        sa_info = Nonß
+        sa_info = None
         if 'stripe_account_info' in validated_data:
             sa_info = validated_data.pop('stripe_account_info')
 
