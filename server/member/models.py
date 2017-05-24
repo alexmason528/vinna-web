@@ -1,3 +1,5 @@
+import jwt
+
 from django.db import models
 from server.media.models import Image
 from server.account.models import Account
@@ -14,6 +16,7 @@ class Member(models.Model):
     mailing_address_country = models.ForeignKey(Country)
     profile_image = models.OneToOneField(Image, null=True, blank=True)
     managed_account_token = models.CharField(max_length=50)
+    referral = models.ForeignKey('self', related_name='member_referral', null=True, blank=True)
 
     security_hash = models.CharField(max_length=32)
     ssn_token = models.CharField(max_length=10)
@@ -23,6 +26,8 @@ class Member(models.Model):
     def __str__(self):
         return self.account.first_name +' '+self.account.last_name
 
+    def get_registration_link(self):
+        return jwt.encode({'id': self.id}, 'secret').decode('utf-8')
 
 class MemberPaymentInfo(models.Model):
     member = models.ForeignKey(Member, on_delete=models.CASCADE)

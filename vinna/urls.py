@@ -36,6 +36,7 @@ urlpatterns = [
     url(r'^api/business/', include('server.business.urls')),
     url(r'^api/notification/', include('server.notification.urls')),
     url(r'^api/media/', include('server.media.urls')),
+    url(r'^api/review/', include('server.review.urls')),
     url(r'^api/', include('server.account.urls')),
 
     url(r'^purple/admin/', admin.site.urls),

@@ -8,8 +8,8 @@ class Purchase(models.Model):
     description = models.CharField(max_length=500, null=True, blank=True)
     business = models.ForeignKey(Business)
 
-    member = models.ForeignKey(Member, related_name="member")
-    member_referral = models.ForeignKey(Member, related_name="member_referral", null=True, blank=True)
+    member = models.ForeignKey(Member, related_name="purchase_member")
+    member_referral = models.ForeignKey(Member, related_name="purchase_member_referral", null=True, blank=True)
 
     posted = models.BooleanField(default=0)
 

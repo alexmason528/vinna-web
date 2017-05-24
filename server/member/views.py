@@ -40,6 +40,7 @@ class MemberView(APIView):
 		if request.method == 'GET':	
 			member = get_object_or_404(Member, pk=id)
 			serializer = MemberSerializer(member)
+			print(serializer.data)
 			return Response(serializer.data)
 
 		elif request.method == 'PUT':

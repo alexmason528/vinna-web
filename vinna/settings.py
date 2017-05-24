@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'server.purchase',
     'server.account',
     'server.member',
+    'server.review',
 
     'client.client_home',
     'client.client_business',
