@@ -1,4 +1,5 @@
 import stripe
+import jwt
 
 from django.conf import settings
 from django.shortcuts import get_object_or_404
@@ -40,16 +41,18 @@ class MemberPaymentInfoSerializer(serializers.HyperlinkedModelSerializer):
         return member_payment_info
 
 class MemberSerializer(serializers.HyperlinkedModelSerializer):
-    account_id = serializers.IntegerField(read_only=True)
-    mailing_address_state_id = serializers.IntegerField(required=True)
-    mailing_address_country_id = serializers.IntegerField(required=True)
-    stripe_account_info = StripeManagedAccountSerializer(write_only=True)
+    account_id = serializers.IntegerField()
+    mailing_address_state_id = serializers.IntegerField()
+    mailing_address_country_id = serializers.IntegerField()
+    stripe_account_info = StripeManagedAccountSerializer(required=False)
     managed_account_token = serializers.CharField(read_only=True)
     payment_infos = MemberPaymentInfoSerializer(read_only=True, many=True)
+    registration_link = serializers.CharField(source='get_registration_link', read_only=True)
+    referral_link = serializers.CharField(required=False)
 
     class Meta:
         model = Member
-        fields = ('account_id', 'mailing_address_1','mailing_address_2','mailing_address_city', 'mailing_address_state_id', 'mailing_address_zip', 'mailing_address_country_id', 'managed_account_token', 'security_hash', 'ssn_token', 'stripe_account_info', 'payment_infos')
+        fields = ('account_id', 'mailing_address_1','mailing_address_2','mailing_address_city', 'mailing_address_state_id', 'mailing_address_zip', 'mailing_address_country_id', 'managed_account_token', 'security_hash', 'ssn_token', 'stripe_account_info', 'payment_infos', 'registration_link', 'referral_link')
 
     def create(self, validated_data):
         sa_info = validated_data.pop('stripe_account_info')
@@ -59,9 +62,17 @@ class MemberSerializer(serializers.HyperlinkedModelSerializer):
         )
         validated_data['managed_account_token'] = response['id']
 
-        payment_infos = None
+        payment_infos, referral_link = None, None
+
         if 'payment_infos' in validated_data:
             payment_infos = validated_data.pop('payment_infos')
+
+        if 'referral_link' in validated_data:
+            referral_link = validated_data.pop('referral_link')
+
+        if referral_link is not None:
+            decoded = jwt.decode(referral_link, 'secret')
+            validated_data['referral_id'] = decoded['id']
 
         member = Member.objects.create(**validated_data)
 
@@ -72,6 +83,8 @@ class MemberSerializer(serializers.HyperlinkedModelSerializer):
         return member
 
     def update(self, instance, validated_data):
+        if 'referral_link' in validated_data:
+            validated_data.pop('referral_link')
 
         sa_info = None
         if 'stripe_account_info' in validated_data:
@@ -84,6 +97,7 @@ class MemberSerializer(serializers.HyperlinkedModelSerializer):
         instance.save()
 
         return instance
+
 
 class MemberPurchaseSerializer(serializers.ModelSerializer):
     class Meta:
