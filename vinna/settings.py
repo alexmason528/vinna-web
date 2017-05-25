@@ -54,12 +54,14 @@ INSTALLED_APPS = [
     'client.client_home',
     'client.client_business',
     'client.client_member',
+
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
     'vinna.middleware.disable_csrf_middleware',
 #    'subdomains.middleware.SubdomainURLRoutingMiddleware',
-
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -223,8 +225,6 @@ STATICFILES_DIRS = [
 FORMAT_MODULE_PATH = [
 ]
 
-
-
 BASICAUTH_USERNAME = 'vinna'
 BASICAUTH_PASSWORD = 'vinnatesting123!'
 
@@ -239,3 +239,5 @@ EMAIL_PORT = 587
 
 STRIPE_API_KEY = 'sk_test_RWKnLTTuJgU5Tzc3Gltv5zzH'
 STRIPE_PUBLIC_KEY = 'pk_test_vSXaN8PlxDIA9SRDrvPyNllu'
+
+CORS_ORIGIN_ALLOW_ALL = True

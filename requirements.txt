@@ -32,3 +32,4 @@ termcolor==1.1.0
 wcwidth==0.1.7
 websocket-client==0.40.0
 django-ipware==1.1.6
+django-cors-headers==2.0.2
