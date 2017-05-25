@@ -16,6 +16,8 @@ from datetime import datetime
 from ipware.ip import get_real_ip, get_ip
 
 from core.models import UserLog
+from server.account.models import Account
+from server.member.models import Member
 
 def get_secret_key(payload=None):
     if api_settings.JWT_GET_USER_SECRET_KEY:
@@ -114,3 +116,36 @@ def decode_handler(token, request):
         raise exceptions.AuthenticationFailed('Invalid token')
 
     return decoded_token
+
+def response_payload_handler(token, user=None, request=None):
+    """
+    Returns the response data for both the login and refresh views.
+    Override to return a custom response such as including the
+    serialized representation of the User.
+    Example:
+    def jwt_response_payload_handler(token, user=None, request=None):
+        return {
+            'token': token,
+            'user': UserSerializer(user, context={'request': request}).data
+        }
+    """
+
+    account_id, member_id = 0, 0
+    
+    try:
+        account = Account.objects.get(user_id = user.id)
+        account_id = account.id
+    except Account.DoesNotExist:
+        pass
+
+    try:
+        member = Member.objects.get(account_id = account_id)
+        member_id = member.id
+    except Member.DoesNotExist:
+        pass
+
+    return {
+        'token': token,
+        'account': account_id,
+        'member': member_id
+    }
