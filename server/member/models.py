@@ -18,8 +18,8 @@ class Member(models.Model):
     managed_account_token = models.CharField(max_length=50)
     referral = models.ForeignKey('self', related_name='member_referral', null=True, blank=True)
 
-    security_hash = models.CharField(max_length=32)
-    ssn_token = models.CharField(max_length=10)
+    security_hash = models.CharField(max_length=32, null=True, blank=True)
+    ssn_token = models.CharField(max_length=10, null=True, blank=True)
 
     last_modified_date = models.DateTimeField('Last Modified', auto_now=True)
 

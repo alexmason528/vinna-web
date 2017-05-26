@@ -40,7 +40,6 @@ htmlcov/
 .coverage
 .coverage.*
 .cache
-.DS_Store
 nosetests.xml
 coverage.xml
 *,cover
@@ -57,3 +56,5 @@ docs/_build/
 
 # PyBuilder
 target/
+
+.DS_Store

@@ -31,10 +31,11 @@ class AccountCreateSerializer(serializers.HyperlinkedModelSerializer):
     roles = serializers.PrimaryKeyRelatedField(many=True, write_only=True, required=False, queryset = Role.objects.all())
     user_id = serializers.IntegerField()
     language_id = serializers.IntegerField()
+    id = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Account
-        fields = ('user_id', 'first_name','last_name', 'language_id', 'phone', 'dob', 'gender', 'profile_photo_url', 'roles')
+        fields = ('id', 'user_id', 'first_name','last_name', 'language_id', 'phone', 'dob', 'gender', 'profile_photo_url', 'roles')
 
     def create(self, validated_data):
         roles = None

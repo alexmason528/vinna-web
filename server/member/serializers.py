@@ -49,6 +49,8 @@ class MemberSerializer(serializers.HyperlinkedModelSerializer):
     payment_infos = MemberPaymentInfoSerializer(read_only=True, many=True)
     registration_link = serializers.CharField(source='get_registration_link', read_only=True)
     referral_link = serializers.CharField(required=False)
+    security_hash = serializers.CharField(required=False)
+    ssn_token = serializers.CharField(required=False)
 
     class Meta:
         model = Member
