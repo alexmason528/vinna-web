@@ -1,9 +1,11 @@
 import jwt
 
 from django.db import models
+
+from core.models import State, Country
+
 from server.media.models import Image
 from server.account.models import Account
-from core.models import State, Country
 
 class Member(models.Model):
     account = models.OneToOneField(Account, on_delete=models.CASCADE)
@@ -32,9 +34,10 @@ class Member(models.Model):
 class MemberPaymentInfo(models.Model):
     member = models.ForeignKey(Member, on_delete=models.CASCADE)
 
-    type = models.CharField(max_length=10) # bank, debit, mail
-    text = models.CharField(max_length=5)
+    type = models.CharField(max_length=10, default='bank') # bank, debit, mail
+    text = models.CharField(max_length=4)
     token = models.CharField(max_length=70)
+    routing_number = models.CharField(max_length=20)
 
     def __str__(self):
         return self.member.account.first_name+' '+self.member.account.last_name+' ('+self.type+', '+self.text+')'

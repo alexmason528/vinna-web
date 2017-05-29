@@ -12,8 +12,8 @@ from rest_framework.views import APIView
 
 from vinna.authentication import CustomJSONWebTokenAuthentication
 
-from .models import Member, MemberPaymentInfo
 from server.purchase.models import Purchase
+from .models import Member, MemberPaymentInfo
 from .serializers import MemberSerializer, MemberPaymentInfoSerializer, MemberPurchaseSerializer
 
 @permission_classes(IsAuthenticated, )

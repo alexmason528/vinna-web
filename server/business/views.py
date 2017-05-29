@@ -12,7 +12,7 @@ from rest_framework.views import APIView
 from vinna.authentication import CustomJSONWebTokenAuthentication
 
 from .models import Business, BusinessBillingInfo
-from .serializers import BusinessSerializer, BusinessBillingInfoSerializer, BusinessBillingBankInfoSerializer, BusinessBillingCreditInfoSerializer, BusinessPurchaseSerializer
+from .serializers import BusinessSerializer, BusinessBillingInfoSerializer, BusinessPurchaseSerializer
 from server.purchase.models import Purchase
 
 @permission_classes(IsAuthenticated, )
@@ -60,25 +60,11 @@ class BusinessBillingInfoView(APIView):
 			return Response(serializer.data)
 		elif request.method == 'POST':
 			request.data['business_id'] = id
-
-			if 'type' not in request.data:
-				err_msg = {'type' : ['This field is required']}
-				return Response(err_msg, status=status.HTTP_400_BAD_REQUEST)
-			if request.data['type'] == 'bank':
-				serializer = BusinessBillingBankInfoSerializer(data=request.data)
-				if serializer.is_valid():
-					serializer.save()
-					return Response(serializer.data, status=status.HTTP_201_CREATED)
-				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-			elif request.data['type'] == 'card':
-				serializer = BusinessBillingCreditInfoSerializer(data=request.data)
-				if serializer.is_valid():
-					serializer.save()
-					return Response(serializer.data, status=status.HTTP_201_CREATED)
-				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-			else:
-				err_msg = {'type' : ['You should provide correct billing type (bank or credit)']}
-				return Response(err_msg, status=status.HTTP_400_BAD_REQUEST)
+			serializer = BusinessBillingInfoSerializer(data=request.data)
+			if serializer.is_valid():
+				serializer.save()
+				return Response(serializer.data, status=status.HTTP_201_CREATED)
+			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 	@api_view(['GET', 'PUT', 'DELETE'])
 	def business_billing_info_element(request, id, binfo_id):
@@ -89,20 +75,13 @@ class BusinessBillingInfoView(APIView):
 		elif request.method == 'PUT':
 			request.data['business_id'] = id
 			billing_info = get_object_or_404(BusinessBillingInfo, pk=binfo_id)
-			if billing_info.type == 'bank':
-				serializer = BusinessBillingBankInfoSerializer(billing_info, data=request.data, partial=True)
-				if serializer.is_valid():
-					serializer.save()
-					return Response(serializer.data)
-				else:
-					return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-			elif billing_info.type == 'card':
-				serializer = BusinessBillingCreditInfoSerializer(billing_info, data=request.data, partial=True)
-				if serializer.is_valid():
-					serializer.save()
-					return Response(serializer.data)
-				else:
-					return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+			serializer = BusinessBillingInfoSerializer(billing_info, data=request.data, partial=True)
+			if serializer.is_valid():
+				serializer.save()
+				return Response(serializer.data)
+			else:
+				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 		elif request.method == 'DELETE':
 			biling_info = get_object_or_404(BusinessBillingInfo, pk=binfo_id)

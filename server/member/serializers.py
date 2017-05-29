@@ -5,30 +5,30 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404
 
 from rest_framework import serializers
-from .models import Member, MemberPaymentInfo
+
+from core.models import Country
+
 from server.purchase.models import Purchase
 from server.account.models import Account
 
-from server.account.serializers import AccountListSerializer
+from .models import Member, MemberPaymentInfo
 
 stripe.api_key = settings.STRIPE_API_KEY
 
 class MemberPaymentInfoSerializer(serializers.HyperlinkedModelSerializer):
+    id = serializers.IntegerField(read_only=True)
     member_id = serializers.IntegerField(required=False)
-    type = serializers.CharField()
-    text = serializers.CharField()
-    token = serializers.CharField()
 
     class Meta:
         model = MemberPaymentInfo
-        fields = ('member_id', 'type', 'text', 'token')
+        fields = ('id', 'member_id', 'text', 'token', 'routing_number')
 
 class MemberSerializer(serializers.HyperlinkedModelSerializer):
     account_id = serializers.IntegerField()
     mailing_address_state_id = serializers.IntegerField()
     mailing_address_country_id = serializers.IntegerField()
-    managed_account_token = serializers.CharField(read_only=True)
-    payment_infos = MemberPaymentInfoSerializer(write_only=True, many=True)
+    managed_account_token = serializers.CharField(required=False)
+    payment_infos = MemberPaymentInfoSerializer(required=False, many=True)
     registration_link = serializers.CharField(source='get_registration_link', read_only=True)
     referral_link = serializers.CharField(required=False)
     security_hash = serializers.CharField(required=False)
@@ -39,10 +39,15 @@ class MemberSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('account_id', 'mailing_address_1','mailing_address_2','mailing_address_city', 'mailing_address_state_id', 'mailing_address_zip', 'mailing_address_country_id', 'managed_account_token', 'security_hash', 'ssn_token','payment_infos', 'registration_link', 'referral_link')
 
     def create(self, validated_data):
-        # account = AccountListSerializer(get_object_or_404(Account, pk=validated_data['account_id']))
+        account = get_object_or_404(Account, pk=validated_data['account_id'])
+        email = account.user.email
+
+        country = get_object_or_404(Country, pk=validated_data['mailing_address_country_id'])
 
         response = stripe.Account.create(
-            managed=True
+            managed=True,
+            email = email,
+            country = country.abbrev
         )
 
         validated_data['managed_account_token'] = response['id']
@@ -71,9 +76,8 @@ class MemberSerializer(serializers.HyperlinkedModelSerializer):
         if 'referral_link' in validated_data:
             validated_data.pop('referral_link')
 
-        sa_info = None
-        if 'stripe_account_info' in validated_data:
-            sa_info = validated_data.pop('stripe_account_info')
+        if 'payment_infos' in validated_data:
+            validated_data.pop('payment_infos')
 
         for item in validated_data:
             if Member._meta.get_field(item):

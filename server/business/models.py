@@ -1,4 +1,5 @@
 from django.db import models
+
 from core.models import Country, State
 from server.account.models import Account
 
@@ -37,8 +38,8 @@ class Business(models.Model):
 
     managed_account_token = models.CharField(max_length=50, null=True, blank=True)
     
-    security_hash = models.CharField(max_length=32)
-    ssn_token = models.CharField(max_length=10)
+    security_hash = models.CharField(max_length=32, null=True, blank=True)
+    ssn_token = models.CharField(max_length=10, null=True, blank=True)
 
     last_modified_date = models.DateTimeField('Last Modified', auto_now=True)
 
@@ -48,11 +49,11 @@ class Business(models.Model):
 class BusinessBillingInfo(models.Model):
     business = models.ForeignKey(Business, on_delete=models.CASCADE)
 
-    active = models.BooleanField();
+    active = models.BooleanField(default=0)
 
     type = models.CharField(max_length=10) # bank, debit, mail
-    text = models.CharField(max_length=5)
-    token = models.CharField(max_length=70, null=True, blank=True)
+    text = models.CharField(max_length=4)
+    token = models.CharField(max_length=70)
 
     country = models.ForeignKey(Country)
     state = models.ForeignKey(State)
