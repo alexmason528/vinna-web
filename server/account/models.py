@@ -10,7 +10,7 @@ class Role(models.Model):
         return self.name
 
 class Account(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     language = models.ForeignKey(Language)
 
     first_name = models.CharField(max_length=50)
