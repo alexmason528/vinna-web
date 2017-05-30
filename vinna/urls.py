@@ -37,6 +37,7 @@ urlpatterns = [
     url(r'^api/notification/', include('server.notification.urls')),
     url(r'^api/media/', include('server.media.urls')),
     url(r'^api/review/', include('server.review.urls')),
+    url(r'^api/core/', include('core.urls')),
     url(r'^api/', include('server.account.urls')),
 
     url(r'^purple/admin/', admin.site.urls),
@@ -52,4 +53,4 @@ urlpatterns = [
 #    url(r'^contact/', include('client.client_member.urls')),
 
 #    url(r'^', include('client.client_home.urls')),
-] # + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static('/', document_root='angularjs/src')
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)# + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static('/', document_root='angularjs/src')

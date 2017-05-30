@@ -18,7 +18,7 @@ class Account(models.Model):
     phone = models.CharField(max_length=25)
     dob = models.DateField()
     gender = models.CharField(choices=((u'F',u'Female'),(u'M',u'Male')), max_length=1)
-    profile_photo_url = models.CharField(max_length=100, null=True, blank=True)
+    profile_photo_url = models.ImageField(upload_to='images/', null=True, blank=True)
     last_modified_date = models.DateTimeField('Last Modified', auto_now=True)
     roles = models.ManyToManyField(Role, through='AccountRole')
 

@@ -16,7 +16,7 @@ class Member(models.Model):
     mailing_address_state = models.ForeignKey(State)
     mailing_address_zip = models.CharField(max_length=20)
     mailing_address_country = models.ForeignKey(Country)
-    profile_image = models.OneToOneField(Image, null=True, blank=True)
+    profile_image = models.OneToOneField(Image)
     managed_account_token = models.CharField(max_length=50)
     referral = models.ForeignKey('self', related_name='member_referral', null=True, blank=True)
 
