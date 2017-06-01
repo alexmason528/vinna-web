@@ -52,5 +52,5 @@ urlpatterns = [
 #    url(r'^about/', include('client.client_member.urls')),
 #    url(r'^contact/', include('client.client_member.urls')),
 
-#    url(r'^', include('client.client_home.urls')),
+    url(r'^', include('client.client_home.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)# + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static('/', document_root='angularjs/src')
