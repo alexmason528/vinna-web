@@ -34,3 +34,8 @@ websocket-client==0.40.0
 django-ipware==1.1.6
 django-cors-headers==2.0.2
 pillow==4.1.1
+djangorestframework==3.6.3
+djangorestframework-jwt==1.10.0
+stripe==1.57.1
+django-storages==1.5.2
+boto3==1.4.4

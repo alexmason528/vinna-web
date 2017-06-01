@@ -1,7 +1,9 @@
 from django.contrib.auth.models import User, Group
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.hashers import make_password
+
 from rest_framework import serializers
 from .models import Account, Role, AccountRole
-from django.shortcuts import get_object_or_404
 
 class Base64ImageField(serializers.ImageField):
     """
@@ -27,7 +29,6 @@ class Base64ImageField(serializers.ImageField):
                 # Break out the header from the base64 content
                 header, data = data.split(';base64,')
 
-            # Try to decode the file. Return validation error if it fails.
             try:
                 decoded_file = base64.b64decode(data)
             except TypeError:
@@ -69,38 +70,73 @@ class RoleSerializer(serializers.HyperlinkedModelSerializer):
 
 class AccountListSerializer(serializers.HyperlinkedModelSerializer):
     roles = RoleSerializer(many=True)
-    user_id = serializers.IntegerField()
     language_id = serializers.IntegerField()
 
     class Meta:
         model = Account
-        fields = ('user_id', 'first_name','last_name', 'language_id', 'phone', 'dob', 'gender', 'profile_photo_url', 'roles')
+        fields = ('first_name','last_name', 'language_id', 'phone', 'dob', 'gender', 'profile_photo_url', 'roles')
 
 class AccountCreateSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.IntegerField(read_only=True)
     roles = serializers.PrimaryKeyRelatedField(many=True, write_only=True, required=False, queryset = Role.objects.all())
-    user_id = serializers.IntegerField()
-    language_id = serializers.IntegerField()
-    profile_photo_url = Base64ImageField(max_length=None, use_url=True)
+    email = serializers.EmailField(write_only=True)
+    password = serializers.CharField(write_only=True)
+
+    profile_photo_url = Base64ImageField(max_length=None, use_url=True, required=False)
 
     class Meta:
         model = Account
-        fields = ('id', 'user_id', 'first_name','last_name', 'language_id', 'phone', 'dob', 'gender', 'profile_photo_url', 'roles')
+        fields = ('id', 'first_name','last_name', 'email', 'phone', 'dob', 'gender', 'password', 'profile_photo_url', 'roles')
 
     def create(self, validated_data):
         roles = None
         if 'roles' in validated_data:
             roles = validated_data.pop('roles')
-        account = Account.objects.create(**validated_data)
+
+        user_info = {}
+        user_info['first_name'] = validated_data['first_name']
+        user_info['last_name'] = validated_data['last_name']
+        user_info['username'] = validated_data['first_name'] + validated_data['last_name']
+        user_info['is_superuser'] = 0
+        user_info['is_staff'] = 0
+        user_info['is_active'] = 1
+        user_info['email'] = validated_data['email']
+        user_info['password'] = make_password(validated_data['password'])
+
+        user = User.objects.create(**user_info)
+        
+        validated_data.pop('email')
+        validated_data.pop('password')
+
+        validated_data['language_id'] = 1
+
+        account = Account.objects.create(user=user, **validated_data)
+
         if roles is not None:
             for role in roles:
                 AccountRole.objects.create(account=account, role=role)
+
         return account
 
     def update(self, instance, validated_data):
+
         roles = None
         if 'roles' in validated_data:
             roles = validated_data.pop('roles')
+
+        user = instance.user
+
+        setattr(user, 'first_name', validated_data['first_name'])
+        setattr(user, 'last_name', validated_data['last_name'])
+        setattr(user, 'email', validated_data['email'])
+        setattr(user, 'password', make_password(validated_data['password']))
+        setattr(user, 'username', validated_data['first_name'] + validated_data['last_name'])
+
+        user.save()
+
+        validated_data.pop('email')
+        validated_data.pop('password')
+
         for item in validated_data:
             if Account._meta.get_field(item):
                 setattr(instance, item, validated_data[item])

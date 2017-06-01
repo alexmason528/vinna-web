@@ -1,6 +1,18 @@
 from django.db import models
 from django.conf import settings
+
 from core.models import Language
+
+def upload_profile_image_to(instance, filename):
+    import os
+    from django.utils.timezone import now
+
+    filename_base, filename_ext = os.path.splitext(filename)
+    return 'profile/%s/%s%s' % (
+        now().strftime("%Y%m%d"),
+        now().strftime("%Y%m%d%H%M%S"),
+        filename_ext.lower(),
+    )
 
 class Role(models.Model):
     name = models.CharField(max_length=25)
@@ -18,7 +30,7 @@ class Account(models.Model):
     phone = models.CharField(max_length=25)
     dob = models.DateField()
     gender = models.CharField(choices=((u'F',u'Female'),(u'M',u'Male')), max_length=1)
-    profile_photo_url = models.ImageField(upload_to='images/', null=True, blank=True)
+    profile_photo_url = models.ImageField(upload_to=upload_profile_image_to, null=True, blank=True)
     last_modified_date = models.DateTimeField('Last Modified', auto_now=True)
     roles = models.ManyToManyField(Role, through='AccountRole')
 

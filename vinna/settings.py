@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'client.client_business',
     'client.client_member',
 
+    'storages',
     'corsheaders'
 ]
 
@@ -223,6 +224,15 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
     os.path.join(BASE_DIR, "s"),
 ]
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+AWS_S3_SECURE_URLS = False
+AWS_QUERYSTRING_AUTH = False
+AWS_S3_ACCESS_KEY_ID = 'AKIAIE7PNSCMGSJLDXOQ'
+AWS_S3_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = 's3.vinna.me'
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 
 FORMAT_MODULE_PATH = [
 ]
