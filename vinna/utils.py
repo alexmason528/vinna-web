@@ -19,6 +19,10 @@ from core.models import UserLog
 from server.account.models import Account
 from server.member.models import Member
 
+from core.serializers import UserSerializer
+from server.account.serializers import AccountListSerializer
+from server.member.serializers import MemberSerializer
+
 def get_secret_key(payload=None):
     if api_settings.JWT_GET_USER_SECRET_KEY:
         User = get_user_model()
@@ -130,7 +134,7 @@ def response_payload_handler(token, user=None, request=None):
         }
     """
 
-    account_id, member_id = 0, 0
+    account, member = None, None
     
     try:
         account = Account.objects.get(user_id = user.id)
@@ -146,7 +150,7 @@ def response_payload_handler(token, user=None, request=None):
 
     return {
         'token': token,
-        'user' : user.id,
-        'account': account_id,
-        'member': member_id
+        'user' : UserSerializer(user).data,
+        'account': AccountListSerializer(account).data,
+        'member': MemberSerializer(member).data
     }

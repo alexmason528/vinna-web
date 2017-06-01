@@ -1,3 +1,5 @@
+from django.contrib.auth.models import User
+
 from rest_framework import serializers
 
 from .models import Country, State
@@ -23,3 +25,8 @@ class StateSerializer(serializers.HyperlinkedModelSerializer):
 	class Meta:
 		model = State
 		fields = ('id', 'country_id', 'abbrev', 'text')
+
+class UserSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = User
+		fields = ('first_name', 'last_name', 'username', 'email')

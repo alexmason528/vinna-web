@@ -96,7 +96,7 @@ class AccountCreateSerializer(serializers.HyperlinkedModelSerializer):
         user_info = {}
         user_info['first_name'] = validated_data['first_name']
         user_info['last_name'] = validated_data['last_name']
-        user_info['username'] = validated_data['first_name'] + validated_data['last_name']
+        user_info['username'] = validated_data['email']
         user_info['is_superuser'] = 0
         user_info['is_staff'] = 0
         user_info['is_active'] = 1
