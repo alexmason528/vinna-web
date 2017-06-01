@@ -2,6 +2,8 @@ from django.utils.decorators import method_decorator
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth import authenticate
 
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
@@ -43,6 +45,21 @@ class AccountView(APIView):
 
 		elif request.method == 'PUT':
 			account = get_object_or_404(Account, pk=id)
+
+			if ('current_password' in request.data) and ('username' in request.data):
+				credentials = {
+					'username': request.data['username'],
+					'password': request.data['current_password']
+				}
+
+				user = authenticate(**credentials)
+
+				if not user:
+					return Reponse('Current password is wrong', status=status.HTTP_400_BAD_REQUEST)
+
+				request.data.pop('current_password')
+				request.data.pop('username')
+
 			serializer = AccountCreateSerializer(account, data=request.data, partial=True)
 			if serializer.is_valid():
 				serializer.save()

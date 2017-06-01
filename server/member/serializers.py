@@ -24,6 +24,7 @@ class MemberPaymentInfoSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('id', 'member_id', 'text', 'token', 'routing_number')
 
 class MemberSerializer(serializers.HyperlinkedModelSerializer):
+    id = serializers.IntegerField()
     account_id = serializers.IntegerField()
     mailing_address_state_id = serializers.IntegerField()
     mailing_address_country_id = serializers.IntegerField()
@@ -36,7 +37,7 @@ class MemberSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Member
-        fields = ('account_id', 'mailing_address_1','mailing_address_2','mailing_address_city', 'mailing_address_state_id', 'mailing_address_zip', 'mailing_address_country_id', 'managed_account_token', 'security_hash', 'ssn_token','payment_infos', 'registration_link', 'referral_link')
+        fields = ('id', 'account_id', 'mailing_address_1','mailing_address_2','mailing_address_city', 'mailing_address_state_id', 'mailing_address_zip', 'mailing_address_country_id', 'managed_account_token', 'security_hash', 'ssn_token','payment_infos', 'registration_link', 'referral_link')
 
     def create(self, validated_data):
         account = get_object_or_404(Account, pk=validated_data['account_id'])

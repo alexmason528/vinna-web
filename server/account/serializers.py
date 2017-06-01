@@ -71,10 +71,11 @@ class RoleSerializer(serializers.HyperlinkedModelSerializer):
 class AccountListSerializer(serializers.HyperlinkedModelSerializer):
     roles = RoleSerializer(many=True)
     language_id = serializers.IntegerField()
-
+    id = serializers.IntegerField()
+    
     class Meta:
         model = Account
-        fields = ('first_name','last_name', 'language_id', 'phone', 'dob', 'gender', 'profile_photo_url', 'roles')
+        fields = ('id', 'first_name','last_name', 'language_id', 'phone', 'dob', 'gender', 'profile_photo_url', 'roles')
 
 class AccountCreateSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.IntegerField(read_only=True)
@@ -126,16 +127,22 @@ class AccountCreateSerializer(serializers.HyperlinkedModelSerializer):
 
         user = instance.user
 
-        setattr(user, 'first_name', validated_data['first_name'])
-        setattr(user, 'last_name', validated_data['last_name'])
-        setattr(user, 'email', validated_data['email'])
-        setattr(user, 'password', make_password(validated_data['password']))
-        setattr(user, 'username', validated_data['first_name'] + validated_data['last_name'])
+        if 'first_name' in validated_data:
+            setattr(user, 'first_name', validated_data['first_name'])
+
+        if 'last_name' in validated_data:
+            setattr(user, 'last_name', validated_data['last_name'])
+
+        if 'email' in validated_data:
+            setattr(user, 'email', validated_data['email'])
+            setattr(user, 'username', validated_data['email'])
+            validated_data.pop('email')
+
+        if 'password' in validated_data:
+            setattr(user, 'password', make_password(validated_data['password']))
+            validated_data.pop('password')
 
         user.save()
-
-        validated_data.pop('email')
-        validated_data.pop('password')
 
         for item in validated_data:
             if Account._meta.get_field(item):
