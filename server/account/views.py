@@ -55,7 +55,7 @@ class AccountView(APIView):
 				user = authenticate(**credentials)
 
 				if not user:
-					return Reponse('Current password is wrong', status=status.HTTP_400_BAD_REQUEST)
+					return Response('Current password is wrong', status=status.HTTP_400_BAD_REQUEST)
 
 				request.data.pop('current_password')
 				request.data.pop('username')
