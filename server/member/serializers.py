@@ -24,7 +24,7 @@ class MemberPaymentInfoSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('id', 'member_id', 'text', 'token', 'routing_number')
 
 class MemberSerializer(serializers.HyperlinkedModelSerializer):
-    id = serializers.IntegerField()
+    id = serializers.IntegerField(read_only=True)
     account_id = serializers.IntegerField()
     mailing_address_state_id = serializers.IntegerField()
     mailing_address_country_id = serializers.IntegerField()
@@ -66,6 +66,10 @@ class MemberSerializer(serializers.HyperlinkedModelSerializer):
             validated_data['referral_id'] = decoded['id']
 
         member = Member.objects.create(**validated_data)
+
+        account = stripe.Account.retrieve(response['id'])
+        account.metadata = { 'Member' : member.id }
+        account.save()
 
         if payment_infos is not None:
             for payment_info in payment_infos:

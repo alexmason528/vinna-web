@@ -13,6 +13,9 @@ from rest_framework.views import APIView
 
 from vinna.authentication import CustomJSONWebTokenAuthentication
 
+from server.business.models import Business
+from server.business.serializers import BusinessSerializer
+
 from .models import Account, Role
 from .serializers import RoleSerializer, AccountListSerializer, AccountCreateSerializer
 
@@ -66,6 +69,13 @@ class AccountView(APIView):
 				return Response(serializer.data)
 			else:
 				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+	@api_view(['GET'])
+	def nearest_partner(request, id, count):
+		if request.method == 'GET':
+			businesses = Business.objects.filter(account_id=id).order_by('-last_modified_date')
+			serializer = BusinessSerializer(businesses, many=True)
+			return Response(serializer.data)
 
 
 class RoleView(APIView):

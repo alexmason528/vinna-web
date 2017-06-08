@@ -35,6 +35,7 @@ class BusinessBillingInfoSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('business_id', 'active', 'type', 'text', 'token', 'country_id', 'state_id', 'zip', 'address1', 'address2')
 
 class BusinessSerializer(serializers.HyperlinkedModelSerializer):
+    id = serializers.IntegerField(read_only=True)
     billing_info = BusinessBillingInfoSerializer(required=False)
     account_id = serializers.IntegerField()
     category_id = serializers.IntegerField()
@@ -48,7 +49,7 @@ class BusinessSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Business
-        fields = ('account_id', 'text', 'taxid', 'country_id', 'state_id', 'zip', 'address1', 'address2','email', 'phone', 'category_id', 'sub_category_id', 'managed_account_token', 'security_hash', 'ssn_token', 'billing_info')
+        fields = ('id', 'account_id', 'text', 'taxid', 'country_id', 'state_id', 'zip', 'address1', 'address2','email', 'phone', 'category_id', 'sub_category_id', 'managed_account_token', 'security_hash', 'ssn_token', 'billing_info')
 
     def create(self, validated_data):
         country = get_object_or_404(Country, pk = validated_data['country_id'])
@@ -68,7 +69,14 @@ class BusinessSerializer(serializers.HyperlinkedModelSerializer):
             validated_data['managed_account_token'] = response['id']
 
         business = Business.objects.create(**validated_data)
+
+        account = stripe.Account.retrieve(response['id'])
+        account.metadata = { 'Business' : business.id }
+        account.save()
+
         if billing_info is not None:
+            extAccountResponse = account.external_accounts.create(external_account=billing_info['token'])
+            billing_info['token'] = extAccountResponse['id']
             BusinessBillingInfo.objects.create(business=business, **billing_info)
 
         return business

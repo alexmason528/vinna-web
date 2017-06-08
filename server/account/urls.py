@@ -5,6 +5,7 @@ from . import views
 app_name = 'account'
 
 urlpatterns = [
+	url(r'account/(?P<id>[0-9]+)/nearest_partner/(?P<count>[0-9]+)/$', views.AccountView.nearest_partner, name='nearest_partner'),
     url(r'account/(?P<id>[0-9]+)/$', views.AccountView.account_element, name='account_element'),
     url(r'account/', views.AccountView.account_collection, name='account_collection'),
     url(r'role/(?P<id>[0-9]+)/$', views.RoleView.role_element, name='role_element'),

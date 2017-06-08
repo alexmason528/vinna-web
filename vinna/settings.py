@@ -184,7 +184,7 @@ JWT_AUTH = {
 }
 
 PREPEND_WWW = False
-ALLOWED_HOSTS = ['www.test.vinna.me','test.vinna.me','www.dev.vinna.me','dev.vinna.me','vinna.me','www.vinna.me','www.localhost','localhost']
+ALLOWED_HOSTS = ['www.test.vinna.me','test.vinna.me','www.dev.vinna.me','dev.vinna.me','vinna.me','www.vinna.me','www.localhost','localhost', '192.168.0.180']
 APPEND_SLASH = True
 
 #ROOT_URLCONF = 'myproject.urls.account'
