@@ -15,6 +15,9 @@ from vinna.authentication import CustomJSONWebTokenAuthentication
 
 from server.business.models import Business
 from server.business.serializers import BusinessSerializer
+from server.media.models import BusinessImage
+
+from server.media.serializers import BusinessImageSerializer
 
 from .models import Account, Role
 from .serializers import RoleSerializer, AccountListSerializer, AccountCreateSerializer
@@ -29,7 +32,6 @@ class AccountView(APIView):
 		if request.method == 'GET':
 			accounts = Account.objects.all()
 			serializer = AccountListSerializer(accounts, many=True)
-			print(accounts)
 			return Response(serializer.data)
 		
 		elif request.method == 'POST':
@@ -71,10 +73,20 @@ class AccountView(APIView):
 				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 	@api_view(['GET'])
-	def nearest_partner(request, id, count):
+	def nearest_partner(request, id):
 		if request.method == 'GET':
 			businesses = Business.objects.filter(account_id=id).order_by('-last_modified_date')
 			serializer = BusinessSerializer(businesses, many=True)
+			
+			for business in serializer.data:
+				
+
+				business_image = BusinessImage.objects.filter(business_id=business['id']).order_by('-created_at').first()
+				business_image_serializer = BusinessImageSerializer(business_image)
+				business['image'] = business_image_serializer.data
+
+				print(business_image_serializer.data)
+
 			return Response(serializer.data)
 
 

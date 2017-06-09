@@ -11,7 +11,7 @@ class BusinessImageSerializer(ImageSerializer):
     business_id = serializers.IntegerField(required=True)
     class Meta:
         model = BusinessImage
-        fields = ('business_id', 'hash', 's3_url', 'title', 'description')
+        fields = ('business_id', 'hash', 's3_url', 'title', 'description', 'created_at')
 
 class VideoSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:

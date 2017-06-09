@@ -11,12 +11,12 @@ class Image(models.Model):
         return self.title
 
 class BusinessImage(models.Model):
-    business = models.OneToOneField(Business, on_delete = models.CASCADE)
+    business = models.ForeignKey(Business, on_delete = models.CASCADE)
     hash = models.CharField(max_length=100)
     s3_url = models.CharField(max_length=100)
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=500, null=True)
-
+    created_at = models.DateTimeField('Created At', auto_now=True)
     def __str__(self):
         return self.title
 
