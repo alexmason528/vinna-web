@@ -15,13 +15,15 @@ from calendar import timegm
 from datetime import datetime
 from ipware.ip import get_real_ip, get_ip
 
-from core.models import UserLog
+from core.models import UserLog, Country, State
 from server.account.models import Account
 from server.member.models import Member
+from server.business.models import Category
 
-from core.serializers import UserSerializer
+from core.serializers import UserSerializer, CountrySerializer, StateSerializer
 from server.account.serializers import AccountListSerializer
 from server.member.serializers import MemberSerializer
+from server.business.serializers import CategorySerializer
 
 def get_secret_key(payload=None):
     if api_settings.JWT_GET_USER_SECRET_KEY:
@@ -122,19 +124,8 @@ def decode_handler(token, request):
     return decoded_token
 
 def response_payload_handler(token, user=None, request=None):
-    """
-    Returns the response data for both the login and refresh views.
-    Override to return a custom response such as including the
-    serialized representation of the User.
-    Example:
-    def jwt_response_payload_handler(token, user=None, request=None):
-        return {
-            'token': token,
-            'user': UserSerializer(user, context={'request': request}).data
-        }
-    """
 
-    account, member = None, None
+    account, member, country, state, category = None, None, None, None, None
     
     try:
         account = Account.objects.get(user_id = user.id)
@@ -148,9 +139,17 @@ def response_payload_handler(token, user=None, request=None):
     except Member.DoesNotExist:
         pass
 
+
+    country = Country.objects.all()
+    state = State.objects.all()
+    category = Category.objects.all()
+
     return {
         'token': token,
         'user' : UserSerializer(user).data,
         'account': AccountListSerializer(account).data,
-        'member': MemberSerializer(member).data
+        'member': MemberSerializer(member).data,
+        'country': CountrySerializer(country, many=True).data,
+        'state': StateSerializer(state, many=True).data,
+        'category': CategorySerializer(category, many=True).data
     }

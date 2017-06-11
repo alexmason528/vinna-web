@@ -15,7 +15,7 @@ from .models import Member, MemberPaymentInfo
 
 stripe.api_key = settings.STRIPE_API_KEY
 
-class MemberPaymentInfoSerializer(serializers.HyperlinkedModelSerializer):
+class MemberPaymentInfoSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
     member_id = serializers.IntegerField(required=False)
 
@@ -23,7 +23,7 @@ class MemberPaymentInfoSerializer(serializers.HyperlinkedModelSerializer):
         model = MemberPaymentInfo
         fields = ('id', 'member_id', 'text', 'token', 'routing_number')
 
-class MemberSerializer(serializers.HyperlinkedModelSerializer):
+class MemberSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
     account_id = serializers.IntegerField()
     mailing_address_state_id = serializers.IntegerField()

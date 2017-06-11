@@ -30,11 +30,9 @@ class MemberView(APIView):
 		
 		elif request.method == 'POST':
 			serializer = MemberSerializer(data=request.data)
-			print(request.data)
 			if serializer.is_valid():
 				serializer.save()
 				return Response(serializer.data, status=status.HTTP_201_CREATED)
-			print(serializer.errors)
 			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 	@api_view(['PUT','GET'])
@@ -42,7 +40,6 @@ class MemberView(APIView):
 		if request.method == 'GET':	
 			member = get_object_or_404(Member, pk=id)
 			serializer = MemberSerializer(member)
-			print(serializer.data)
 			return Response(serializer.data)
 
 		elif request.method == 'PUT':

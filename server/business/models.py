@@ -28,6 +28,7 @@ class Business(models.Model):
     address2 = models.CharField(max_length=40)
     email = models.CharField(max_length=50)
     phone = models.CharField(max_length=25)
+    description = models.CharField(max_length=1000)
     facebook_link = models.CharField(max_length=50, null=True, blank=True)
     twitter_link = models.CharField(max_length=50, null=True, blank=True)
     instagram_link = models.CharField(max_length=50, null=True, blank=True)

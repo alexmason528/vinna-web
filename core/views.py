@@ -30,7 +30,6 @@ class CountryView(APIView):
 		if request.method == 'GET':
 			countries = Country.objects.all()
 			serializer = CountrySerializer(countries, many=True)
-			print(serializer.data)
 			return Response(serializer.data)
 
 	@api_view(['GET'])

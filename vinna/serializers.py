@@ -24,7 +24,7 @@ class CustomJSONWebTokenSerializer(Serializer):
 
         self.fields[self.username_field] = serializers.CharField()
         self.fields['password'] = PasswordField(write_only=True)
-        print(self.context['request'])
+
     @property
     def username_field(self):
         return get_username_field()

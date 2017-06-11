@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Review
 
-class ReviewSerializer(serializers.HyperlinkedModelSerializer):
+class ReviewSerializer(serializers.ModelSerializer):
     member_id = serializers.IntegerField()
     business_id = serializers.IntegerField()
     review = serializers.CharField(required = False)

@@ -79,13 +79,9 @@ class AccountView(APIView):
 			serializer = BusinessSerializer(businesses, many=True)
 			
 			for business in serializer.data:
-				
-
 				business_image = BusinessImage.objects.filter(business_id=business['id']).order_by('-created_at').first()
 				business_image_serializer = BusinessImageSerializer(business_image)
 				business['image'] = business_image_serializer.data
-
-				print(business_image_serializer.data)
 
 			return Response(serializer.data)
 

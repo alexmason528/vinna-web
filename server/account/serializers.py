@@ -53,7 +53,7 @@ class Base64ImageField(serializers.ImageField):
 
         return extension
 
-class AccountRoleSerializer(serializers.HyperlinkedModelSerializer):
+class AccountRoleSerializer(serializers.ModelSerializer):
     role_id = serializers.ReadOnlyField(source='role.id')
     account_id = serializers.ReadOnlyField(source='account.id')
 
@@ -61,14 +61,14 @@ class AccountRoleSerializer(serializers.HyperlinkedModelSerializer):
         model = AccountRole
         fields = ('role_id', 'account_id')
 
-class RoleSerializer(serializers.HyperlinkedModelSerializer):
+class RoleSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Role
         fields = ('id', 'name', 'description')
 
-class AccountListSerializer(serializers.HyperlinkedModelSerializer):
+class AccountListSerializer(serializers.ModelSerializer):
     roles = RoleSerializer(many=True)
     language_id = serializers.IntegerField()
     id = serializers.IntegerField()
@@ -77,7 +77,7 @@ class AccountListSerializer(serializers.HyperlinkedModelSerializer):
         model = Account
         fields = ('id', 'first_name','last_name', 'language_id', 'phone', 'dob', 'gender', 'profile_photo_url', 'roles')
 
-class AccountCreateSerializer(serializers.HyperlinkedModelSerializer):
+class AccountCreateSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
     roles = serializers.PrimaryKeyRelatedField(many=True, write_only=True, required=False, queryset = Role.objects.all())
     email = serializers.EmailField(write_only=True)

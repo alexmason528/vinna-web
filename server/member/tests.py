@@ -1,12 +1,12 @@
 from django.test import TestCase
 from server.member.models import Member, MemberPaymentInfo
 
-class MemberPaymentInfoSerializer(serializers.HyperlinkedModelSerializer):
+class MemberPaymentInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = MemberPaymentInfo
         fields = ('type', 'text', 'token')
 
-class MemberSerializer(serializers.HyperlinkedModelSerializer):
+class MemberSerializer(serializers.ModelSerializer):
     payment_infos = MemberPaymentInfoSerializer(required=False, many=True)
     account_id = serializers.IntegerField(required=True)
     mailing_address_state_id = serializers.IntegerField(required=True)
