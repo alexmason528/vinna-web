@@ -11,20 +11,31 @@ from rest_framework.views import APIView
 
 from vinna.authentication import CustomJSONWebTokenAuthentication
 
+from server.purchase.models import Purchase
+from server.media.models import BusinessImage
+
+from server.media.serializers import BusinessImageSerializer
 from .models import Business, BusinessBillingInfo
 from .serializers import BusinessSerializer, BusinessBillingInfoSerializer, BusinessPurchaseSerializer
-from server.purchase.models import Purchase
 
-@permission_classes(IsAuthenticated, )
-@authentication_classes(CustomJSONWebTokenAuthentication, )
+
+
+# @permission_classes(IsAuthenticated, )
+# @authentication_classes(CustomJSONWebTokenAuthentication, )
 
 class BusinessView(APIView):
 
 	@api_view(['GET', 'POST'])
 	def business_collection(request):
 		if request.method == 'GET':
-			businesses = Business.objects.all()
+			businesses = Business.objects.all().order_by('-last_modified_date')
 			serializer = BusinessSerializer(businesses, many=True)
+			
+			for business in serializer.data:
+				business_image = BusinessImage.objects.filter(business_id=business['id']).order_by('-created_at').first()
+				business_image_serializer = BusinessImageSerializer(business_image)
+				business['image'] = business_image_serializer.data
+
 			return Response(serializer.data)
 		
 		elif request.method == 'POST':
