@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.hashers import make_password
 
 from rest_framework import serializers
-from .models import Account, Role, AccountRole
+from .models import Account
 
 class Base64ImageField(serializers.ImageField):
     """
@@ -53,33 +53,8 @@ class Base64ImageField(serializers.ImageField):
 
         return extension
 
-class AccountRoleSerializer(serializers.ModelSerializer):
-    role_id = serializers.ReadOnlyField(source='role.id')
-    account_id = serializers.ReadOnlyField(source='account.id')
-
-    class Meta:
-        model = AccountRole
-        fields = ('role_id', 'account_id')
-
-class RoleSerializer(serializers.ModelSerializer):
+class AccountSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
-
-    class Meta:
-        model = Role
-        fields = ('id', 'name', 'description')
-
-class AccountListSerializer(serializers.ModelSerializer):
-    roles = RoleSerializer(many=True)
-    language_id = serializers.IntegerField()
-    id = serializers.IntegerField()
-    
-    class Meta:
-        model = Account
-        fields = ('id', 'first_name','last_name', 'language_id', 'phone', 'dob', 'gender', 'profile_photo_url', 'roles')
-
-class AccountCreateSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(read_only=True)
-    roles = serializers.PrimaryKeyRelatedField(many=True, write_only=True, required=False, queryset = Role.objects.all())
     email = serializers.EmailField(write_only=True)
     password = serializers.CharField(write_only=True)
 
@@ -87,12 +62,9 @@ class AccountCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = ('id', 'first_name','last_name', 'email', 'phone', 'dob', 'gender', 'password', 'profile_photo_url', 'roles')
+        fields = ('id', 'first_name','last_name', 'email', 'phone', 'dob', 'gender', 'password', 'profile_photo_url')
 
     def create(self, validated_data):
-        roles = None
-        if 'roles' in validated_data:
-            roles = validated_data.pop('roles')
 
         user_info = {}
         user_info['first_name'] = validated_data['first_name']
@@ -113,17 +85,9 @@ class AccountCreateSerializer(serializers.ModelSerializer):
 
         account = Account.objects.create(user=user, **validated_data)
 
-        if roles is not None:
-            for role in roles:
-                AccountRole.objects.create(account=account, role=role)
-
         return account
 
     def update(self, instance, validated_data):
-
-        roles = None
-        if 'roles' in validated_data:
-            roles = validated_data.pop('roles')
 
         user = instance.user
 
@@ -148,9 +112,5 @@ class AccountCreateSerializer(serializers.ModelSerializer):
             if Account._meta.get_field(item):
                 setattr(instance, item, validated_data[item])
 
-        if roles is not None:
-            AccountRole.objects.filter(account=instance).delete()
-            for role in roles:
-                AccountRole.objects.create(account=instance, role=role)
         instance.save()
         return instance

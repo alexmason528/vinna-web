@@ -23,6 +23,7 @@ class Business(models.Model):
     taxid = models.CharField(max_length=15)
     country = models.ForeignKey(Country)
     state = models.ForeignKey(State)
+    city = models.CharField(max_length=20)
     zip = models.CharField(max_length=20)
     address1 = models.CharField(max_length=40)
     address2 = models.CharField(max_length=40)

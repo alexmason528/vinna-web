@@ -8,6 +8,7 @@ from rest_framework import serializers
 from core.models import Country
 
 from server.purchase.models import Purchase
+from server.account.partner_model import AccountPartnerRole
 
 from .models import Category, SubCategory, Business, BusinessBillingInfo
 
@@ -50,7 +51,7 @@ class BusinessSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Business
-        fields = ('id', 'account_id', 'text', 'taxid', 'country_id', 'state_id', 'zip', 'address1', 'address2','email', 'phone', 'description', 'category_id', 'sub_category_id', 'managed_account_token', 'security_hash', 'ssn_token', 'billing_info')
+        fields = ('id', 'account_id', 'text', 'taxid', 'country_id', 'state_id', 'city', 'zip', 'address1', 'address2','email', 'phone', 'description', 'category_id', 'sub_category_id', 'managed_account_token', 'security_hash', 'ssn_token', 'billing_info')
 
     def create(self, validated_data):
         country = get_object_or_404(Country, pk = validated_data['country_id'])
@@ -74,6 +75,8 @@ class BusinessSerializer(serializers.ModelSerializer):
         account = stripe.Account.retrieve(response['id'])
         account.metadata = { 'Business' : business.id }
         account.save()
+
+        AccountPartnerRole.objects.create(account_id=validated_data['account_id'], business_id=business.id, role="cashier")
 
         if billing_info is not None:
             extAccountResponse = account.external_accounts.create(external_account=billing_info['token'])

@@ -19,8 +19,8 @@ from server.media.models import BusinessImage
 
 from server.media.serializers import BusinessImageSerializer
 
-from .models import Account, Role
-from .serializers import RoleSerializer, AccountListSerializer, AccountCreateSerializer
+from .models import Account
+from .serializers import AccountSerializer
 
 @permission_classes(IsAuthenticated, )
 @authentication_classes(CustomJSONWebTokenAuthentication, )
@@ -31,11 +31,11 @@ class AccountView(APIView):
 	def account_collection(request):
 		if request.method == 'GET':
 			accounts = Account.objects.all()
-			serializer = AccountListSerializer(accounts, many=True)
+			serializer = AccountSerializer(accounts, many=True)
 			return Response(serializer.data)
 		
 		elif request.method == 'POST':
-			serializer = AccountCreateSerializer(data=request.data)
+			serializer = AccountSerializer(data=request.data)
 			if serializer.is_valid():
 				serializer.save()
 				return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -45,7 +45,7 @@ class AccountView(APIView):
 	def account_element(request, id):
 		if request.method == 'GET':	
 			account = get_object_or_404(Account, pk=id)
-			serializer = AccountListSerializer(account)
+			serializer = AccountSerializer(account)
 			return Response(serializer.data)
 
 		elif request.method == 'PUT':
@@ -65,7 +65,7 @@ class AccountView(APIView):
 				request.data.pop('current_password')
 				request.data.pop('username')
 
-			serializer = AccountCreateSerializer(account, data=request.data, partial=True)
+			serializer = AccountSerializer(account, data=request.data, partial=True)
 			if serializer.is_valid():
 				serializer.save()
 				return Response(serializer.data)
@@ -84,40 +84,3 @@ class AccountView(APIView):
 				business['image'] = business_image_serializer.data
 
 			return Response(serializer.data)
-
-
-class RoleView(APIView):
-
-	@api_view(['GET', 'POST'])
-	def role_collection(request):
-		if request.method == 'GET':
-			roles = Role.objects.all()
-			serializer = RoleSerializer(roles, many=True)
-			return Response(serializer.data)
-		
-		elif request.method == 'POST':
-			serializer = RoleSerializer(data=request.data)
-			if serializer.is_valid():
-				serializer.save()
-				return Response(serializer.data, status=status.HTTP_201_CREATED)
-			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-	@api_view(['PUT','GET', 'DELETE'])
-	def role_element(request, id):
-		if request.method == 'GET':	
-			role = get_object_or_404(Role, pk=id)
-			serializer = RoleSerializer(role)
-			return Response(serializer.data)
-
-		elif request.method == 'PUT':
-			role = get_object_or_404(Role, pk=id)
-			serializer = RoleSerializer(role, data=request.data, partial=True)
-			if serializer.is_valid():
-				serializer.save()
-				return Response(serializer.data)
-			else:
-				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-		elif request.method == 'DELETE':
-			role = get_object_or_404(Role, pk=id)
-			role.delete()

@@ -18,12 +18,14 @@ from ipware.ip import get_real_ip, get_ip
 from core.models import UserLog, Country, State
 from server.account.models import Account
 from server.member.models import Member
-from server.business.models import Category
+from server.business.models import Category, Business
+from server.account.partner_model import AccountPartnerRole
 
 from core.serializers import UserSerializer, CountrySerializer, StateSerializer
-from server.account.serializers import AccountListSerializer
+from server.account.serializers import AccountSerializer
 from server.member.serializers import MemberSerializer
-from server.business.serializers import CategorySerializer
+from server.business.serializers import CategorySerializer, BusinessSerializer
+from server.account.partner_serializer import AccountPartnerRoleSerializer
 
 def get_secret_key(payload=None):
     if api_settings.JWT_GET_USER_SECRET_KEY:
@@ -128,14 +130,12 @@ def response_payload_handler(token, user=None, request=None):
     account, member, country, state, category = None, None, None, None, None
     
     try:
-        account = Account.objects.get(user_id = user.id)
-        account_id = account.id
+        account = Account.objects.get(user = user)
     except Account.DoesNotExist:
         pass
 
     try:
-        member = Member.objects.get(account_id = account_id)
-        member_id = member.id
+        member = Member.objects.get(account = account)
     except Member.DoesNotExist:
         pass
 
@@ -143,13 +143,19 @@ def response_payload_handler(token, user=None, request=None):
     country = Country.objects.all()
     state = State.objects.all()
     category = Category.objects.all()
+    partners = Business.objects.filter(account=account)
+    cashiers = []
+    for role in AccountPartnerRole.objects.filter(account = account):
+        cashiers.append(Business.objects.get(id=role.business_id))
 
     return {
         'token': token,
         'user' : UserSerializer(user).data,
-        'account': AccountListSerializer(account).data,
+        'account': AccountSerializer(account).data,
         'member': MemberSerializer(member).data,
         'country': CountrySerializer(country, many=True).data,
         'state': StateSerializer(state, many=True).data,
-        'category': CategorySerializer(category, many=True).data
+        'category': CategorySerializer(category, many=True).data,
+        'partners': BusinessSerializer(partners, many=True).data,
+        'cashiers': BusinessSerializer(cashiers, many=True).data
     }
