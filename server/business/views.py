@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.utils.decorators import method_decorator
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -13,11 +14,15 @@ from vinna.authentication import CustomJSONWebTokenAuthentication
 
 from server.purchase.models import Purchase
 from server.media.models import BusinessImage
+from server.account.models import Account
+from server.account.partner_model import AccountPartnerRole
+from .models import Business, BusinessBillingInfo
+from .invitation_model import Invitation
 
 from server.media.serializers import BusinessImageSerializer
-from .models import Business, BusinessBillingInfo
+from server.account.partner_serializer import AccountPartnerRoleSerializer
 from .serializers import BusinessSerializer, BusinessBillingInfoSerializer, BusinessPurchaseSerializer
-
+from .invitation_serializer import InvitationSerializer
 
 
 # @permission_classes(IsAuthenticated, )
@@ -131,4 +136,60 @@ class BusinessPurchaseView(APIView):
 				serializer.save()
 				return Response(serializer.data)
 			else:
+				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class BusinessInvitationView(APIView):
+
+	@api_view(['GET', 'POST'])
+	def business_invitation_collection(request, id):
+		if request.method == 'GET':
+			invitations = Invitation.objects.all()
+			serializer = InvitationSerializer(invitations, many=True)
+			
+			return Response(serializer.data)
+		
+		elif request.method == 'POST':
+			request.data['business_id'] = id
+			serializer = InvitationSerializer(data=request.data)
+
+			if serializer.is_valid():
+				serializer.save()
+				return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+	@api_view(['GET'])
+	def business_invitation_element(request, id, invitation_id):
+		if request.method == 'GET':	
+			invitation = get_object_or_404(Invitation, pk=invitation_id)
+			serializer = InvitationSerializer(invitation)
+			return Response(serializer.data)
+
+class BusinessCashierView(APIView):
+
+	@api_view(['GET', 'POST'])
+	def business_cashier(request, id):
+		if request.method == 'GET':
+			cashiers = AccountPartnerRole.objects.filter(business_id = id)
+			serializer = AccountPartnerRoleSerializer(cashiers, many=True)
+			return Response(serializer.data)
+		if request.method == 'POST':
+			user = None
+			try:
+				user = User.objects.get(username=request.data['email'])
+			except:
+				pass
+
+			if not user:
+				serializer = InvitationSerializer(data={'business_id': id, 'email': request.data['email'], 'type': 'cashier'})
+				if serializer.is_valid():
+					serializer.save()
+					return Response(serializer.data, status=status.HTTP_201_CREATED)
+				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+			else:
+				account = Account.objects.get(user_id=user.id)
+				serializer = AccountPartnerRoleSerializer(data={'account_id': account.id, 'business_id': id, 'role': 'cashier', 'description': 'extra'})
+				if serializer.is_valid():
+					serializer.save()
+					return Response(serializer.data, status=status.HTTP_201_CREATED)
 				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -1,7 +1,5 @@
 from django.db import models
-from django.conf import settings
 
-from core.models import Language
 from server.account.models import Account
 from server.business.models import Business
 

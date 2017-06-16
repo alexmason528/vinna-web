@@ -3,8 +3,8 @@ from server.account.partner_model import AccountPartnerRole
 
 class AccountPartnerRoleSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
-    account_id = serializers.IntegerField(read_only=True)
-    business_id = serializers.IntegerField(read_only=True)
+    account_id = serializers.IntegerField()
+    business_id = serializers.IntegerField()
 
     class Meta:
         model = AccountPartnerRole

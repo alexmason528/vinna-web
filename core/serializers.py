@@ -23,6 +23,14 @@ class StateSerializer(serializers.ModelSerializer):
 		fields = ('id', 'country_id', 'text')
 
 class UserSerializer(serializers.ModelSerializer):
+	id = serializers.IntegerField(read_only=True)
+	first_name = serializers.CharField(write_only=True)
+	last_name = serializers.CharField(write_only=True)
+	is_superuser = serializers.CharField(write_only=True)
+	is_staff = serializers.CharField(write_only=True)
+	is_active = serializers.CharField(write_only=True)
+	password = serializers.CharField(write_only=True)
+
 	class Meta:
 		model = User
-		fields = ('first_name', 'last_name', 'username', 'email')
+		fields = ('id', 'first_name', 'last_name', 'username', 'is_superuser', 'is_staff', 'is_active', 'email', 'password')

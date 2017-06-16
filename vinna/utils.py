@@ -144,9 +144,9 @@ def response_payload_handler(token, user=None, request=None):
     state = State.objects.all()
     category = Category.objects.all()
     partners = Business.objects.filter(account=account)
-    cashiers = []
+    works = []
     for role in AccountPartnerRole.objects.filter(account = account):
-        cashiers.append(Business.objects.get(id=role.business_id))
+        works.append(Business.objects.get(id=role.business_id))
 
     return {
         'token': token,
@@ -157,5 +157,5 @@ def response_payload_handler(token, user=None, request=None):
         'state': StateSerializer(state, many=True).data,
         'category': CategorySerializer(category, many=True).data,
         'partners': BusinessSerializer(partners, many=True).data,
-        'cashiers': BusinessSerializer(cashiers, many=True).data
+        'works': BusinessSerializer(works, many=True).data
     }
