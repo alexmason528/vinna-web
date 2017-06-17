@@ -168,7 +168,7 @@ class BusinessInvitationView(APIView):
 class BusinessCashierView(APIView):
 
 	@api_view(['GET', 'POST'])
-	def business_cashier(request, id):
+	def business_cashier_collection(request, id):
 		if request.method == 'GET':
 			cashiers = AccountPartnerRole.objects.filter(business_id = id)
 			serializer = AccountPartnerRoleSerializer(cashiers, many=True)
@@ -188,8 +188,30 @@ class BusinessCashierView(APIView):
 				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 			else:
 				account = Account.objects.get(user_id=user.id)
-				serializer = AccountPartnerRoleSerializer(data={'account_id': account.id, 'business_id': id, 'role': 'cashier', 'description': 'extra'})
-				if serializer.is_valid():
-					serializer.save()
-					return Response(serializer.data, status=status.HTTP_201_CREATED)
-				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+				partner_role_data = {
+					'account_id': account.id,
+					'business_id': id,
+					'role': 'cashier',
+					'description': 'extra'
+				}
+
+				AccountPartnerRole.objects.create(**partner_role_data)
+
+				cashiers = AccountPartnerRole.objects.filter(business_id=id)
+				serializer = AccountPartnerRoleSerializer(cashiers, many=True)
+
+				return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+	@api_view(['GET', 'DELETE'])
+	def business_cashier_element(request, id, cashier_id):
+		if request.method == 'GET':
+			cashier = get_object_or_404(AccountPartnerRole, pk = cashier_id)
+			serializer = AccountPartnerRoleSerializer(cashier)
+			return Response(serializer.data)
+		elif request.method == 'DELETE':
+			cashier = get_object_or_404(AccountPartnerRole, pk = cashier_id)
+			cashier.delete()
+
+			cashiers = AccountPartnerRole.objects.filter(business_id = id)
+			serializer = AccountPartnerRoleSerializer(cashiers, many=True)
+			return Response(serializer.data)

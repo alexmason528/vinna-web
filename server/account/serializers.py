@@ -5,7 +5,6 @@ from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 from core.serializers import UserSerializer
 from server.account.partner_model import AccountPartnerRole
-from server.account.partner_serializer import AccountPartnerRoleSerializer
 from server.business.invitation_model import Invitation
 from .models import Account
 
@@ -79,11 +78,15 @@ class AccountSerializer(serializers.ModelSerializer):
         validated_data['language_id'] = 1
 
         account = Account.objects.create(user_id=serializer.data['id'], **validated_data)
+        partner_role_info = {
+            'account_id': account.id,
+            'business_id': invitation.business_id,
+            'role': 'cashier',
+            'description': 'extra'
+        }
 
         if invitation:
-            serializer = AccountPartnerRoleSerializer(data={'account_id': account.id, 'business_id': invitation.business_id, 'role': 'cashier', 'description': 'extra'})
-            if serializer.is_valid():
-                serializer.save()
+            AccountPartnerRole.objects.create(**partner_role_info)
 
         return account
 
