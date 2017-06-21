@@ -71,21 +71,18 @@ class AccountSerializer(serializers.ModelSerializer):
             'password' : make_password(validated_data.pop('password'))
         }
 
-        serializer = UserSerializer(data=user_info)
-        if serializer.is_valid():
-            serializer.save()
-
+        user = User.objects.create(**user_info)
         validated_data['language_id'] = 1
 
-        account = Account.objects.create(user_id=serializer.data['id'], **validated_data)
-        partner_role_info = {
-            'account_id': account.id,
-            'business_id': invitation.business_id,
-            'role': 'cashier',
-            'description': 'extra'
-        }
+        account = Account.objects.create(user_id=user.id, **validated_data)
 
         if invitation:
+            partner_role_info = {
+                'account_id': account.id,
+                'business_id': invitation.business_id,
+                'role': 'cashier',
+                'description': 'extra'
+            }
             AccountPartnerRole.objects.create(**partner_role_info)
 
         return account

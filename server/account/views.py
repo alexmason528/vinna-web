@@ -1,3 +1,5 @@
+import qrcode
+
 from django.utils.decorators import method_decorator
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -46,6 +48,7 @@ class AccountView(APIView):
 		if request.method == 'GET':	
 			account = get_object_or_404(Account, pk=id)
 			serializer = AccountSerializer(account)
+			serializer.data['qrcode'] = qrcode.make(account.user.username)
 			return Response(serializer.data)
 
 		elif request.method == 'PUT':

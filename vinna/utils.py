@@ -1,6 +1,9 @@
 import jwt
 import uuid
 import warnings
+import qrcode
+import base64
+import io
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
@@ -148,10 +151,22 @@ def response_payload_handler(token, user=None, request=None):
     for role in AccountPartnerRole.objects.filter(account = account):
         works.append(Business.objects.get(id=role.business_id))
 
+    qr = qrcode.make(account.user.username)
+
+    in_mem_file = io.BytesIO()
+    qr.save(in_mem_file, format = "JPEG")
+    in_mem_file.seek(0)
+    img_bytes = in_mem_file.read()
+    base64_encoded_result_bytes = base64.b64encode(img_bytes)
+    base64_encoded_result_str = base64_encoded_result_bytes.decode('ascii')
+
+    account_data = AccountSerializer(account).data
+    account_data['qrcode'] = base64_encoded_result_str
+
     return {
         'token': token,
         'user' : UserSerializer(user).data,
-        'account': AccountSerializer(account).data,
+        'account': account_data,
         'member': MemberSerializer(member).data,
         'country': CountrySerializer(country, many=True).data,
         'state': StateSerializer(state, many=True).data,
