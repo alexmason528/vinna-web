@@ -3,6 +3,7 @@ from django.utils.decorators import method_decorator
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
+from django.db import transaction
 
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
@@ -31,6 +32,7 @@ from .invitation_serializer import InvitationSerializer
 class BusinessView(APIView):
 
 	@api_view(['GET', 'POST'])
+	@transaction.atomic
 	def business_collection(request):
 		if request.method == 'GET':
 			businesses = Business.objects.all().order_by('-last_modified_date')
@@ -168,6 +170,7 @@ class BusinessInvitationView(APIView):
 class BusinessCashierView(APIView):
 
 	@api_view(['GET', 'POST'])
+	@transaction.atomic
 	def business_cashier_collection(request, id):
 		if request.method == 'GET':
 			cashiers = AccountPartnerRole.objects.filter(business_id = id)
@@ -203,6 +206,7 @@ class BusinessCashierView(APIView):
 				return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 	@api_view(['GET', 'DELETE'])
+	@transaction.atomic
 	def business_cashier_element(request, id, cashier_id):
 		if request.method == 'GET':
 			cashier = get_object_or_404(AccountPartnerRole, pk = cashier_id)

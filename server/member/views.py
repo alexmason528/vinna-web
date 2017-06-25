@@ -3,6 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+from django.db import transaction
 
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
@@ -22,6 +23,7 @@ from .serializers import MemberSerializer, MemberPaymentInfoSerializer, MemberPu
 class MemberView(APIView):
 
 	@api_view(['GET', 'POST'])
+	@transaction.atomic
 	def member_collection(request):
 		if request.method == 'GET':
 			members = Member.objects.all()
@@ -36,6 +38,7 @@ class MemberView(APIView):
 			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 	@api_view(['PUT','GET'])
+	@transaction.atomic
 	def member_element(request, id):
 		if request.method == 'GET':	
 			member = get_object_or_404(Member, pk=id)
@@ -55,6 +58,7 @@ class MemberView(APIView):
 class MemberPaymentInfoView(APIView):
 
 	@api_view(['GET', 'POST'])
+	@transaction.atomic
 	def member_payment_info_collection(request, id):
 		if request.method == 'GET':
 			member_payment_infos = MemberPaymentInfo.objects.filter(member_id = id)
@@ -70,6 +74,7 @@ class MemberPaymentInfoView(APIView):
 			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 	@api_view(['PUT','GET', 'DELETE'])
+	@transaction.atomic
 	def member_payment_info_element(request, id, pinfo_id):
 		if request.method == 'GET':	
 			member_payment_info = get_object_or_404(MemberPaymentInfo, pk=pinfo_id)

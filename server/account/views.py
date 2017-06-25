@@ -1,11 +1,10 @@
-import qrcode
-
 from django.utils.decorators import method_decorator
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate
+from django.db import transaction
 
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
@@ -30,6 +29,7 @@ from .serializers import AccountSerializer
 class AccountView(APIView):
 
 	@api_view(['GET', 'POST'])
+	@transaction.atomic
 	def account_collection(request):
 		if request.method == 'GET':
 			accounts = Account.objects.all()
@@ -44,11 +44,11 @@ class AccountView(APIView):
 			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 	@api_view(['PUT','GET'])
+	@transaction.atomic
 	def account_element(request, id):
 		if request.method == 'GET':	
 			account = get_object_or_404(Account, pk=id)
 			serializer = AccountSerializer(account)
-			serializer.data['qrcode'] = qrcode.make(account.user.username)
 			return Response(serializer.data)
 
 		elif request.method == 'PUT':
@@ -56,8 +56,8 @@ class AccountView(APIView):
 
 			if ('current_password' in request.data) and ('username' in request.data):
 				credentials = {
-					'username': request.data['username'],
-					'password': request.data['current_password']
+					'username': request.data.pop('current_password'),
+					'password': request.data.pop('username')
 				}
 
 				user = authenticate(**credentials)

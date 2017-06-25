@@ -104,6 +104,7 @@ WSGI_APPLICATION = 'vinna.wsgi.application'
 
 DATABASES = {
     'default': {
+        'ATOMIC_REQUESTS': True,
         'ENGINE': 'django.db.backends.mysql',
         'OPTIONS': {
             'sql_mode': 'STRICT_ALL_TABLES',
