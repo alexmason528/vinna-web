@@ -146,7 +146,7 @@ def response_payload_handler(token, user=None, request=None):
     country = Country.objects.all()
     state = State.objects.all()
     category = Category.objects.all()
-    partners = Business.objects.filter(account=account)
+    partners = Business.objects.filter(account=account).order_by('-last_modified_date')
     works = []
     for role in AccountPartnerRole.objects.filter(account = account):
         works.append(Business.objects.get(id=role.business_id))

@@ -9,6 +9,9 @@ from core.models import Country
 
 from server.purchase.models import Purchase
 from server.account.partner_model import AccountPartnerRole
+from server.media.models import BusinessImage
+
+from server.media.serializers import BusinessImageSerializer
 
 from .models import Category, SubCategory, Business, BusinessBillingInfo
 
@@ -39,7 +42,8 @@ class BusinessSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
     billing_info = BusinessBillingInfoSerializer(required=False)
     account_id = serializers.IntegerField()
-    category_id = serializers.IntegerField()
+    category_id = serializers.IntegerField(write_only=True)
+    category = CategorySerializer(read_only=True)
     sub_category_id = serializers.IntegerField()
     country_id = serializers.IntegerField()
     state_id = serializers.IntegerField()
@@ -48,10 +52,10 @@ class BusinessSerializer(serializers.ModelSerializer):
     security_hash = serializers.CharField(required=False)
     ssn_token = serializers.CharField(required=False)
     description = serializers.CharField(required=False)
-
+    images = BusinessImageSerializer(source='get_images', many=True)
     class Meta:
         model = Business
-        fields = ('id', 'account_id', 'text', 'taxid', 'country_id', 'state_id', 'city', 'zip', 'address1', 'address2','email', 'phone', 'description', 'category_id', 'sub_category_id', 'managed_account_token', 'security_hash', 'ssn_token', 'billing_info')
+        fields = ('id', 'account_id', 'text', 'taxid', 'country_id', 'state_id', 'city', 'zip', 'address1', 'address2','email', 'phone', 'description', 'category', 'category_id', 'sub_category_id', 'managed_account_token', 'security_hash', 'ssn_token', 'billing_info', 'images')
 
     def create(self, validated_data):
         country = get_object_or_404(Country, pk = validated_data['country_id'])

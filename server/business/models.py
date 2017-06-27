@@ -2,6 +2,7 @@ from django.db import models
 
 from core.models import Country, State
 from server.account.models import Account
+from server.media.models import BusinessImage
 
 class Category(models.Model):
     text = models.CharField(max_length=50)
@@ -47,6 +48,10 @@ class Business(models.Model):
 
     def __str__(self):
         return self.text+' ('+self.account.first_name+' '+self.account.last_name+')'
+
+    def get_images(self):
+        images = BusinessImage.objects.filter(business=self).order_by('-created_at')
+        return images
 
 class BusinessBillingInfo(models.Model):
     business = models.ForeignKey(Business, on_delete=models.CASCADE)
