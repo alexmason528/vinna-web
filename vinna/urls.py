@@ -37,6 +37,7 @@ urlpatterns = [
     url(r'^api/notification/', include('server.notification.urls')),
     url(r'^api/media/', include('server.media.urls')),
     url(r'^api/review/', include('server.review.urls')),
+    url(r'^api/purchase/', include('server.purchase.urls')),
     url(r'^api/core/', include('core.urls')),
     url(r'^api/', include('server.account.urls')),
 
