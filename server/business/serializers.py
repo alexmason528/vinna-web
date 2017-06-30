@@ -90,6 +90,20 @@ class BusinessSerializer(serializers.ModelSerializer):
         return business
 
     def update(self, instance, validated_data):
+
+        billing_info = None
+        if 'billing_info' in validated_data:
+            billing_info = validated_data.pop('billing_info')
+        business_billing_info = get_object_or_404(BusinessBillingInfo, business=instance)
+        business_billing_info.type = billing_info['type']
+        business_billing_info.text = billing_info['text']
+
+        account = stripe.Account.retrieve(instance.managed_account_token)
+        extAccountResponse = account.external_accounts.create(external_account=billing_info['token'])
+        business_billing_info.token = extAccountResponse['id']
+
+        business_billing_info.save()
+
         for item in validated_data:
             if Business._meta.get_field(item):
                 setattr(instance, item, validated_data[item])

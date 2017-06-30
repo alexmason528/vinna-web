@@ -57,6 +57,7 @@ class BusinessView(APIView):
 			return Response(serializer.data)
 
 		elif request.method == 'PUT':
+			print(request.data)
 			business = get_object_or_404(Business, pk=id)
 			serializer = BusinessSerializer(business, data=request.data, partial=True)
 			if serializer.is_valid():
