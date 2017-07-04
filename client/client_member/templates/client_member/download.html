@@ -17,11 +17,13 @@
                       <a href="#"><img src="/static/images/app-store.png" alt="" title="" ></a>
                         <a href="#"><img src="/static/images/google-play.png" alt="" title="" ></a>
                         <p>Receive a link to download the App on your device.</p>
-                        <form method="POST" action="#">
+                        <form method="POST" action="">
                           {% csrf_token %}
-                          <input type="text" name="email" value="" placeholder="Email or Phone #" style="color:#000">
-                            <button type="submit">Send</button>
-                          
+                          {{form_download.member}}
+                          {% if form_download.member %}
+                          {{form_download.email}}
+                          {% endif %}
+                          <button type="submit">Send</button>
                         </form>
                     </div>
                     <div class="clear"></div>

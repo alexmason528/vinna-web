@@ -1,11 +1,13 @@
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.hashers import make_password
+from django.db.models import Q
 
 from rest_framework import serializers
 from core.serializers import UserSerializer
 from server.account.partner_model import AccountPartnerRole
 from server.business.invitation_model import Invitation
+from server.member.models import MemberReferral
 from .models import Account
 
 class Base64ImageField(serializers.ImageField):
@@ -43,19 +45,20 @@ class AccountSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
     email = serializers.EmailField(write_only=True)
     password = serializers.CharField(write_only=True)
-
+    qrcode = serializers.CharField(source='get_qrcode', read_only=True)
     profile_photo_url = Base64ImageField(max_length=None, use_url=True, required=False)
 
     class Meta:
         model = Account
-        fields = ('id', 'first_name','last_name', 'email', 'phone', 'dob', 'gender', 'password', 'profile_photo_url')
+        fields = ('id', 'first_name','last_name', 'email', 'phone', 'dob', 'gender', 'password', 'profile_photo_url', 'qrcode')
 
     def create(self, validated_data):
-
+        email = validated_data.pop('email')
+        password = validated_data.pop('password')
         invitation = None
 
         try:
-            invitation = Invitation.objects.get(email=validated_data['email'])
+            invitation = Invitation.objects.get(email=email)
         except:
             pass
 
@@ -63,12 +66,12 @@ class AccountSerializer(serializers.ModelSerializer):
         user_info = {
             'first_name' : validated_data['first_name'],
             'last_name' : validated_data['last_name'],
-            'username' : validated_data['email'],
+            'username' : email,
             'is_superuser' : 0,
             'is_staff' : 0,
             'is_active' : 1,
-            'email' : validated_data.pop('email'),
-            'password' : make_password(validated_data.pop('password'))
+            'email' : email,
+            'password' : make_password(password)
         }
 
         user = User.objects.create(**user_info)
@@ -84,6 +87,13 @@ class AccountSerializer(serializers.ModelSerializer):
                 'description': 'extra'
             }
             AccountPartnerRole.objects.create(**partner_role_info)
+
+        referral = MemberReferral.objects.get(Q(friend_email_or_phone=email) | Q(friend_email_or_phone=validated_data['phone']))  
+        print(referral)
+        if referral:
+            referral.connected = 1
+            referral.save()
+        
 
         return account
 

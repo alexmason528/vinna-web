@@ -201,6 +201,8 @@ APPEND_SLASH = True
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 
+BASE_URL = "http://192.168.0.180:8000/"
+
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'

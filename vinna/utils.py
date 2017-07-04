@@ -150,28 +150,7 @@ def response_payload_handler(token, user=None, request=None):
     works = []
     for role in AccountPartnerRole.objects.filter(account = account):
         works.append(Business.objects.get(id=role.business_id))
-
-    qr = qrcode.QRCode(
-        version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=10,
-        border=0,
-    )
-    qr.add_data(account.user.username)
-    qr.make(fit=True)
-
-    img = qr.make_image()
-
-    in_mem_file = io.BytesIO()
-    img.save(in_mem_file, format = "PNG")
-    in_mem_file.seek(0)
-    img_bytes = in_mem_file.read()
-
-    base64_encoded_result_bytes = base64.b64encode(img_bytes)
-    base64_encoded_result_str = base64_encoded_result_bytes.decode('ascii')
-
     account_data = AccountSerializer(account).data
-    account_data['qrcode'] = base64_encoded_result_str
 
     return {
         'token': token,

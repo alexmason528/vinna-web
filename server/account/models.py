@@ -1,3 +1,7 @@
+import qrcode
+import base64
+import io
+
 from django.db import models
 from django.conf import settings
 
@@ -28,3 +32,25 @@ class Account(models.Model):
 
     def __str__(self):
         return self.first_name+' '+self.last_name
+
+
+    def get_qrcode(self):
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=0,
+        )
+        qr.add_data(self.user.username)
+        qr.make(fit=True)
+
+        img = qr.make_image()
+
+        in_mem_file = io.BytesIO()
+        img.save(in_mem_file, format = "PNG")
+        in_mem_file.seek(0)
+        img_bytes = in_mem_file.read()
+
+        base64_encoded_result_bytes = base64.b64encode(img_bytes)
+        base64_encoded_result_str = base64_encoded_result_bytes.decode('ascii')
+        return base64_encoded_result_str

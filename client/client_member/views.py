@@ -10,12 +10,12 @@ import json
 import requests
 from requests.auth import HTTPBasicAuth
 import re
-
-
+from server.member.models import MemberReferral
+import jwt
 from core.models import Language
 
 from .forms import UserForm, AccountForm, DownloadForm
-
+from ipware.ip import get_real_ip, get_ip
 
 # Create your views here.
 def index(request):
@@ -79,12 +79,12 @@ def download(request):
     print ('boo!')
 
   if request.method == "POST":
-#        print(request.POST)
     form_download = DownloadForm(request.POST)
 
     if (form_download.is_valid()):
       email = form_download.cleaned_data.get('email')
       phone = form_download.cleaned_data.get('email')
+      member = form_download.cleaned_data.get('member')
       phone = phone.replace("-", "")
       phone = phone.replace("(", "")
       phone = phone.replace(")", "")
@@ -108,20 +108,38 @@ def download(request):
         resp = requests.post(url, data=data, auth=HTTPBasicAuth('SAMZC0MGI3MTAWNZIXMT', 'ODc5ZDU0ZTVjMjViMjAwOGU4MTQ0NTE3NGRmMWYx'))
         print (resp)
 
+      if member:
+        if email:
+          member_data = {
+            'member_id': member,
+            'friend_email_or_phone': email,
+            'friend_ip': get_ip(request),
+            'friend_user_agent': request.META['HTTP_USER_AGENT'],
+            'friend_referrer': request.META['HTTP_REFERER']
+          }
+          
+          member_referral = MemberReferral.objects.create(**member_data)
 
-      
     else:
       print (form_download._errors)
       print ('failed email')
 
-  else:
+  elif request.method == "GET":
+    if 'referral' in request.GET:
+      referral = request.GET['referral']
+
+    if referral:
+      member_id = jwt.decode(request.GET['referral'], 'secret')
+
     if request.user.is_authenticated:
       print ('authenticated.')
-      form_download = DownloadForm()
-      #form_download.email = 
     else:
       print ('not authenticated.')
-      form_download = DownloadForm()
+
+    if member_id:
+      form_download = DownloadForm({'member': member_id['id']})
+    else:
+      forms_download = DownloadForm()
 
   context = { 'form_download': form_download }
   return render(request, 'client_member/download.html', context)
