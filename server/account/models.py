@@ -1,11 +1,13 @@
 import qrcode
 import base64
 import io
+import jwt
 
 from django.db import models
 from django.conf import settings
 
 from core.models import Language
+# from server.member.models import Member
 
 def upload_profile_image_to(instance, filename):
     import os
@@ -28,6 +30,7 @@ class Account(models.Model):
     dob = models.DateField()
     gender = models.CharField(choices=((u'F',u'Female'),(u'M',u'Male')), max_length=1)
     profile_photo_url = models.ImageField(upload_to=upload_profile_image_to, null=True, blank=True)
+    referral_member = models.ForeignKey('member.Member', related_name='member_referral', null=True, blank=True)
     last_modified_date = models.DateTimeField('Last Modified', auto_now=True)
 
     def __str__(self):
@@ -41,7 +44,8 @@ class Account(models.Model):
             box_size=10,
             border=0,
         )
-        qr.add_data(self.user.username)
+        
+        qr.add_data(jwt.encode({'id': self.id}, 'secret').decode('utf-8'))
         qr.make(fit=True)
 
         img = qr.make_image()

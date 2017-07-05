@@ -20,7 +20,6 @@ class Member(models.Model):
     mailing_address_country = models.ForeignKey(Country)
     profile_image = models.ForeignKey(Image, null=True, blank=True)
     managed_account_token = models.CharField(max_length=50)
-    referral = models.ForeignKey('self', related_name='member_referral', null=True, blank=True)
 
     security_hash = models.CharField(max_length=32, null=True, blank=True)
     ssn_token = models.CharField(max_length=10, null=True, blank=True)

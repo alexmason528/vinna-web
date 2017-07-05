@@ -52,7 +52,7 @@ class BusinessSerializer(serializers.ModelSerializer):
     security_hash = serializers.CharField(required=False)
     ssn_token = serializers.CharField(required=False)
     description = serializers.CharField(required=False)
-    images = BusinessImageSerializer(source='get_images', many=True)
+    images = BusinessImageSerializer(source='get_images', many=True, read_only=True)
     class Meta:
         model = Business
         fields = ('id', 'account_id', 'text', 'taxid', 'country_id', 'state_id', 'city', 'zip', 'address1', 'address2','email', 'phone', 'description', 'category', 'category_id', 'sub_category_id', 'managed_account_token', 'security_hash', 'ssn_token', 'billing_info', 'images')

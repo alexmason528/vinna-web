@@ -130,7 +130,7 @@ def decode_handler(token, request):
 
 def response_payload_handler(token, user=None, request=None):
 
-    account, member, country, state, category = None, None, None, None, None
+    account, member, countries, states, categories = None, None, None, None, None
     
     try:
         account = Account.objects.get(user = user)
@@ -142,24 +142,20 @@ def response_payload_handler(token, user=None, request=None):
     except Member.DoesNotExist:
         pass
 
-
-    country = Country.objects.all()
-    state = State.objects.all()
-    category = Category.objects.all()
+    countries = Country.objects.all()
+    states = State.objects.all()
     partners = Business.objects.filter(account=account).order_by('-last_modified_date')
-    works = []
+    cashiers = []
     for role in AccountPartnerRole.objects.filter(account = account):
-        works.append(Business.objects.get(id=role.business_id))
-    account_data = AccountSerializer(account).data
+        cashiers.append(Business.objects.get(id=role.business_id))
 
     return {
         'token': token,
         'user' : UserSerializer(user).data,
-        'account': account_data,
+        'account': AccountSerializer(account).data,
         'member': MemberSerializer(member).data if member else member,
-        'country': CountrySerializer(country, many=True).data,
-        'state': StateSerializer(state, many=True).data,
-        'category': CategorySerializer(category, many=True).data,
         'partners': BusinessSerializer(partners, many=True).data,
-        'works': BusinessSerializer(works, many=True).data
+        'cashiers': BusinessSerializer(cashiers, many=True).data,
+        'countries': CountrySerializer(countries, many=True).data,
+        'states': StateSerializer(states, many=True).data
     }

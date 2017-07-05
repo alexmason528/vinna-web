@@ -31,13 +31,12 @@ class MemberSerializer(serializers.ModelSerializer):
     managed_account_token = serializers.CharField(required=False)
     payment_infos = MemberPaymentInfoSerializer(required=False, many=True)
     registration_link = serializers.CharField(source='get_registration_link', read_only=True)
-    referral_link = serializers.CharField(required=False)
     security_hash = serializers.CharField(required=False)
     ssn_token = serializers.CharField(required=False)
 
     class Meta:
         model = Member
-        fields = ('id', 'account_id', 'mailing_address_1','mailing_address_2','mailing_address_city', 'mailing_address_state_id', 'mailing_address_zip', 'mailing_address_country_id', 'managed_account_token', 'security_hash', 'ssn_token','payment_infos', 'registration_link', 'referral_link')
+        fields = ('id', 'account_id', 'mailing_address_1','mailing_address_2','mailing_address_city', 'mailing_address_state_id', 'mailing_address_zip', 'mailing_address_country_id', 'managed_account_token', 'security_hash', 'ssn_token','payment_infos', 'registration_link')
 
     def create(self, validated_data):
         account = get_object_or_404(Account, pk=validated_data['account_id'])
@@ -57,13 +56,6 @@ class MemberSerializer(serializers.ModelSerializer):
 
         if 'payment_infos' in validated_data:
             payment_infos = validated_data.pop('payment_infos')
-
-        if 'referral_link' in validated_data:
-            referral_link = validated_data.pop('referral_link')
-
-        if referral_link is not None:
-            decoded = jwt.decode(referral_link, 'secret')
-            validated_data['referral_id'] = decoded['id']
 
         member = Member.objects.create(**validated_data)
 

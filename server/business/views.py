@@ -17,12 +17,12 @@ from server.purchase.models import Purchase
 from server.media.models import BusinessImage
 from server.account.models import Account
 from server.account.partner_model import AccountPartnerRole
-from .models import Business, BusinessBillingInfo
+from .models import Business, BusinessBillingInfo, Category
 from .invitation_model import Invitation
 
 from server.media.serializers import BusinessImageSerializer
 from server.account.partner_serializer import AccountPartnerRoleSerializer
-from .serializers import BusinessSerializer, BusinessBillingInfoSerializer, BusinessPurchaseSerializer
+from .serializers import BusinessSerializer, BusinessBillingInfoSerializer, BusinessPurchaseSerializer, CategorySerializer
 from .invitation_serializer import InvitationSerializer
 
 
@@ -65,6 +65,16 @@ class BusinessView(APIView):
 				return Response(serializer.data)
 			else:
 				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+	@api_view(['GET'])
+	def category(request):
+		if request.method == 'GET':
+			categories = Category.objects.all()
+			serializer = CategorySerializer(categories, many=True)
+
+			
+
+			return Response(serializer.data)
 
 class BusinessBillingInfoView(APIView):
 

@@ -16,7 +16,7 @@ import stripe
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+BASE_URL = 'http://192.168.0.180:8000/'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
@@ -201,7 +201,6 @@ APPEND_SLASH = True
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 
-BASE_URL = "http://192.168.0.180:8000/"
 
 LANGUAGE_CODE = 'en-us'
 

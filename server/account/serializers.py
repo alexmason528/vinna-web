@@ -55,6 +55,7 @@ class AccountSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         email = validated_data.pop('email')
         password = validated_data.pop('password')
+
         invitation = None
 
         try:
@@ -74,10 +75,22 @@ class AccountSerializer(serializers.ModelSerializer):
             'password' : make_password(password)
         }
 
+        referral = None
+        try:
+            referral = MemberReferral.objects.get(Q(friend_email_or_phone=email) | Q(friend_email_or_phone=validated_data['phone']))  
+        except:
+            pass
+
+        if referral:
+            user_inf['referral_member_id'] = referral.member_id
+            referral.connected = 1
+            referral.save()
+
         user = User.objects.create(**user_info)
         validated_data['language_id'] = 1
 
         account = Account.objects.create(user_id=user.id, **validated_data)
+
 
         if invitation:
             partner_role_info = {
@@ -88,11 +101,7 @@ class AccountSerializer(serializers.ModelSerializer):
             }
             AccountPartnerRole.objects.create(**partner_role_info)
 
-        referral = MemberReferral.objects.get(Q(friend_email_or_phone=email) | Q(friend_email_or_phone=validated_data['phone']))  
-        print(referral)
-        if referral:
-            referral.connected = 1
-            referral.save()
+        
         
 
         return account
