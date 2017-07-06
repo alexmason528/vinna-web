@@ -135,13 +135,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        #'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.IsAuthenticated',
         # 'rest_framework.permissions.IsAdminUser',
-        'rest_framework.permissions.AllowAny',
+        # 'rest_framework.permissions.AllowAny',
     ],
     'PAGE_SIZE': 50,
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        # 'vinna.authentication.CustomJSONWebTokenAuthentication',
+        'vinna.authentication.CustomJSONWebTokenAuthentication',
         # 'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         # 'rest_framework.authentication.SessionAuthentication',
         # 'rest_framework.authentication.BasicAuthentication',

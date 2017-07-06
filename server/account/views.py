@@ -23,12 +23,13 @@ from server.media.serializers import BusinessImageSerializer
 from .models import Account
 from .serializers import AccountSerializer
 
-@permission_classes(IsAuthenticated, )
-@authentication_classes(CustomJSONWebTokenAuthentication, )
+
 
 class AccountView(APIView):
 
 	@api_view(['GET', 'POST'])
+	@permission_classes([])
+	@authentication_classes([])
 	@transaction.atomic
 	def account_collection(request):
 		if request.method == 'GET':

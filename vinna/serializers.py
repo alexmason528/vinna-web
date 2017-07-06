@@ -57,7 +57,10 @@ class CustomJSONWebTokenSerializer(Serializer):
             msg = msg.format(username_field=self.username_field)
             raise serializers.ValidationError(msg)
 
-class CustomVerificationBaseSerializer(Serializer):
+class VerificationBaseSerializer(Serializer):
+    """
+    Abstract serializer used for verifying and refreshing JWTs.
+    """
     token = serializers.CharField()
 
     def validate(self, attrs):
@@ -65,8 +68,10 @@ class CustomVerificationBaseSerializer(Serializer):
         raise NotImplementedError(msg)
 
     def _check_payload(self, token):
+        # Check payload valid (based off of JSONWebTokenAuthentication,
+        # may want to refactor)
         try:
-            payload = jwt_decode_handler(token, self.contenxt['request'])
+            payload = jwt_decode_handler(token, self.context['request'])
         except jwt.ExpiredSignature:
             msg = _('Signature has expired.')
             raise serializers.ValidationError(msg)
@@ -83,6 +88,7 @@ class CustomVerificationBaseSerializer(Serializer):
             msg = _('Invalid payload.')
             raise serializers.ValidationError(msg)
 
+        # Make sure user exists
         try:
             user = User.objects.get_by_natural_key(username)
         except User.DoesNotExist:
@@ -94,3 +100,20 @@ class CustomVerificationBaseSerializer(Serializer):
             raise serializers.ValidationError(msg)
 
         return user
+
+class CustomVerifyJSONWebTokenSerializer(VerificationBaseSerializer):
+    """
+    Check the veracity of an access token.
+    """
+
+    def validate(self, attrs):
+        token = attrs['token']
+
+        payload = self._check_payload(token=token)
+        user = self._check_user(payload=payload)
+
+        return {
+            'token': token,
+            'user': user
+        }
+

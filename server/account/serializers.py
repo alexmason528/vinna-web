@@ -101,9 +101,6 @@ class AccountSerializer(serializers.ModelSerializer):
             }
             AccountPartnerRole.objects.create(**partner_role_info)
 
-        
-        
-
         return account
 
     def update(self, instance, validated_data):
