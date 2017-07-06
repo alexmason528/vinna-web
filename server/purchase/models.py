@@ -12,7 +12,7 @@ class Purchase(models.Model):
     post_date = models.DateTimeField(auto_now=True)
     balance = models.DecimalField(decimal_places=2, max_digits=9, null=True, blank=True)
 
-    member = models.ForeignKey(Member, related_name="purchase_member")
+    account = models.ForeignKey(Account, related_name="purchase_member")
     member_referral = models.ForeignKey(Member, related_name="purchase_member_referral", null=True, blank=True)
 
     posted = models.BooleanField(default=0)
