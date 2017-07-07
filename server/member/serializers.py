@@ -1,10 +1,13 @@
 import stripe
 import jwt
+import time
+
 
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 
 from rest_framework import serializers
+from ipware.ip import get_real_ip, get_ip
 
 from core.models import Country
 
@@ -46,7 +49,7 @@ class MemberSerializer(serializers.ModelSerializer):
         country = get_object_or_404(Country, pk=validated_data['mailing_address_country_id'])
 
         response = stripe.Account.create(
-            managed=True,
+            type = 'custom',
             email = email,
             country = country.abbrev
         )
@@ -60,9 +63,29 @@ class MemberSerializer(serializers.ModelSerializer):
 
         member = Member.objects.create(**validated_data)
 
-        account = stripe.Account.retrieve(response['id'])
-        account.metadata = { 'Member' : member.id }
-        account.save()
+        stripe_account = stripe.Account.retrieve(response['id'])
+        stripe_account.legal_entity.dob.year = account.dob.year
+        stripe_account.legal_entity.dob.day = account.dob.day
+        stripe_account.legal_entity.dob.month = account.dob.month
+        stripe_account.legal_entity.business_name = account.first_name + ' ' + account.last_name
+        stripe_account.legal_entity.type = 'individual'
+        stripe_account.legal_entity.address = stripe_account.legal_entity.personal_address = {
+            'city': member.mailing_address_city,
+            'country': member.mailing_address_country.abbrev,
+            'line1': member.mailing_address_1,
+            'line2': member.mailing_address_2,
+            'postal_code': member.mailing_address_zip,
+            'state': member.mailing_address_state.abbrev
+        }
+
+        stripe_account.legal_entity.first_name = account.first_name
+        stripe_account.legal_entity.last_name = account.last_name
+        stripe_account.legal_entity.personal_id_number = member.ssn_token
+        stripe_account.tos_acceptance.date = str(time.time()).split('.')[0]
+        stripe_account.tos_acceptance.ip = get_ip(self.context['request'])
+        
+        stripe_account.metadata = { 'Member' : member.id }
+        stripe_account.save()
 
         if payment_infos is not None:
             for payment_info in payment_infos:

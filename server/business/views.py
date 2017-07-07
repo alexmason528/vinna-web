@@ -41,7 +41,7 @@ class BusinessView(APIView):
 			return Response(serializer.data)
 		
 		elif request.method == 'POST':
-			serializer = BusinessSerializer(data=request.data)
+			serializer = BusinessSerializer(data=request.data, context={'request': request})
 
 			if serializer.is_valid():
 				serializer.save()
