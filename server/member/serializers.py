@@ -36,7 +36,7 @@ class MemberSerializer(serializers.ModelSerializer):
     registration_link = serializers.CharField(source='get_registration_link', read_only=True)
     security_hash = serializers.CharField(required=False)
     ssn_token = serializers.CharField(required=False)
-    mailing_address_1 = serializers.CharField(required=False)
+    mailing_address_2 = serializers.CharField(required=False)
 
     class Meta:
         model = Member
