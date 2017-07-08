@@ -73,6 +73,8 @@ def welcome(request):
 
 # Download App
 def download(request):
+  referral = None
+
   if request.user.is_authenticated:
     print ('yay!')
   else:
@@ -102,9 +104,9 @@ def download(request):
             fail_silently=False,
         )
       else:
-        data = {'src':'15612641630','dst':phone,'text':'Download link: http://www.vinna.me/downloadapp'}
+        data = {'src':'15612641630','dst':phone,'text':'Download link: http://dev.vinna.me/downloadapp'}
         print ('sending text message')
-        url = 'http://debug.local/' #'https://api.plivo.com/v1/Account/SAMZC0MGI3MTAWNZIXMT/Message/'
+        url = 'https://api.plivo.com/v1/Account/SAMZC0MGI3MTAWNZIXMT/Message/'
         resp = requests.post(url, data=data, auth=HTTPBasicAuth('SAMZC0MGI3MTAWNZIXMT', 'ODc5ZDU0ZTVjMjViMjAwOGU4MTQ0NTE3NGRmMWYx'))
         print (resp)
 
@@ -127,9 +129,13 @@ def download(request):
   elif request.method == "GET":
     if 'referral' in request.GET:
       referral = request.GET['referral']
-
+    else:
+      referral = None
+# Verify that referral = None, member_id = None did not break functionality as expected.
     if referral:
       member_id = jwt.decode(request.GET['referral'], 'secret')
+    else:
+      member_id = None
 
     if request.user.is_authenticated:
       print ('authenticated.')
@@ -139,7 +145,7 @@ def download(request):
     if member_id:
       form_download = DownloadForm({'member': member_id['id']})
     else:
-      forms_download = DownloadForm()
+      form_download = DownloadForm()
 
   context = { 'form_download': form_download }
   return render(request, 'client_member/download.html', context)

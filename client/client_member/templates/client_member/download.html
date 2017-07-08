@@ -14,17 +14,22 @@
              <div class="app-banner-content">
                <div class="app-container">
                     <div class="app-right-content">
+                      {% if form_download.member or !referral %}
                       <a href="#"><img src="/static/images/app-store.png" alt="" title="" ></a>
-                        <a href="#"><img src="/static/images/google-play.png" alt="" title="" ></a>
+                      <a href="http://bit.ly/2t4AC0f"><img src="/static/images/google-play.png" alt="" title="" ></a>
+                      {% endif %}
+                      {% if referral %}
                         <p>Receive a link to download the App on your device.</p>
-                        <form method="POST" action="">
+                        <form method="POST" action="?">
                           {% csrf_token %}
                           {{form_download.member}}
                           {% if form_download.member %}
                           {{form_download.email}}
                           {% endif %}
                           <button type="submit">Send</button>
+                          <!-- TODO need confirmation after send... or page reload -->
                         </form>
+                      {% endif %}
                     </div>
                     <div class="clear"></div>
                 </div>
