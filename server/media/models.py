@@ -1,8 +1,19 @@
 from django.db import models
 
+def upload_profile_image_to(instance, filename):
+    import os
+    from django.utils.timezone import now
+
+    filename_base, filename_ext = os.path.splitext(filename)
+    return 'profile/%s/%s%s' % (
+        now().strftime("%Y%m%d"),
+        now().strftime("%Y%m%d%H%M%S"),
+        filename_ext.lower(),
+    )
+
 class Image(models.Model):
     hash = models.CharField(max_length=100)
-    s3_url = models.CharField(max_length=100)
+    s3_url = models.ImageField(upload_to=upload_profile_image_to, null=True, blank=True)
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=500, null=True)
 
@@ -12,7 +23,7 @@ class Image(models.Model):
 class BusinessImage(models.Model):
     business = models.ForeignKey('business.Business', on_delete = models.CASCADE)
     hash = models.CharField(max_length=100)
-    s3_url = models.CharField(max_length=100)
+    s3_url = models.ImageField(upload_to=upload_profile_image_to, null=True, blank=True)
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=500, null=True)
     created_at = models.DateTimeField('Created At', auto_now=True)
