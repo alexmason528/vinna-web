@@ -9,6 +9,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate
 from django.db import transaction
 from django.db.models import Sum
+from django.db.models.functions import Coalesce
 
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
@@ -94,8 +95,8 @@ class AccountView(APIView):
 
 	@api_view(['GET'])
 	def purchase_info(request, id):
-		total_earned = Purchase.objects.filter(account_id=id).aggregate(total_earned=Sum('member_amount'))['total_earned']
-		next_payment = Purchase.objects.filter(account_id=id, member_amount_processed=0).aggregate(next_payment=Sum('member_amount'))['next_payment']
+		total_earned = Purchase.objects.filter(account_id=id).aggregate(total_earned=Coalesce(Sum('member_amount'), 0))['total_earned']
+		next_payment = Purchase.objects.filter(account_id=id, member_amount_processed=0).aggregate(next_payment=Coalesce(Sum('member_amount'),0))['next_payment']
 		payday = date.today().replace(day=1) + relativedelta(months=1)
 
 		purchase_info = {

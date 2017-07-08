@@ -67,6 +67,8 @@ class BusinessSerializer(serializers.ModelSerializer):
             country=country.abbrev
         )
 
+        validated_data['sub_category_id'] = 1
+        
         billing_info = None
         if 'billing_info' in validated_data:
             billing_info = validated_data.pop('billing_info')
