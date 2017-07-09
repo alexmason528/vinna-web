@@ -7,6 +7,9 @@ from django.db import models
 from django.conf import settings
 
 from core.models import Language
+
+from vinna.settings import BASE_URL
+
 # from server.member.models import Member
 
 def upload_profile_image_to(instance, filename):
@@ -30,7 +33,7 @@ class Account(models.Model):
     dob = models.DateField()
     gender = models.CharField(choices=((u'F',u'Female'),(u'M',u'Male')), max_length=1)
     profile_photo_url = models.ImageField(upload_to=upload_profile_image_to, null=True, blank=True)
-    referral_member = models.ForeignKey('member.Member', related_name='member_referral', null=True, blank=True)
+    referral_account = models.ForeignKey('Account', related_name='account_referral', null=True, blank=True)
     last_modified_date = models.DateTimeField('Last Modified', auto_now=True)
 
     def __str__(self):
@@ -58,3 +61,15 @@ class Account(models.Model):
         base64_encoded_result_bytes = base64.b64encode(img_bytes)
         base64_encoded_result_str = base64_encoded_result_bytes.decode('ascii')
         return base64_encoded_result_str
+
+    def get_registration_link(self):
+        return BASE_URL + 'client_member/download/?referral='+jwt.encode({'id': self.id}, 'secret').decode('utf-8')
+
+class AccountReferral(models.Model):
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    friend_email_or_phone = models.CharField(max_length=40)
+    friend_ip = models.CharField(max_length=15, null=True, blank=True)
+    friend_user_agent = models.CharField(max_length=200, null=True, blank=True)
+    friend_referrer = models.CharField(max_length=200, null=True, blank=True)
+    connected = models.BooleanField(default=0)
+    created = models.DateTimeField(auto_now=True)
