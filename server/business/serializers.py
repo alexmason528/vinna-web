@@ -56,7 +56,8 @@ class BusinessSerializer(serializers.ModelSerializer):
     description = serializers.CharField(required=False)
     images = BusinessImageSerializer(source='get_images', many=True, read_only=True)
 
-    pic1 = serializers.CharField()
+    # TODO require pic1 once issues resolved.
+    pic1 = serializers.CharField(required=False)
     pic2 = serializers.CharField(required=False)
     pic3 = serializers.CharField(required=False)
     pic4 = serializers.CharField(required=False)
