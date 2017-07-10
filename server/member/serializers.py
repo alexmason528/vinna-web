@@ -2,11 +2,12 @@ import stripe
 import jwt
 import time
 
-
 from django.conf import settings
 from django.shortcuts import get_object_or_404
+from django.core.exceptions import ValidationError
 
 from rest_framework import serializers
+
 from ipware.ip import get_real_ip, get_ip
 
 from core.models import Country
@@ -47,12 +48,17 @@ class MemberSerializer(serializers.ModelSerializer):
 
         country = get_object_or_404(Country, pk=validated_data['mailing_address_country_id'])
 
-        response = stripe.Account.create(
-            type = 'custom',
-            email = email,
-            country = country.abbrev
-        )
-
+        response = None
+        
+        try:
+            response = stripe.Account.create(
+                type = 'custom',
+                email = email,
+                country = country.abbrev
+            )
+        except stripe.error.StripeError as e:
+            raise ValidationError(e.json_body['error']['message'])
+        
         validated_data['managed_account_token'] = response['id']
 
         payment_infos = None
@@ -84,7 +90,13 @@ class MemberSerializer(serializers.ModelSerializer):
         stripe_account.tos_acceptance.ip = get_ip(self.context['request'])
         
         stripe_account.metadata = { 'Member' : member.id }
-        stripe_account.save()
+
+        try:
+            stripe_account.save()
+        except stripe.error.StripeError as e:
+            stripe_account.delete()
+            member.delete()
+            raise ValidationError(e.json_body['error']['message'])
 
         if payment_infos is not None:
             for payment_info in payment_infos:

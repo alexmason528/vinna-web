@@ -83,7 +83,6 @@ class AccountSerializer(serializers.ModelSerializer):
             pass
 
         if referral:
-            user_inf['referral_account_id'] = referral.account_id
             referral.connected = 1
             referral.save()
 

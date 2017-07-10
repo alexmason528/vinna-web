@@ -41,13 +41,19 @@ class BusinessView(APIView):
 			return Response(serializer.data)
 		
 		elif request.method == 'POST':
+
 			serializer = BusinessSerializer(data=request.data, context={'request': request})
-
+			
 			if serializer.is_valid():
-				serializer.save()
-				return Response(serializer.data, status=status.HTTP_201_CREATED)
+				try:
+					serializer.save()
+				except Exception as e:
+					return Response(e.message, status=status.HTTP_400_BAD_REQUEST)
 
-			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+				return Response(serializer.data, status=status.HTTP_201_CREATED)
+			else:
+				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 	@api_view(['PUT','GET'])
 	def business_element(request, id):
@@ -57,7 +63,6 @@ class BusinessView(APIView):
 			return Response(serializer.data)
 
 		elif request.method == 'PUT':
-			print(request.data)
 			business = get_object_or_404(Business, pk=id)
 			serializer = BusinessSerializer(business, data=request.data, partial=True)
 			if serializer.is_valid():
@@ -71,8 +76,6 @@ class BusinessView(APIView):
 		if request.method == 'GET':
 			categories = Category.objects.all()
 			serializer = CategorySerializer(categories, many=True)
-
-			
 
 			return Response(serializer.data)
 

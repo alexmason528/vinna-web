@@ -4,14 +4,6 @@ from rest_framework import serializers
 
 from .models import Country, State
 
-class CountrySerializer(serializers.ModelSerializer):
-
-	id = serializers.IntegerField(read_only = True)
-
-	class Meta:
-		model = Country
-		fields = ('id', 'english_text')
-
 
 class StateSerializer(serializers.ModelSerializer):
 
@@ -21,6 +13,16 @@ class StateSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = State
 		fields = ('id', 'country_id', 'text')
+
+class CountrySerializer(serializers.ModelSerializer):
+
+	id = serializers.IntegerField(read_only = True)
+	states = StateSerializer(source='get_states', many=True)
+
+	class Meta:
+		model = Country
+		fields = ('id', 'english_text', 'states')
+
 
 class UserSerializer(serializers.ModelSerializer):
 	id = serializers.IntegerField(read_only=True)

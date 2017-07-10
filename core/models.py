@@ -18,6 +18,15 @@ class Language(models.Model):
     def __str__(self):
         return self.text
 
+class State(models.Model):
+    country = models.ForeignKey('core.Country', on_delete=models.CASCADE)
+    abbrev = models.CharField(max_length=5)
+    text = models.CharField(max_length=50)
+    language = models.ForeignKey(Language)
+
+    def __str__(self):
+        return self.text + ' (' + self.abbrev + ')'
+
 class Country(models.Model):
     phone_country_code = models.CharField(max_length=5)
     abbrev = models.CharField(max_length=5)
@@ -28,11 +37,9 @@ class Country(models.Model):
     def __str__(self):
         return self.english_text + ' (' + self.abbrev + ')'
 
-class State(models.Model):
-    country = models.ForeignKey(Country, on_delete=models.CASCADE)
-    abbrev = models.CharField(max_length=5)
-    text = models.CharField(max_length=50)
-    language = models.ForeignKey(Language)
+    def get_states(self):
+        states = State.objects.filter(country = self)
+        
+        return states
 
-    def __str__(self):
-        return self.text + ' (' + self.abbrev + ')'
+

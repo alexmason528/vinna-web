@@ -22,7 +22,7 @@ class Member(models.Model):
     managed_account_token = models.CharField(max_length=50)
 
     security_hash = models.CharField(max_length=32, default='', blank=True)
-    ssn_token = models.CharField(max_length=10, default='', blank=True)
+    ssn_token = models.CharField(max_length=9, default='', blank=True)
 
     last_modified_date = models.DateTimeField('Last Modified', auto_now=True)
 
@@ -36,7 +36,7 @@ class MemberPaymentInfo(models.Model):
     member = models.ForeignKey(Member, on_delete=models.CASCADE)
 
     type = models.CharField(max_length=10, default='bank') # bank, debit, mail
-    text = models.CharField(max_length=4)
+    text = models.CharField(max_length=15)
     token = models.CharField(max_length=70)
     routing_number = models.CharField(max_length=20)
 

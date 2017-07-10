@@ -4,18 +4,23 @@ from core.models import Country, State
 from server.account.models import Account
 from server.media.models import BusinessImage
 
+class SubCategory(models.Model):
+    category = models.ForeignKey('business.Category')
+    text = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.text
+
 class Category(models.Model):
     text = models.CharField(max_length=50)
 
     def __str__(self):
         return self.text
 
-class SubCategory(models.Model):
-    category = models.ForeignKey(Category)
-    text = models.CharField(max_length=50)
+    def get_sub_categories(self):
+        sub_categories = SubCategory.objects.filter(category = self)
+        return sub_categories
 
-    def __str__(self):
-        return self.text
 
 class Business(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)

@@ -1,9 +1,12 @@
 import stripe
+import time
 
 from django.conf import settings
 from django.shortcuts import get_object_or_404
+from django.core.exceptions import ValidationError
 
 from rest_framework import serializers
+from ipware.ip import get_real_ip, get_ip
 
 from core.models import Country
 
@@ -17,16 +20,18 @@ from .models import Category, SubCategory, Business, BusinessBillingInfo
 
 stripe.api_key = settings.STRIPE_API_KEY
 
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = ('id', 'text')
 
 class SubCategorySerializer(serializers.ModelSerializer):
     category_id = serializers.IntegerField()
     class Meta:
         model = SubCategory
-        fields = ('category_id', 'text')
+        fields = ('id', 'category_id', 'text')
+
+class CategorySerializer(serializers.ModelSerializer):
+    sub_categories = SubCategorySerializer(source='get_sub_categories', many=True)
+    class Meta:
+        model = Category
+        fields = ('id', 'text', 'sub_categories')
 
 class BusinessBillingInfoSerializer(serializers.ModelSerializer):
     business_id = serializers.IntegerField(required=False)
@@ -54,10 +59,10 @@ class BusinessSerializer(serializers.ModelSerializer):
     description = serializers.CharField(required=False)
     images = BusinessImageSerializer(source='get_images', many=True, read_only=True)
 
-    pic1 = serializers.CharField()
-    pic2 = serializers.CharField(required=False)
-    pic3 = serializers.CharField(required=False)
-    pic4 = serializers.CharField(required=False)
+    pic1 = serializers.CharField(write_only=True)
+    pic2 = serializers.CharField(write_only=True, allow_blank=True)
+    pic3 = serializers.CharField(write_only=True, allow_blank=True)
+    pic4 = serializers.CharField(write_only=True, allow_blank=True)
 
     class Meta:
         model = Business
@@ -81,11 +86,15 @@ class BusinessSerializer(serializers.ModelSerializer):
         country = get_object_or_404(Country, pk = validated_data['country_id'])
 
         response = None
-        response = stripe.Account.create(
-            type='custom',
-            email=validated_data['email'],
-            country=country.abbrev
-        )
+
+        try:
+            response = stripe.Account.create(
+                type='custom',
+                email=validated_data['email'],
+                country=country.abbrev
+            )
+        except stripe.error.StripeError as e:
+            raise ValidationError(e.json_body['error']['message'])
         
         billing_info = None
         if 'billing_info' in validated_data:
@@ -95,6 +104,36 @@ class BusinessSerializer(serializers.ModelSerializer):
             validated_data['managed_account_token'] = response['id']
 
         business = Business.objects.create(**validated_data)
+
+        # stripe_account = stripe.Account.retrieve(response['id'])
+        # stripe_account.legal_entity.dob.year = business.account.dob.year
+        # stripe_account.legal_entity.dob.day = business.account.dob.day
+        # stripe_account.legal_entity.dob.month = business.account.dob.month
+        # stripe_account.legal_entity.business_name = business.account.first_name + ' ' + business.account.last_name
+        # stripe_account.legal_entity.type = 'individual'
+        # stripe_account.legal_entity.address = stripe_account.legal_entity.personal_address = {
+        #     'city': business.city,
+        #     'country': business.country.abbrev,
+        #     'line1': business.address1,
+        #     'line2': business.address2,
+        #     'postal_code': business.zip,
+        #     'state': business.state.abbrev
+        # }
+
+        # stripe_account.legal_entity.first_name = business.account.first_name
+        # stripe_account.legal_entity.last_name = business.account.last_name
+        # stripe_account.tos_acceptance.date = str(time.time()).split('.')[0]
+        # stripe_account.tos_acceptance.ip = get_ip(self.context['request'])
+        # stripe_account.metadata = { 'Business' : business.id }
+        # if business.ssn_token:
+        #     stripe_account.legal_entity.personal_id_number = business.ssn_token
+
+        # try:
+        #     stripe_account.save()
+        # except stripe.error.StripeError as e:
+        #     business.delete()
+        #     stripe_account.delete()
+        #     raise ValidationError(e.json_body['error']['message'])
 
         if pic1:
             serializer = BusinessImageSerializer(data={
@@ -140,36 +179,16 @@ class BusinessSerializer(serializers.ModelSerializer):
             if serializer.is_valid():
                 serializer.save()
 
-        stripe_account = stripe.Account.retrieve(response['id'])
-        stripe_account.legal_entity.dob.year = business.account.dob.year
-        stripe_account.legal_entity.dob.day = business.account.dob.day
-        stripe_account.legal_entity.dob.month = business.account.dob.month
-        stripe_account.legal_entity.business_name = business.account.first_name + ' ' + business.account.last_name
-        stripe_account.legal_entity.type = 'individual'
-        stripe_account.legal_entity.address = stripe_account.legal_entity.personal_address = {
-            'city': business.city,
-            'country': business.country.abbrev,
-            'line1': business.address1,
-            'line2': business.address2,
-            'postal_code': business.zip,
-            'state': business.state.abbrev
-        }
-
-        stripe_account.legal_entity.first_name = business.account.first_name
-        stripe_account.legal_entity.last_name = business.account.last_name
-        stripe_account.legal_entity.personal_id_number = business.ssn_token
-        stripe_account.tos_acceptance.date = str(time.time()).split('.')[0]
-        stripe_account.tos_acceptance.ip = get_ip(self.context['request'])
-        stripe_account.metadata = { 'Business' : business.id }
-        stripe_account.save()
+        
 
         AccountPartnerRole.objects.create(account_id=validated_data['account_id'], business_id=business.id, role="cashier")
 
         if billing_info is not None:
-            extAccountResponse = stripe_account.external_accounts.create(external_account=billing_info['token'])
-            billing_info['token'] = extAccountResponse['id']
+            # extAccountResponse = stripe_account.external_accounts.create(external_account=billing_info['token'])
+            # billing_info['token'] = extAccountResponse['id']
+            billing_info['token'] = '1234'
             BusinessBillingInfo.objects.create(business=business, **billing_info)
-
+        
         return business
 
     def update(self, instance, validated_data):

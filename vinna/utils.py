@@ -143,7 +143,7 @@ def response_payload_handler(token, user=None, request=None):
         pass
 
     countries = Country.objects.all()
-    states = State.objects.all()
+    categories = Category.objects.all()
     partners = Business.objects.filter(account=account).order_by('-last_modified_date')
     cashiers = []
     for role in AccountPartnerRole.objects.filter(account = account):
@@ -157,5 +157,5 @@ def response_payload_handler(token, user=None, request=None):
         'partners': BusinessSerializer(partners, many=True).data,
         'cashiers': BusinessSerializer(cashiers, many=True).data,
         'countries': CountrySerializer(countries, many=True).data,
-        'states': StateSerializer(states, many=True).data
+        'categories': CategorySerializer(categories, many=True).data
     }
