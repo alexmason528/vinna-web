@@ -105,35 +105,35 @@ class BusinessSerializer(serializers.ModelSerializer):
 
         business = Business.objects.create(**validated_data)
 
-        # stripe_account = stripe.Account.retrieve(response['id'])
-        # stripe_account.legal_entity.dob.year = business.account.dob.year
-        # stripe_account.legal_entity.dob.day = business.account.dob.day
-        # stripe_account.legal_entity.dob.month = business.account.dob.month
-        # stripe_account.legal_entity.business_name = business.account.first_name + ' ' + business.account.last_name
-        # stripe_account.legal_entity.type = 'individual'
-        # stripe_account.legal_entity.address = stripe_account.legal_entity.personal_address = {
-        #     'city': business.city,
-        #     'country': business.country.abbrev,
-        #     'line1': business.address1,
-        #     'line2': business.address2,
-        #     'postal_code': business.zip,
-        #     'state': business.state.abbrev
-        # }
+        stripe_account = stripe.Account.retrieve(response['id'])
+        stripe_account.legal_entity.dob.year = business.account.dob.year
+        stripe_account.legal_entity.dob.day = business.account.dob.day
+        stripe_account.legal_entity.dob.month = business.account.dob.month
+        stripe_account.legal_entity.business_name = business.account.first_name + ' ' + business.account.last_name
+        stripe_account.legal_entity.type = 'individual'
+        stripe_account.legal_entity.address = stripe_account.legal_entity.personal_address = {
+            'city': business.city,
+            'country': business.country.abbrev,
+            'line1': business.address1,
+            'line2': business.address2,
+            'postal_code': business.zip,
+            'state': business.state.abbrev
+        }
 
-        # stripe_account.legal_entity.first_name = business.account.first_name
-        # stripe_account.legal_entity.last_name = business.account.last_name
-        # stripe_account.tos_acceptance.date = str(time.time()).split('.')[0]
-        # stripe_account.tos_acceptance.ip = get_ip(self.context['request'])
-        # stripe_account.metadata = { 'Business' : business.id }
-        # if business.ssn_token:
-        #     stripe_account.legal_entity.personal_id_number = business.ssn_token
+        stripe_account.legal_entity.first_name = business.account.first_name
+        stripe_account.legal_entity.last_name = business.account.last_name
+        stripe_account.tos_acceptance.date = str(time.time()).split('.')[0]
+        stripe_account.tos_acceptance.ip = get_ip(self.context['request'])
+        stripe_account.metadata = { 'Business' : business.id }
+        if business.ssn_token:
+            stripe_account.legal_entity.personal_id_number = business.ssn_token
 
-        # try:
-        #     stripe_account.save()
-        # except stripe.error.StripeError as e:
-        #     business.delete()
-        #     stripe_account.delete()
-        #     raise ValidationError(e.json_body['error']['message'])
+        try:
+            stripe_account.save()
+        except stripe.error.StripeError as e:
+            business.delete()
+            stripe_account.delete()
+            raise ValidationError(e.json_body['error']['message'])
 
         if pic1:
             serializer = BusinessImageSerializer(data={
@@ -184,9 +184,8 @@ class BusinessSerializer(serializers.ModelSerializer):
         AccountPartnerRole.objects.create(account_id=validated_data['account_id'], business_id=business.id, role="cashier")
 
         if billing_info is not None:
-            # extAccountResponse = stripe_account.external_accounts.create(external_account=billing_info['token'])
-            # billing_info['token'] = extAccountResponse['id']
-            billing_info['token'] = '1234'
+            extAccountResponse = stripe_account.external_accounts.create(external_account=billing_info['token'])
+            billing_info['token'] = extAccountResponse['id']
             BusinessBillingInfo.objects.create(business=business, **billing_info)
         
         return business
