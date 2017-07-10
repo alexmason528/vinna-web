@@ -33,14 +33,13 @@ class MemberSerializer(serializers.ModelSerializer):
     mailing_address_country_id = serializers.IntegerField()
     managed_account_token = serializers.CharField(required=False)
     payment_infos = MemberPaymentInfoSerializer(required=False, many=True)
-    registration_link = serializers.CharField(source='get_registration_link', read_only=True)
     security_hash = serializers.CharField(required=False)
     ssn_token = serializers.CharField(required=False)
     mailing_address_2 = serializers.CharField(required=False)
 
     class Meta:
         model = Member
-        fields = ('id', 'account_id', 'mailing_address_1','mailing_address_2','mailing_address_city', 'mailing_address_state_id', 'mailing_address_zip', 'mailing_address_country_id', 'managed_account_token', 'security_hash', 'ssn_token','payment_infos', 'registration_link')
+        fields = ('id', 'account_id', 'mailing_address_1','mailing_address_2','mailing_address_city', 'mailing_address_state_id', 'mailing_address_zip', 'mailing_address_country_id', 'managed_account_token', 'security_hash', 'ssn_token','payment_infos')
 
     def create(self, validated_data):
         account = get_object_or_404(Account, pk=validated_data['account_id'])
@@ -56,7 +55,7 @@ class MemberSerializer(serializers.ModelSerializer):
 
         validated_data['managed_account_token'] = response['id']
 
-        payment_infos, referral_link = None, None
+        payment_infos = None
 
         if 'payment_infos' in validated_data:
             payment_infos = validated_data.pop('payment_infos')
@@ -94,9 +93,6 @@ class MemberSerializer(serializers.ModelSerializer):
         return member
 
     def update(self, instance, validated_data):
-        if 'referral_link' in validated_data:
-            validated_data.pop('referral_link')
-
         if 'payment_infos' in validated_data:
             validated_data.pop('payment_infos')
 

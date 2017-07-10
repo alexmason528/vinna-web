@@ -3,7 +3,7 @@ from django.conf import settings
 
 class UserLog(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    ip = models.CharField(max_length=15)
+    ip = models.CharField(max_length=40)
     last_login_time = models.DateTimeField('Last Login Time', auto_now=True)
     current_token = models.CharField(max_length=1000)
 

@@ -7,7 +7,7 @@ from rest_framework import serializers
 from core.serializers import UserSerializer
 from server.account.partner_model import AccountPartnerRole
 from server.business.invitation_model import Invitation
-from server.member.models import MemberReferral
+from server.account.models import AccountReferral
 from .models import Account
 
 class Base64ImageField(serializers.ImageField):
@@ -47,10 +47,11 @@ class AccountSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     qrcode = serializers.CharField(source='get_qrcode', read_only=True)
     profile_photo_url = Base64ImageField(max_length=None, use_url=True, required=False)
+    registration_link = serializers.CharField(source='get_registration_link', read_only=True)
 
     class Meta:
         model = Account
-        fields = ('id', 'first_name','last_name', 'email', 'phone', 'dob', 'gender', 'password', 'profile_photo_url', 'qrcode')
+        fields = ('id', 'first_name','last_name', 'email', 'phone', 'dob', 'gender', 'password', 'profile_photo_url', 'qrcode', 'registration_link')
 
     def create(self, validated_data):
         email = validated_data.pop('email')
@@ -63,6 +64,7 @@ class AccountSerializer(serializers.ModelSerializer):
         except:
             pass
 
+        
         user_info = {
             'first_name' : validated_data['first_name'],
             'last_name' : validated_data['last_name'],
@@ -76,11 +78,12 @@ class AccountSerializer(serializers.ModelSerializer):
 
         referral = None
         try:
-            referral = MemberReferral.objects.get(Q(friend_email_or_phone=email) | Q(friend_email_or_phone=validated_data['phone']))  
+            referral = AccountReferral.objects.get(Q(friend_email_or_phone=email) | Q(friend_email_or_phone=validated_data['phone']))  
         except:
             pass
 
         if referral:
+            user_inf['referral_account_id'] = referral.account_id
             referral.connected = 1
             referral.save()
 
@@ -88,6 +91,7 @@ class AccountSerializer(serializers.ModelSerializer):
         validated_data['language_id'] = 1
 
         account = Account.objects.create(user_id=user.id, **validated_data)
+
 
         if invitation:
             partner_role_info = {

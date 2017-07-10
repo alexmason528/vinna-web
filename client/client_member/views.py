@@ -10,7 +10,7 @@ import json
 import requests
 from requests.auth import HTTPBasicAuth
 import re
-from server.member.models import MemberReferral
+from server.account.models import AccountReferral
 import jwt
 from core.models import Language
 
@@ -86,7 +86,7 @@ def download(request):
     if (form_download.is_valid()):
       email = form_download.cleaned_data.get('email')
       phone = form_download.cleaned_data.get('email')
-      member = form_download.cleaned_data.get('member')
+      account = form_download.cleaned_data.get('account')
       phone = phone.replace("-", "")
       phone = phone.replace("(", "")
       phone = phone.replace(")", "")
@@ -99,7 +99,7 @@ def download(request):
         send_mail(
             'Download Vinna App',
             'Downlad the Vinna App to your phone.',
-            'kenneth@vinna.me',
+            'tech@vinna.me',
             [form_download.cleaned_data.get('email')],
             fail_silently=False,
         )
@@ -113,14 +113,14 @@ def download(request):
       if member:
         if email:
           member_data = {
-            'member_id': member,
+            'account_id': account,
             'friend_email_or_phone': email,
             'friend_ip': get_ip(request),
             'friend_user_agent': request.META['HTTP_USER_AGENT'],
             'friend_referrer': request.META['HTTP_REFERER']
           }
           
-          member_referral = MemberReferral.objects.create(**member_data)
+          account_referral = AccountReferral.objects.create(**member_data)
 
     else:
       print (form_download._errors)
@@ -133,9 +133,9 @@ def download(request):
       referral = None
 # Verify that referral = None, member_id = None did not break functionality as expected.
     if referral:
-      member_id = jwt.decode(request.GET['referral'], 'secret')
+      account_id = jwt.decode(request.GET['referral'], 'secret')
     else:
-      member_id = None
+      account_id = None
 
     if request.user.is_authenticated:
       print ('authenticated.')
@@ -143,7 +143,7 @@ def download(request):
       print ('not authenticated.')
 
     if member_id:
-      form_download = DownloadForm({'member': member_id['id']})
+      form_download = DownloadForm({'account': account_id['id']})
     else:
       form_download = DownloadForm()
 

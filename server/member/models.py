@@ -42,12 +42,3 @@ class MemberPaymentInfo(models.Model):
 
     def __str__(self):
         return self.member.account.first_name+' '+self.member.account.last_name+' ('+self.type+', '+self.text+')'
-
-class MemberReferral(models.Model):
-    member = models.ForeignKey(Member, on_delete=models.CASCADE)
-    friend_email_or_phone = models.CharField(max_length=40)
-    friend_ip = models.CharField(max_length=15, null=True, blank=True)
-    friend_user_agent = models.CharField(max_length=200, null=True, blank=True)
-    friend_referrer = models.CharField(max_length=200, null=True, blank=True)
-    connected = models.BooleanField(default=0)
-    created = models.DateTimeField(auto_now=True)

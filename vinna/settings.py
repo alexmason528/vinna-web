@@ -16,7 +16,8 @@ import stripe
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BASE_URL = 'http://192.168.0.180:8000/'
+#BASE_URL = 'http://192.168.0.180:8000/'
+BASE_URL = 'http://dev.vinna.me/'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
@@ -135,13 +136,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+        # 'rest_framework.permissions.IsAuthenticated',
         # 'rest_framework.permissions.IsAdminUser',
-        # 'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.AllowAny',
     ],
     'PAGE_SIZE': 50,
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'vinna.authentication.CustomJSONWebTokenAuthentication',
+        # 'vinna.authentication.CustomJSONWebTokenAuthentication',
         # 'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         # 'rest_framework.authentication.SessionAuthentication',
         # 'rest_framework.authentication.BasicAuthentication',
@@ -173,19 +174,21 @@ JWT_AUTH = {
     'JWT_VERIFY': True,
     'JWT_VERIFY_EXPIRATION': True,
     'JWT_LEEWAY': 0,
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(weeks=54),
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=3600),
+#    'JWT_EXPIRATION_DELTA': datetime.timedelta(weeks=54),
     'JWT_AUDIENCE': None,
     'JWT_ISSUER': None,
 
     'JWT_ALLOW_REFRESH': True,
-    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(weeks=54),
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
+#    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(weeks=54),
 
     'JWT_AUTH_HEADER_PREFIX': 'JWT',
     'JWT_AUTH_COOKIE': None,
 }
 
 PREPEND_WWW = False
-ALLOWED_HOSTS = ['www.test.vinna.me','test.vinna.me','www.dev.vinna.me','dev.vinna.me','vinna.me','www.vinna.me','www.localhost','localhost', '192.168.0.180']
+ALLOWED_HOSTS = ['www.test.vinna.me','test.vinna.me','www.dev.vinna.me','dev.vinna.me','vinna.me','www.vinna.me','www.localhost','localhost', '192.168.0.180', '127.0.0.1']
 APPEND_SLASH = True
 
 #ROOT_URLCONF = 'myproject.urls.account'
