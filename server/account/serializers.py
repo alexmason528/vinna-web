@@ -63,7 +63,6 @@ class AccountSerializer(serializers.ModelSerializer):
         except:
             pass
 
-        
         user_info = {
             'first_name' : validated_data['first_name'],
             'last_name' : validated_data['last_name'],
@@ -82,7 +81,6 @@ class AccountSerializer(serializers.ModelSerializer):
             pass
 
         if referral:
-            user_inf['referral_member_id'] = referral.member_id
             referral.connected = 1
             referral.save()
 
@@ -90,7 +88,6 @@ class AccountSerializer(serializers.ModelSerializer):
         validated_data['language_id'] = 1
 
         account = Account.objects.create(user_id=user.id, **validated_data)
-
 
         if invitation:
             partner_role_info = {

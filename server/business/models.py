@@ -27,22 +27,22 @@ class Business(models.Model):
     city = models.CharField(max_length=20)
     zip = models.CharField(max_length=20)
     address1 = models.CharField(max_length=40)
-    address2 = models.CharField(max_length=40)
+    address2 = models.CharField(max_length=40, blank=True, default='')
     email = models.CharField(max_length=50)
     phone = models.CharField(max_length=25)
     description = models.CharField(max_length=1000)
-    facebook_link = models.CharField(max_length=50, null=True, blank=True)
-    twitter_link = models.CharField(max_length=50, null=True, blank=True)
-    instagram_link = models.CharField(max_length=50, null=True, blank=True)
-    linkedin_link = models.CharField(max_length=50, null=True, blank=True)
+    facebook_link = models.CharField(max_length=50, default='', blank=True)
+    twitter_link = models.CharField(max_length=50, default='', blank=True)
+    instagram_link = models.CharField(max_length=50, default='', blank=True)
+    linkedin_link = models.CharField(max_length=50, default='', blank=True)
 
     category = models.ForeignKey(Category)
     sub_category = models.ForeignKey(SubCategory)
 
-    managed_account_token = models.CharField(max_length=50, null=True, blank=True)
+    managed_account_token = models.CharField(max_length=50, default='', blank=True)
     
-    security_hash = models.CharField(max_length=32, null=True, blank=True)
-    ssn_token = models.CharField(max_length=10, null=True, blank=True)
+    security_hash = models.CharField(max_length=32, default='', blank=True)
+    ssn_token = models.CharField(max_length=10, default='', blank=True)
 
     last_modified_date = models.DateTimeField('Last Modified', auto_now=True)
 
