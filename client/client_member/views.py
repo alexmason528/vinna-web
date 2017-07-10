@@ -142,7 +142,7 @@ def download(request):
     else:
       print ('not authenticated.')
 
-    if member_id:
+    if account_id:
       form_download = DownloadForm({'account': account_id['id']})
     else:
       form_download = DownloadForm()
