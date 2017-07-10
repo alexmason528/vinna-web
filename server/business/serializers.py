@@ -1,4 +1,6 @@
 import stripe
+import time
+from ipware.ip import get_real_ip, get_ip
 
 from django.conf import settings
 from django.shortcuts import get_object_or_404
@@ -99,13 +101,13 @@ class BusinessSerializer(serializers.ModelSerializer):
         stripe_account.tos_acceptance.date = str(time.time()).split('.')[0]
         stripe_account.tos_acceptance.ip = get_ip(self.context['request'])
         stripe_account.metadata = { 'Business' : business.id }
-        stripe_account.save()
+#        stripe_account.save()
 
         AccountPartnerRole.objects.create(account_id=validated_data['account_id'], business_id=business.id, role="cashier")
 
         if billing_info is not None:
-            extAccountResponse = stripe_account.external_accounts.create(external_account=billing_info['token'])
-            billing_info['token'] = extAccountResponse['id']
+#            extAccountResponse = stripe_account.external_accounts.create(external_account=billing_info['token'])
+#            billing_info['token'] = extAccountResponse['id']
             BusinessBillingInfo.objects.create(business=business, **billing_info)
 
         return business
