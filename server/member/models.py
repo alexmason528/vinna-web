@@ -13,7 +13,7 @@ class Member(models.Model):
     account = models.OneToOneField(Account, on_delete=models.CASCADE)
 
     mailing_address_1 = models.CharField(max_length=40)
-    mailing_address_2 = models.CharField(max_length=40, null=True, blank=True)
+    mailing_address_2 = models.CharField(max_length=40, default='', blank=True)
     mailing_address_city = models.CharField(max_length=50)
     mailing_address_state = models.ForeignKey(State)
     mailing_address_zip = models.CharField(max_length=20)
@@ -21,8 +21,8 @@ class Member(models.Model):
     profile_image = models.ForeignKey(Image, null=True, blank=True)
     managed_account_token = models.CharField(max_length=50)
 
-    security_hash = models.CharField(max_length=32, null=True, blank=True)
-    ssn_token = models.CharField(max_length=10, null=True, blank=True)
+    security_hash = models.CharField(max_length=32, default='', blank=True)
+    ssn_token = models.CharField(max_length=10, default='', blank=True)
 
     last_modified_date = models.DateTimeField('Last Modified', auto_now=True)
 

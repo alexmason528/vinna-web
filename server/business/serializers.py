@@ -55,11 +55,31 @@ class BusinessSerializer(serializers.ModelSerializer):
     ssn_token = serializers.CharField(required=False)
     description = serializers.CharField(required=False)
     images = BusinessImageSerializer(source='get_images', many=True, read_only=True)
+
+    pic1 = serializers.CharField()
+    pic2 = serializers.CharField(required=False)
+    pic3 = serializers.CharField(required=False)
+    pic4 = serializers.CharField(required=False)
+
     class Meta:
         model = Business
-        fields = ('id', 'account_id', 'text', 'taxid', 'country_id', 'state_id', 'city', 'zip', 'address1', 'address2','email', 'phone', 'description', 'category', 'category_id', 'sub_category_id', 'managed_account_token', 'security_hash', 'ssn_token', 'billing_info', 'images')
+        fields = ('id', 'account_id', 'text', 'taxid', 'country_id', 'state_id', 'city', 'zip', 'address1', 'address2','email', 'phone', 'description', 'category', 'category_id', 'sub_category_id', 'managed_account_token', 'security_hash', 'ssn_token', 'billing_info', 'images', 'pic1', 'pic2', 'pic3', 'pic4')
 
     def create(self, validated_data):
+        pic1 = pic2 = pic3 = pic4 = None
+
+        if 'pic1' in validated_data:
+            pic1 = validated_data.pop('pic1')
+
+        if 'pic2' in validated_data:
+            pic2 = validated_data.pop('pic2')
+
+        if 'pic3' in validated_data:
+            pic3 = validated_data.pop('pic3')
+
+        if 'pic4' in validated_data:
+            pic4 = validated_data.pop('pic4')
+
         country = get_object_or_404(Country, pk = validated_data['country_id'])
 
         response = None
@@ -68,8 +88,6 @@ class BusinessSerializer(serializers.ModelSerializer):
             email=validated_data['email'],
             country=country.abbrev
         )
-
-        validated_data['sub_category_id'] = 1
         
         billing_info = None
         if 'billing_info' in validated_data:
@@ -79,6 +97,50 @@ class BusinessSerializer(serializers.ModelSerializer):
             validated_data['managed_account_token'] = response['id']
 
         business = Business.objects.create(**validated_data)
+
+        if pic1:
+            serializer = BusinessImageSerializer(data={
+                'business_id': business.id,
+                'hash': 'Hash',
+                's3_url': pic1,
+                'title': business.email,
+                'description': business.description
+            })
+            if serializer.is_valid():
+                serializer.save()
+
+        if pic2:
+            serializer = BusinessImageSerializer(data={
+                'business_id': business.id,
+                'hash': 'Hash',
+                's3_url': pic2,
+                'title': business.email,
+                'description': business.description
+            })
+            if serializer.is_valid():
+                serializer.save()
+
+        if pic3:
+            serializer = BusinessImageSerializer(data={
+                'business_id': business.id,
+                'hash': 'Hash',
+                's3_url': pic3,
+                'title': business.email,
+                'description': business.description
+            })
+            if serializer.is_valid():
+                serializer.save()
+
+        if pic4:
+            serializer = BusinessImageSerializer(data={
+                'business_id': business.id,
+                'hash': 'Hash',
+                's3_url': pic4,
+                'title': business.email,
+                'description': business.description
+            })
+            if serializer.is_valid():
+                serializer.save()
 
         stripe_account = stripe.Account.retrieve(response['id'])
         stripe_account.legal_entity.dob.year = business.account.dob.year
