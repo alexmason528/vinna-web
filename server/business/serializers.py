@@ -135,6 +135,24 @@ class BusinessSerializer(serializers.ModelSerializer):
             stripe_account.delete()
             raise ValidationError(e.json_body['error']['message'])
 
+        
+
+        
+
+        role = AccountPartnerRole.objects.create(account_id=validated_data['account_id'], business_id=business.id, role="cashier")
+
+        if billing_info is not None:
+            try:
+                extAccountResponse = stripe_account.external_accounts.create(external_account=billing_info['token'])
+            except stripe.error.StripeError as e:
+                role.delete()
+                business.delete()
+                stripe_account.delete()
+                raise ValidationError(e.json_body['error']['message'])
+
+            billing_info['token'] = extAccountResponse['id']
+            BusinessBillingInfo.objects.create(business=business, **billing_info)
+
         if pic1:
             serializer = BusinessImageSerializer(data={
                 'business_id': business.id,
@@ -178,15 +196,6 @@ class BusinessSerializer(serializers.ModelSerializer):
             })
             if serializer.is_valid():
                 serializer.save()
-
-        
-
-        AccountPartnerRole.objects.create(account_id=validated_data['account_id'], business_id=business.id, role="cashier")
-
-        if billing_info is not None:
-            extAccountResponse = stripe_account.external_accounts.create(external_account=billing_info['token'])
-            billing_info['token'] = extAccountResponse['id']
-            BusinessBillingInfo.objects.create(business=business, **billing_info)
         
         return business
 

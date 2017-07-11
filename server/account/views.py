@@ -44,9 +44,14 @@ class AccountView(APIView):
 		elif request.method == 'POST':
 			serializer = AccountSerializer(data=request.data)
 			if serializer.is_valid():
-				serializer.save()
+				try:
+					serializer.save()
+				except Exception as e:
+					return Response(e.message, status=status.HTTP_400_BAD_REQUEST)
+
 				return Response(serializer.data, status=status.HTTP_201_CREATED)
-			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+			else:
+				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 	@api_view(['PUT','GET'])
 	@transaction.atomic

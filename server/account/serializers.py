@@ -2,6 +2,7 @@ from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.hashers import make_password
 from django.db.models import Q
+from django.core.exceptions import ValidationError
 
 from rest_framework import serializers
 from core.serializers import UserSerializer
@@ -57,6 +58,9 @@ class AccountSerializer(serializers.ModelSerializer):
         email = validated_data.pop('email')
         password = validated_data.pop('password')
 
+        if User.objects.filter(username=email).count() > 0:
+            raise ValidationError("This email is already taken by other user")
+
         invitation = None
 
         try:
@@ -90,7 +94,6 @@ class AccountSerializer(serializers.ModelSerializer):
         validated_data['language_id'] = 1
 
         account = Account.objects.create(user_id=user.id, **validated_data)
-
 
         if invitation:
             partner_role_info = {
