@@ -26,8 +26,8 @@ from .serializers import BusinessSerializer, BusinessBillingInfoSerializer, Busi
 from .invitation_serializer import InvitationSerializer
 
 
-# @permission_classes(IsAuthenticated, )
-# @authentication_classes(CustomJSONWebTokenAuthentication, )
+@permission_classes(IsAuthenticated, )
+@authentication_classes(CustomJSONWebTokenAuthentication, )
 
 class BusinessView(APIView):
 

@@ -135,10 +135,6 @@ class BusinessSerializer(serializers.ModelSerializer):
             stripe_account.delete()
             raise ValidationError(e.json_body['error']['message'])
 
-        
-
-        
-
         role = AccountPartnerRole.objects.create(account_id=validated_data['account_id'], business_id=business.id, role="cashier")
 
         if billing_info is not None:
