@@ -195,9 +195,14 @@ class BusinessCashierView(APIView):
 			if not user:
 				serializer = InvitationSerializer(data={'business_id': id, 'email': request.data['email'], 'type': 'cashier'})
 				if serializer.is_valid():
-					serializer.save()
+					try:
+						serializer.save()
+					except Exception as e:
+						return Response(e.message, status=status.HTTP_400_BAD_REQUEST)
+
 					return Response(serializer.data, status=status.HTTP_201_CREATED)
-				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+				else:
+					return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 			else:
 				account = Account.objects.get(user_id=user.id)
 				partner_role_data = {
@@ -206,6 +211,9 @@ class BusinessCashierView(APIView):
 					'role': 'cashier',
 					'description': 'extra'
 				}
+
+				if AccountPartnerRole.objects.filter(business_id = id, account_id = account.id).count() > 0:
+					return Response('You already added this user as your cashier', status=status.HTTP_400_BAD_REQUEST)
 
 				AccountPartnerRole.objects.create(**partner_role_data)
 
