@@ -60,9 +60,9 @@ class BusinessSerializer(serializers.ModelSerializer):
     images = BusinessImageSerializer(source='get_images', many=True, read_only=True)
 
     pic1 = serializers.CharField(write_only=True)
-    pic2 = serializers.CharField(write_only=True, allow_blank=True)
-    pic3 = serializers.CharField(write_only=True, allow_blank=True)
-    pic4 = serializers.CharField(write_only=True, allow_blank=True)
+    pic2 = serializers.CharField(write_only=True, allow_blank=True, allow_null=True)
+    pic3 = serializers.CharField(write_only=True, allow_blank=True, allow_null=True)
+    pic4 = serializers.CharField(write_only=True, allow_blank=True, allow_null=True)
 
     class Meta:
         model = Business
@@ -154,8 +154,7 @@ class BusinessSerializer(serializers.ModelSerializer):
                 'business_id': business.id,
                 'hash': 'Hash',
                 's3_url': pic1,
-                'title': business.email,
-                'description': business.description
+                'type': 'P'
             })
             if serializer.is_valid():
                 serializer.save()
@@ -165,8 +164,7 @@ class BusinessSerializer(serializers.ModelSerializer):
                 'business_id': business.id,
                 'hash': 'Hash',
                 's3_url': pic2,
-                'title': business.email,
-                'description': business.description
+                'type': 'P'
             })
             if serializer.is_valid():
                 serializer.save()
@@ -176,8 +174,7 @@ class BusinessSerializer(serializers.ModelSerializer):
                 'business_id': business.id,
                 'hash': 'Hash',
                 's3_url': pic3,
-                'title': business.email,
-                'description': business.description
+                'type': 'P'
             })
             if serializer.is_valid():
                 serializer.save()
@@ -187,8 +184,7 @@ class BusinessSerializer(serializers.ModelSerializer):
                 'business_id': business.id,
                 'hash': 'Hash',
                 's3_url': pic4,
-                'title': business.email,
-                'description': business.description
+                'type': 'P'
             })
             if serializer.is_valid():
                 serializer.save()

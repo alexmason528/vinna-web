@@ -1,3 +1,6 @@
+import hashlib
+import string
+
 from rest_framework import serializers
 from server.media.serializers import BusinessImageSerializer
 from .models import Notification
@@ -8,17 +11,18 @@ class NotificationSerializer(serializers.ModelSerializer):
     end = serializers.DateTimeField(required=False)
     account_id = serializers.IntegerField(required=False)
     business_id = serializers.IntegerField()
-    pic1 = serializers.CharField(required=False)
-    pic2 = serializers.CharField(required=False)
-    pic3 = serializers.CharField(required=False)
-    pic4 = serializers.CharField(required=False)
+
+    pic1 = serializers.CharField(write_only=True)
+    pic2 = serializers.CharField(write_only=True, allow_blank=True, allow_null=True)
+    pic3 = serializers.CharField(write_only=True, allow_blank=True, allow_null=True)
+    pic4 = serializers.CharField(write_only=True, allow_blank=True, allow_null=True)
 
     class Meta:
         model = Notification
         fields = ('title', 'category', 'message', 'state', 'link', 'start', 'end', 'account_id', 'business_id', 'pic1', 'pic2', 'pic3', 'pic4')
 
     def create(self, validated_data):
-        pic1, pic2, pic3, pic4 = None,None,None,None
+        pic1 = pic2 = pic3 = pic4 = None
 
         if 'pic1' in validated_data:
             pic1 = validated_data.pop('pic1')
@@ -30,14 +34,12 @@ class NotificationSerializer(serializers.ModelSerializer):
             pic4 = validated_data.pop('pic4')
 
         notification = Notification.objects.create(**validated_data)
-
         if pic1:
             serializer = BusinessImageSerializer(data={
                 'business_id': notification.business.id,
-                'hash': 'Hash',
+                'hash': hashlib.md5(pic1.encode('utf-8')).hexdigest(),
                 's3_url': pic1,
-                'title': notification.title,
-                'description': notification.message
+                'type': 'Notification'
             })
             if serializer.is_valid():
                 serializer.save()
@@ -45,10 +47,9 @@ class NotificationSerializer(serializers.ModelSerializer):
         if pic2:
             serializer = BusinessImageSerializer(data={
                 'business_id': notification.business.id,
-                'hash': 'Hash',
+                'hash': hashlib.md5(pic2.encode('utf-8')).hexdigest(),
                 's3_url': pic2,
-                'title': notification.title,
-                'description': notification.message
+                'type': 'Notification'
             })
             if serializer.is_valid():
                 serializer.save()
@@ -56,10 +57,9 @@ class NotificationSerializer(serializers.ModelSerializer):
         if pic3:
             serializer = BusinessImageSerializer(data={
                 'business_id': notification.business.id,
-                'hash': 'Hash',
+                'hash': hashlib.md5(pic3.encode('utf-8')).hexdigest(),
                 's3_url': pic3,
-                'title': notification.title,
-                'description': notification.message
+                'type': 'Notification'
             })
             if serializer.is_valid():
                 serializer.save()
@@ -67,10 +67,9 @@ class NotificationSerializer(serializers.ModelSerializer):
         if pic4:
             serializer = BusinessImageSerializer(data={
                 'business_id': notification.business.id,
-                'hash': 'Hash',
+                'hash': hashlib.md5(pic4.encode('utf-8')).hexdigest(),
                 's3_url': pic4,
-                'title': notification.title,
-                'description': notification.message
+                'type': 'Notification'
             })
             if serializer.is_valid():
                 serializer.save()

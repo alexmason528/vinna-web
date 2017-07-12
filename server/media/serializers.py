@@ -40,11 +40,15 @@ class ImageSerializer(serializers.ModelSerializer):
         fields = ('hash', 's3_url', 'title', 'description')
 
 class BusinessImageSerializer(ImageSerializer):
-    business_id = serializers.IntegerField(required=True)
+    business_id = serializers.IntegerField()
     s3_url = Base64ImageField(max_length=None, use_url=True)
+    title = serializers.CharField(required=False)
+    description = serializers.CharField(required=False)
+    type = serializers.CharField()
+
     class Meta:
         model = BusinessImage
-        fields = ('business_id', 'hash', 's3_url', 'title', 'description')
+        fields = ('business_id', 'hash', 's3_url', 'title', 'description', 'type')
 
 class VideoSerializer(serializers.ModelSerializer):
     class Meta:

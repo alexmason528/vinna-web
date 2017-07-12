@@ -14,7 +14,7 @@ class Notification(models.Model):
     start = models.DateTimeField(blank=True, null=True)
     end = models.DateTimeField(blank=True, null=True)
     business = models.ForeignKey(Business)
-    account = models.ForeignKey(Account, blank=True, default='')
+    account = models.ForeignKey(Account, blank=True, null=True)
 
     def __str__(self):
     	return self.title

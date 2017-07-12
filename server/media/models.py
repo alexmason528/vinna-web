@@ -24,9 +24,10 @@ class BusinessImage(models.Model):
     business = models.ForeignKey('business.Business', on_delete = models.CASCADE)
     hash = models.CharField(max_length=100)
     s3_url = models.ImageField(upload_to=upload_profile_image_to, default='', blank=True)
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=100, default='')
     description = models.CharField(max_length=500, default='')
     created_at = models.DateTimeField('Created At', auto_now=True)
+    type = models.CharField(max_length=12)
     def __str__(self):
         return self.title
 
