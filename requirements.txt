@@ -39,3 +39,4 @@ djangorestframework-jwt==1.10.0
 stripe==1.57.1
 django-storages==1.5.2
 boto3==1.4.4
+qrcode==5.3
