@@ -1,3 +1,5 @@
+import datetime
+
 from django.utils.decorators import method_decorator
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -22,6 +24,7 @@ class NotificationView(APIView):
 	@api_view(['GET', 'POST'])
 	def notification_collection(request):
 		if request.method == 'GET':
+			now = datetime.datetime.now()
 			notifications = Notification.objects.all()
 			serializer = NotificationSerializer(notifications, many=True)
 			return Response(serializer.data)

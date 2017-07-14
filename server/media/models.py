@@ -26,8 +26,10 @@ class BusinessImage(models.Model):
     s3_url = models.ImageField(upload_to=upload_profile_image_to, default='', blank=True)
     title = models.CharField(max_length=100, default='')
     description = models.CharField(max_length=500, default='')
+    ref = models.IntegerField(null=True, blank=True)
     created_at = models.DateTimeField('Created At', auto_now=True)
     type = models.CharField(max_length=12)
+    
     def __str__(self):
         return self.title
 

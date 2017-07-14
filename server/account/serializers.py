@@ -47,7 +47,7 @@ class AccountSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(write_only=True)
     password = serializers.CharField(write_only=True)
     qrcode = serializers.CharField(source='get_qrcode', read_only=True)
-    profile_photo_url = Base64ImageField(max_length=None, use_url=True, required=False)
+    profile_photo_url = Base64ImageField(max_length=None, use_url=True)
     registration_link = serializers.CharField(source='get_registration_link', read_only=True)
 
     class Meta:
@@ -58,7 +58,7 @@ class AccountSerializer(serializers.ModelSerializer):
         email = validated_data.pop('email')
         password = validated_data.pop('password')
 
-        if User.objects.filter(username=email).count() > 0:
+        if User.objects.filter(Q(username=email) | Q(username=validated_data['phone'])).count() > 0:
             raise ValidationError("This email is already taken by other user")
 
         invitation = None

@@ -20,6 +20,36 @@ from .models import Category, SubCategory, Business, BusinessBillingInfo
 
 stripe.api_key = settings.STRIPE_API_KEY
 
+class Base64ImageField(serializers.ImageField):
+    def to_internal_value(self, data):
+        from django.core.files.base import ContentFile
+        import base64
+        import six
+        import uuid
+
+        if isinstance(data, six.string_types):
+            if 'data:' in data and ';base64,' in data:
+                header, data = data.split(';base64,')
+
+            try:
+                decoded_file = base64.b64decode(data)
+            except TypeError:
+                self.fail('invalid_image')
+
+            file_name = str(uuid.uuid4())[:12]
+            file_extension = self.get_file_extension(file_name, decoded_file)
+            complete_file_name = "%s.%s" % (file_name, file_extension, )
+            data = ContentFile(decoded_file, name=complete_file_name)
+
+        return super(Base64ImageField, self).to_internal_value(data)
+
+    def get_file_extension(self, file_name, decoded_file):
+        import imghdr
+
+        extension = imghdr.what(file_name, decoded_file)
+        extension = "jpg" if extension == "jpeg" else extension
+
+        return extension
 
 class SubCategorySerializer(serializers.ModelSerializer):
     category_id = serializers.IntegerField()
@@ -57,31 +87,17 @@ class BusinessSerializer(serializers.ModelSerializer):
     security_hash = serializers.CharField(required=False)
     ssn_token = serializers.CharField(required=False)
     description = serializers.CharField(required=False)
-    images = BusinessImageSerializer(source='get_images', many=True, read_only=True)
 
-    pic1 = serializers.CharField(write_only=True)
-    pic2 = serializers.CharField(write_only=True, allow_blank=True, allow_null=True)
-    pic3 = serializers.CharField(write_only=True, allow_blank=True, allow_null=True)
-    pic4 = serializers.CharField(write_only=True, allow_blank=True, allow_null=True)
+    picture1 = Base64ImageField(max_length=None, use_url=True)
+    picture2 = Base64ImageField(max_length=None, use_url=True, allow_empty_file=True, required=False)
+    picture3 = Base64ImageField(max_length=None, use_url=True, allow_empty_file=True, required=False)
+    picture4 = Base64ImageField(max_length=None, use_url=True, allow_empty_file=True, required=False)
 
     class Meta:
         model = Business
-        fields = ('id', 'account_id', 'text', 'taxid', 'country_id', 'state_id', 'city', 'zip', 'address1', 'address2','email', 'phone', 'description', 'category', 'category_id', 'sub_category_id', 'managed_account_token', 'security_hash', 'ssn_token', 'billing_info', 'images', 'pic1', 'pic2', 'pic3', 'pic4')
+        fields = ('id', 'account_id', 'text', 'taxid', 'country_id', 'state_id', 'city', 'zip', 'address1', 'address2','email', 'phone', 'description', 'category', 'category_id', 'sub_category_id', 'managed_account_token', 'security_hash', 'ssn_token', 'billing_info', 'picture1', 'picture2', 'picture3', 'picture4')
 
     def create(self, validated_data):
-        pic1 = pic2 = pic3 = pic4 = None
-
-        if 'pic1' in validated_data:
-            pic1 = validated_data.pop('pic1')
-
-        if 'pic2' in validated_data:
-            pic2 = validated_data.pop('pic2')
-
-        if 'pic3' in validated_data:
-            pic3 = validated_data.pop('pic3')
-
-        if 'pic4' in validated_data:
-            pic4 = validated_data.pop('pic4')
 
         country = get_object_or_404(Country, pk = validated_data['country_id'])
 
@@ -148,46 +164,6 @@ class BusinessSerializer(serializers.ModelSerializer):
 
             billing_info['token'] = extAccountResponse['id']
             BusinessBillingInfo.objects.create(business=business, **billing_info)
-
-        if pic1:
-            serializer = BusinessImageSerializer(data={
-                'business_id': business.id,
-                'hash': 'Hash',
-                's3_url': pic1,
-                'type': 'P'
-            })
-            if serializer.is_valid():
-                serializer.save()
-
-        if pic2:
-            serializer = BusinessImageSerializer(data={
-                'business_id': business.id,
-                'hash': 'Hash',
-                's3_url': pic2,
-                'type': 'P'
-            })
-            if serializer.is_valid():
-                serializer.save()
-
-        if pic3:
-            serializer = BusinessImageSerializer(data={
-                'business_id': business.id,
-                'hash': 'Hash',
-                's3_url': pic3,
-                'type': 'P'
-            })
-            if serializer.is_valid():
-                serializer.save()
-
-        if pic4:
-            serializer = BusinessImageSerializer(data={
-                'business_id': business.id,
-                'hash': 'Hash',
-                's3_url': pic4,
-                'type': 'P'
-            })
-            if serializer.is_valid():
-                serializer.save()
         
         return business
 

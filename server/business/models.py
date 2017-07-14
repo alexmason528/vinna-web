@@ -4,6 +4,17 @@ from core.models import Country, State
 from server.account.models import Account
 from server.media.models import BusinessImage
 
+def upload_profile_image_to(instance, filename):
+    import os
+    from django.utils.timezone import now
+
+    filename_base, filename_ext = os.path.splitext(filename)
+    return 'profile/%s/%s%s' % (
+        now().strftime("%Y%m%d"),
+        now().strftime("%Y%m%d%H%M%S"),
+        filename_ext.lower(),
+    )
+
 class SubCategory(models.Model):
     category = models.ForeignKey('business.Category')
     text = models.CharField(max_length=50)
@@ -40,6 +51,10 @@ class Business(models.Model):
     twitter_link = models.CharField(max_length=50, default='', blank=True)
     instagram_link = models.CharField(max_length=50, default='', blank=True)
     linkedin_link = models.CharField(max_length=50, default='', blank=True)
+    picture1 = models.ImageField(upload_to=upload_profile_image_to, null=True, blank=True)
+    picture2 = models.ImageField(upload_to=upload_profile_image_to, null=True, blank=True)
+    picture3 = models.ImageField(upload_to=upload_profile_image_to, null=True, blank=True)
+    picture4 = models.ImageField(upload_to=upload_profile_image_to, null=True, blank=True)
 
     category = models.ForeignKey(Category)
     sub_category = models.ForeignKey(SubCategory)
