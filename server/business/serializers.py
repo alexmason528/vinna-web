@@ -89,9 +89,9 @@ class BusinessSerializer(serializers.ModelSerializer):
     description = serializers.CharField(required=False)
 
     picture1 = Base64ImageField(max_length=None, use_url=True)
-    picture2 = Base64ImageField(max_length=None, use_url=True, allow_empty_file=True, required=False)
-    picture3 = Base64ImageField(max_length=None, use_url=True, allow_empty_file=True, required=False)
-    picture4 = Base64ImageField(max_length=None, use_url=True, allow_empty_file=True, required=False)
+    picture2 = Base64ImageField(max_length=None, use_url=True, allow_empty_file=True, allow_null=True, required=False)
+    picture3 = Base64ImageField(max_length=None, use_url=True, allow_empty_file=True, allow_null=True, required=False)
+    picture4 = Base64ImageField(max_length=None, use_url=True, allow_empty_file=True, allow_null=True, required=False)
 
     class Meta:
         model = Business

@@ -1,14 +1,16 @@
 from django.db import models
 
-from server.member.models import Member
+from server.account.models import Account
 from server.business.models import Business
 # Create your models here.
 
 class Review(models.Model):
-    member = models.ForeignKey(Member)
+    account = models.ForeignKey(Account)
     business = models.ForeignKey(Business)
     rating = models.IntegerField()
     review = models.CharField(max_length = 100, null = True, blank = True)
+    approved = models.BooleanField(default=0)
+    approved_date = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        unique_together = ('member', 'business')
+        unique_together = ('account', 'business')
