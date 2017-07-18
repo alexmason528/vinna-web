@@ -2,6 +2,7 @@ import qrcode
 import base64
 import io
 import jwt
+import short_url
 
 from django.db import models
 from django.conf import settings

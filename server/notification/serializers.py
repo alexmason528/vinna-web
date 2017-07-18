@@ -39,7 +39,7 @@ class Base64ImageField(serializers.ImageField):
         return extension
 
 class NotificationSerializer(serializers.ModelSerializer):
-    link = serializers.CharField(required=False)
+    link = serializers.CharField(required=False, allow_blank=True)
     start = serializers.DateTimeField(required=False)
     end = serializers.DateTimeField(required=False)
     account_id = serializers.IntegerField(required=False)

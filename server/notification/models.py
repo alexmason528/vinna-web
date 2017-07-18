@@ -17,7 +17,7 @@ class Notification(models.Model):
     category = models.CharField(max_length=50)
     description = models.CharField(max_length=140)
     state = models.BooleanField(default=0)
-    link = models.CharField(max_length=150, blank=True, default='')
+    link = models.CharField(max_length=150, blank=True, null=True)
     start = models.DateTimeField(blank=True, null=True)
     end = models.DateTimeField(blank=True, null=True)
     business = models.ForeignKey('business.Business')

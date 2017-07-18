@@ -68,6 +68,7 @@ class BusinessBillingInfoSerializer(serializers.ModelSerializer):
     country_id = serializers.IntegerField()
     state_id = serializers.IntegerField()
     active = serializers.BooleanField()
+    address2 = serializers.CharField(required=False)
 
     class Meta:
         model = BusinessBillingInfo
@@ -82,7 +83,7 @@ class BusinessSerializer(serializers.ModelSerializer):
     sub_category_id = serializers.IntegerField()
     country_id = serializers.IntegerField()
     state_id = serializers.IntegerField()
-    managed_account_token = serializers.CharField(required=False)
+    customer_token = serializers.CharField(required=False)
     email = serializers.EmailField()
     security_hash = serializers.CharField(required=False)
     ssn_token = serializers.CharField(required=False)
@@ -95,19 +96,18 @@ class BusinessSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Business
-        fields = ('id', 'account_id', 'text', 'taxid', 'country_id', 'state_id', 'city', 'zip', 'address1', 'address2','email', 'phone', 'description', 'category', 'category_id', 'sub_category_id', 'managed_account_token', 'security_hash', 'ssn_token', 'billing_info', 'picture1', 'picture2', 'picture3', 'picture4')
+        fields = ('id', 'account_id', 'text', 'taxid', 'country_id', 'state_id', 'city', 'zip', 'address1', 'address2','email', 'phone', 'description', 'category', 'category_id', 'sub_category_id', 'customer_token', 'security_hash', 'ssn_token', 'billing_info', 'picture1', 'picture2', 'picture3', 'picture4')
 
     def create(self, validated_data):
 
         country = get_object_or_404(Country, pk = validated_data['country_id'])
 
-        response = None
+        customer = None
 
         try:
-            response = stripe.Account.create(
-                type='custom',
+            customer = stripe.Customer.create(
                 email=validated_data['email'],
-                country=country.abbrev
+                description=validated_data['description']
             )
         except stripe.error.StripeError as e:
             raise ValidationError(e.json_body['error']['message'])
@@ -117,53 +117,31 @@ class BusinessSerializer(serializers.ModelSerializer):
             billing_info = validated_data.pop('billing_info')
 
         if response is not None:
-            validated_data['managed_account_token'] = response['id']
+            validated_data['customer_token'] = customer['id']
 
         business = Business.objects.create(**validated_data)
-
-        stripe_account = stripe.Account.retrieve(response['id'])
-        stripe_account.legal_entity.dob.year = business.account.dob.year
-        stripe_account.legal_entity.dob.day = business.account.dob.day
-        stripe_account.legal_entity.dob.month = business.account.dob.month
-        stripe_account.legal_entity.business_name = business.account.first_name + ' ' + business.account.last_name
-        stripe_account.legal_entity.type = 'individual'
-        stripe_account.legal_entity.address = stripe_account.legal_entity.personal_address = {
-            'city': business.city,
-            'country': business.country.abbrev,
-            'line1': business.address1,
-            'line2': business.address2,
-            'postal_code': business.zip,
-            'state': business.state.abbrev
-        }
-
-        stripe_account.legal_entity.first_name = business.account.first_name
-        stripe_account.legal_entity.last_name = business.account.last_name
-        stripe_account.tos_acceptance.date = str(time.time()).split('.')[0]
-        stripe_account.tos_acceptance.ip = get_ip(self.context['request'])
-        stripe_account.metadata = { 'Business' : business.id }
-        if business.ssn_token:
-            stripe_account.legal_entity.personal_id_number = business.ssn_token
+        customer.metadata = { 'Business' : business.id }
 
         try:
-            stripe_account.save()
+            customer.save()
         except stripe.error.StripeError as e:
             business.delete()
-            stripe_account.delete()
+            customer.delete()
             raise ValidationError(e.json_body['error']['message'])
 
         role = AccountPartnerRole.objects.create(account_id=validated_data['account_id'], business_id=business.id, role="cashier")
 
-        if billing_info is not None:
-            try:
-                extAccountResponse = stripe_account.external_accounts.create(external_account=billing_info['token'])
-            except stripe.error.StripeError as e:
-                role.delete()
-                business.delete()
-                stripe_account.delete()
-                raise ValidationError(e.json_body['error']['message'])
+        # if billing_info is not None:
+        #     try:
+        #         extAccountResponse = customer.external_accounts.create(external_account=billing_info['token'])
+        #     except stripe.error.StripeError as e:
+        #         role.delete()
+        #         business.delete()
+        #         customer.delete()
+        #         raise ValidationError(e.json_body['error']['message'])
 
-            billing_info['token'] = extAccountResponse['id']
-            BusinessBillingInfo.objects.create(business=business, **billing_info)
+        #     billing_info['token'] = extAccountResponse['id']
+        #     BusinessBillingInfo.objects.create(business=business, **billing_info)
         
         return business
 
@@ -178,7 +156,7 @@ class BusinessSerializer(serializers.ModelSerializer):
             business_billing_info.type = billing_info['type']
             business_billing_info.text = billing_info['text']
 
-            account = stripe.Account.retrieve(instance.managed_account_token)
+            account = stripe.Account.retrieve(instance.customer_token)
             extAccountResponse = account.external_accounts.create(external_account=billing_info['token'])
             business_billing_info.token = extAccountResponse['id']
 
@@ -191,6 +169,24 @@ class BusinessSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+class BusinessPublicSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
+    category = CategorySerializer(read_only=True)
+    sub_category_id = serializers.IntegerField()
+    country_id = serializers.IntegerField()
+    state_id = serializers.IntegerField()
+    email = serializers.EmailField()
+    description = serializers.CharField(required=False)
+
+    picture1 = Base64ImageField(max_length=None, use_url=True)
+    picture2 = Base64ImageField(max_length=None, use_url=True, allow_empty_file=True, allow_null=True, required=False)
+    picture3 = Base64ImageField(max_length=None, use_url=True, allow_empty_file=True, allow_null=True, required=False)
+    picture4 = Base64ImageField(max_length=None, use_url=True, allow_empty_file=True, allow_null=True, required=False)
+
+    class Meta:
+        model = Business
+        fields = ('id', 'text', 'country_id', 'state_id', 'city', 'zip', 'address1', 'address2','email', 'phone', 'description', 'category', 'sub_category_id', 'picture1', 'picture2', 'picture3', 'picture4')
 
 class BusinessPurchaseSerializer(serializers.ModelSerializer):
     member_id = serializers.IntegerField(write_only=True)
