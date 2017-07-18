@@ -111,9 +111,9 @@ DATABASES = {
             'sql_mode': 'STRICT_ALL_TABLES',
             'init_command': 'SET default_storage_engine=INNODB',
         },
-        #'NAME': 'vinna_main','USER': 'root','PASSWORD': '','HOST': '127.0.0.1','PORT': '3306',
-        #'NAME':'vinna_main','USER':'vinna','PASSWORD':'vinna123!','HOST':'cpvlabs.cwdkozsu0mvg.us-east-1.rds.amazonaws.com','PORT': '3306',
-        'NAME':'vinnatestdb','USER':'vinna','PASSWORD':'vinna123!','HOST':'testdb.coa3mtmpsd0a.us-east-2.rds.amazonaws.com','PORT': '3306',
+        'NAME': 'vinna_main','USER': 'root','PASSWORD': '','HOST': '127.0.0.1','PORT': '3306',
+        # 'NAME':'vinna_main','USER':'vinna','PASSWORD':'vinna123!','HOST':'cpvlabs.cwdkozsu0mvg.us-east-1.rds.amazonaws.com','PORT': '3306',
+        # 'NAME':'vinnatestdb','USER':'vinna','PASSWORD':'vinna123!','HOST':'testdb.coa3mtmpsd0a.us-east-2.rds.amazonaws.com','PORT': '3306',
     }
 }
 
@@ -259,3 +259,4 @@ STRIPE_API_KEY = 'sk_test_RWKnLTTuJgU5Tzc3Gltv5zzH'
 STRIPE_PUBLIC_KEY = 'pk_test_vSXaN8PlxDIA9SRDrvPyNllu'
 
 CORS_ORIGIN_ALLOW_ALL = True
+

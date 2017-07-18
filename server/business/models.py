@@ -60,7 +60,7 @@ class Business(models.Model):
     category = models.ForeignKey(Category)
     sub_category = models.ForeignKey(SubCategory)
 
-    managed_account_token = models.CharField(max_length=50, default='', blank=True)
+    customer_token = models.CharField(max_length=50, default='', blank=True)
     
     security_hash = models.CharField(max_length=32, default='', blank=True)
     ssn_token = models.CharField(max_length=10, default='', blank=True)
@@ -87,7 +87,7 @@ class BusinessBillingInfo(models.Model):
     state = models.ForeignKey(State)
     zip = models.CharField(max_length=20)
     address1 = models.CharField(max_length=40)
-    address2 = models.CharField(max_length=40)
+    address2 = models.CharField(max_length=40, default='', blank=True)
 
     def __str__(self):
         return self.business.text+' ('+self.type+', '+self.text+')'

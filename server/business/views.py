@@ -22,7 +22,7 @@ from .invitation_model import Invitation
 
 from server.media.serializers import BusinessImageSerializer
 from server.account.partner_serializer import AccountPartnerRoleSerializer
-from .serializers import BusinessSerializer, BusinessBillingInfoSerializer, BusinessPurchaseSerializer, CategorySerializer
+from .serializers import BusinessSerializer, BusinessPublicSerializer, BusinessBillingInfoSerializer, BusinessPurchaseSerializer, CategorySerializer
 from .invitation_serializer import InvitationSerializer
 
 
@@ -33,10 +33,12 @@ class BusinessView(APIView):
 
 	@api_view(['GET', 'POST'])
 	@transaction.atomic
+	@permission_classes([])
+	@authentication_classes([])
 	def business_collection(request):
 		if request.method == 'GET':
 			businesses = Business.objects.all().order_by('-last_modified_date')
-			serializer = BusinessSerializer(businesses, many=True)
+			serializer = BusinessPublicSerializer(businesses, many=True)
 
 			return Response(serializer.data)
 		
