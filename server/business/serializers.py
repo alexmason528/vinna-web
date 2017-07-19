@@ -148,7 +148,6 @@ class BusinessSerializer(serializers.ModelSerializer):
         return business
 
     def update(self, instance, validated_data):
-
         billing_info = None
         if 'billing_info' in validated_data:
             billing_info = validated_data.pop('billing_info')
@@ -158,10 +157,14 @@ class BusinessSerializer(serializers.ModelSerializer):
             business_billing_info.type = billing_info['type']
             business_billing_info.text = billing_info['text']
 
-            account = stripe.Account.retrieve(instance.customer_token)
-            extAccountResponse = account.external_accounts.create(external_account=billing_info['token'])
-            business_billing_info.token = extAccountResponse['id']
+            try:
+                customer = stripe.Customer.retrieve(instance.customer_token)
+                customer.source = billing_info['token']
+                customer.save()
+            except stripe.error.StripeError as e:
+                raise ValidationError(e.json_body['error']['message'])
 
+            business_billing_info.token = customer.sources.data[0].id
             business_billing_info.save()
 
         for item in validated_data:
