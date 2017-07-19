@@ -90,9 +90,9 @@ class BusinessSerializer(serializers.ModelSerializer):
     description = serializers.CharField(required=False)
 
     picture1 = Base64ImageField(max_length=None, use_url=True)
-    picture2 = Base64ImageField(max_length=None, use_url=True, allow_empty_file=True, allow_null=True, required=False)
-    picture3 = Base64ImageField(max_length=None, use_url=True, allow_empty_file=True, allow_null=True, required=False)
-    picture4 = Base64ImageField(max_length=None, use_url=True, allow_empty_file=True, allow_null=True, required=False)
+    picture2 = Base64ImageField(required=False, max_length=None, use_url=True, allow_empty_file=True, allow_null=True)
+    picture3 = Base64ImageField(required=False, max_length=None, use_url=True, allow_empty_file=True, allow_null=True)
+    picture4 = Base64ImageField(required=False, max_length=None, use_url=True, allow_empty_file=True, allow_null=True)
 
     class Meta:
         model = Business
@@ -116,7 +116,7 @@ class BusinessSerializer(serializers.ModelSerializer):
         if 'billing_info' in validated_data:
             billing_info = validated_data.pop('billing_info')
 
-        if response is not None:
+        if customer is not None:
             validated_data['customer_token'] = customer['id']
 
         business = Business.objects.create(**validated_data)
@@ -131,17 +131,19 @@ class BusinessSerializer(serializers.ModelSerializer):
 
         role = AccountPartnerRole.objects.create(account_id=validated_data['account_id'], business_id=business.id, role="cashier")
 
-        # if billing_info is not None:
-        #     try:
-        #         extAccountResponse = customer.external_accounts.create(external_account=billing_info['token'])
-        #     except stripe.error.StripeError as e:
-        #         role.delete()
-        #         business.delete()
-        #         customer.delete()
-        #         raise ValidationError(e.json_body['error']['message'])
+        if billing_info is not None:
+            try:
+                customer.source = billing_info['token']
+                customer.save()                
+            except stripe.error.StripeError as e:
+                role.delete()
+                business.delete()
+                customer.delete()
+                raise ValidationError(e.json_body['error']['message'])
 
-        #     billing_info['token'] = extAccountResponse['id']
-        #     BusinessBillingInfo.objects.create(business=business, **billing_info)
+            billing_info['token'] = customer.sources.data[0].id
+
+            BusinessBillingInfo.objects.create(business=business, **billing_info)
         
         return business
 
