@@ -88,6 +88,7 @@ class BusinessSerializer(serializers.ModelSerializer):
     security_hash = serializers.CharField(required=False)
     ssn_token = serializers.CharField(required=False)
     description = serializers.CharField(required=False)
+    current_billing_info = BusinessBillingInfoSerializer(source='get_billing_info', read_only=True)
 
     picture1 = Base64ImageField(max_length=None, use_url=True)
     picture2 = Base64ImageField(required=False, max_length=None, use_url=True, allow_empty_file=True, allow_null=True)
@@ -96,7 +97,7 @@ class BusinessSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Business
-        fields = ('id', 'account_id', 'text', 'taxid', 'country_id', 'state_id', 'city', 'zip', 'address1', 'address2','email', 'phone', 'description', 'category', 'category_id', 'sub_category_id', 'customer_token', 'security_hash', 'ssn_token', 'billing_info', 'picture1', 'picture2', 'picture3', 'picture4')
+        fields = ('id', 'account_id', 'text', 'taxid', 'country_id', 'state_id', 'city', 'zip', 'address1', 'address2','email', 'phone', 'description', 'category', 'category_id', 'sub_category_id', 'customer_token', 'security_hash', 'ssn_token', 'billing_info', 'picture1', 'picture2', 'picture3', 'picture4', 'current_billing_info')
 
     def create(self, validated_data):
 
@@ -130,10 +131,12 @@ class BusinessSerializer(serializers.ModelSerializer):
             raise ValidationError(e.json_body['error']['message'])
 
         role = AccountPartnerRole.objects.create(account_id=validated_data['account_id'], business_id=business.id, role="cashier")
+        card_id = None
 
         if billing_info is not None:
             try:
-                customer.source = billing_info['token']
+                response = customer.source = billing_info['token']
+                card_id = response['id']
                 customer.save()                
             except stripe.error.StripeError as e:
                 role.delete()
@@ -141,7 +144,7 @@ class BusinessSerializer(serializers.ModelSerializer):
                 customer.delete()
                 raise ValidationError(e.json_body['error']['message'])
 
-            billing_info['token'] = customer.sources.data[0].id
+            billing_info['token'] = card_id
 
             BusinessBillingInfo.objects.create(business=business, **billing_info)
         
@@ -157,14 +160,17 @@ class BusinessSerializer(serializers.ModelSerializer):
             business_billing_info.type = billing_info['type']
             business_billing_info.text = billing_info['text']
 
+            card_id = None
             try:
                 customer = stripe.Customer.retrieve(instance.customer_token)
-                customer.source = billing_info['token']
+                response = customer.sources.create(card = billing_info['token'])
+                card_id = response['id']
+                customer.default_source = card_id
                 customer.save()
             except stripe.error.StripeError as e:
                 raise ValidationError(e.json_body['error']['message'])
 
-            business_billing_info.token = customer.sources.data[0].id
+            business_billing_info.token = card_id
             business_billing_info.save()
 
         for item in validated_data:

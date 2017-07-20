@@ -74,6 +74,10 @@ class Business(models.Model):
         images = BusinessImage.objects.filter(business=self).order_by('-created_at')
         return images
 
+    def get_billing_info(self):
+        billing_info = BusinessBillingInfo.objects.get(business=self)
+        return billing_info
+
 class BusinessBillingInfo(models.Model):
     business = models.ForeignKey(Business, on_delete=models.CASCADE)
 
