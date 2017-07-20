@@ -24,6 +24,9 @@ class Notification(models.Model):
     account = models.ForeignKey('account.Account', blank=True, null=True)
     picture = models.ImageField(upload_to=upload_profile_image_to)
 
+    create_date = models.DateTimeField('Create Date', auto_now=True)
+    last_modified_date = models.DateTimeField('Last Modified', auto_now=True)
+
     def __str__(self):
     	return self.title
 
