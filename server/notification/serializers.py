@@ -46,6 +46,8 @@ class NotificationSerializer(serializers.ModelSerializer):
     business_id = serializers.IntegerField()
     picture = Base64ImageField(max_length=None, use_url=True)
 
+
     class Meta:
         model = Notification
         fields = ('title', 'category', 'description', 'state', 'link', 'start', 'end', 'account_id', 'business_id', 'picture')
+        ordering = ['-create_date']
