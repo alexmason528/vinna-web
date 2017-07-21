@@ -18,7 +18,6 @@ class PurchaseSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data['account_id'] = jwt.decode(validated_data.pop('qrcode'), 'secret')['id']
-        print(validated_data)
         purchase = Purchase.objects.create(**validated_data)
 
         return purchase

@@ -37,10 +37,11 @@ class MemberSerializer(serializers.ModelSerializer):
     security_hash = serializers.CharField(required=False)
     ssn_token = serializers.CharField(required=False)
     mailing_address_2 = serializers.CharField(required=False)
+    current_payment_info = MemberPaymentInfoSerializer(source='get_payment_info', read_only=True)
 
     class Meta:
         model = Member
-        fields = ('id', 'account_id', 'mailing_address_1','mailing_address_2','mailing_address_city', 'mailing_address_state_id', 'mailing_address_zip', 'mailing_address_country_id', 'managed_account_token', 'security_hash', 'ssn_token','payment_info')
+        fields = ('id', 'account_id', 'mailing_address_1','mailing_address_2','mailing_address_city', 'mailing_address_state_id', 'mailing_address_zip', 'mailing_address_country_id', 'managed_account_token', 'security_hash', 'ssn_token','payment_info', 'current_payment_info')
 
     def create(self, validated_data):
         account = get_object_or_404(Account, pk=validated_data['account_id'])
@@ -106,8 +107,6 @@ class MemberSerializer(serializers.ModelSerializer):
 
         payment_info['token'] = bank_id
 
-        print(payment_info)
-
         MemberPaymentInfo.objects.create(member=member, **payment_info)
 
         return member
@@ -129,7 +128,6 @@ class MemberSerializer(serializers.ModelSerializer):
                 raise ValidationError(e.json_body['error']['message'])
 
             member_payment_info.token = bank_id
-            print(bank_id)
 
             member_payment_info.save()
 

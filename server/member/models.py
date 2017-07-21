@@ -32,6 +32,10 @@ class Member(models.Model):
     def get_registration_link(self):
         return BASE_URL + 'client_member/download/?referral='+jwt.encode({'id': self.id}, 'secret').decode('utf-8')
 
+    def get_payment_info(self):
+        payment_info = MemberPaymentInfo.objects.get(member=self)
+        return payment_info
+
 class MemberPaymentInfo(models.Model):
     member = models.ForeignKey(Member, on_delete=models.CASCADE)
 

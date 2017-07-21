@@ -22,6 +22,9 @@ stripe.api_key = settings.STRIPE_API_KEY
 
 class Base64ImageField(serializers.ImageField):
     def to_internal_value(self, data):
+        if data == '' and self.allow_empty_file:
+            return ''
+
         from django.core.files.base import ContentFile
         import base64
         import six
