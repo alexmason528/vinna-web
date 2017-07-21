@@ -56,6 +56,7 @@ class Business(models.Model):
     picture2 = models.ImageField(upload_to=upload_profile_image_to, null=True, blank=True)
     picture3 = models.ImageField(upload_to=upload_profile_image_to, null=True, blank=True)
     picture4 = models.ImageField(upload_to=upload_profile_image_to, null=True, blank=True)
+    hours = models.CharField(max_length=1000, default='', blank=True)
 
     category = models.ForeignKey(Category)
     sub_category = models.ForeignKey(SubCategory)

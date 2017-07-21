@@ -100,7 +100,7 @@ class BusinessSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Business
-        fields = ('id', 'account_id', 'text', 'taxid', 'country_id', 'state_id', 'city', 'zip', 'address1', 'address2','email', 'phone', 'description', 'category', 'category_id', 'sub_category_id', 'customer_token', 'security_hash', 'ssn_token', 'billing_info', 'picture1', 'picture2', 'picture3', 'picture4', 'current_billing_info')
+        fields = ('id', 'account_id', 'text', 'taxid', 'country_id', 'state_id', 'city', 'zip', 'address1', 'address2','email', 'phone', 'description', 'category', 'category_id', 'sub_category_id', 'customer_token', 'security_hash', 'ssn_token', 'billing_info', 'picture1', 'picture2', 'picture3', 'picture4', 'current_billing_info', 'hours')
 
     def create(self, validated_data):
 
@@ -195,7 +195,7 @@ class BusinessPublicSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Business
-        fields = ('id', 'text', 'country_id', 'state_id', 'city', 'zip', 'address1', 'address2','email', 'phone', 'description', 'category', 'sub_category_id', 'picture1', 'picture2', 'picture3', 'picture4')
+        fields = ('id', 'text', 'country_id', 'state_id', 'city', 'zip', 'address1', 'address2','email', 'phone', 'description', 'category', 'sub_category_id', 'picture1', 'picture2', 'picture3', 'picture4', 'hours')
 
 class BusinessPurchaseSerializer(serializers.ModelSerializer):
     member_id = serializers.IntegerField(write_only=True)
