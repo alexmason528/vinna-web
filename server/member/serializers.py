@@ -33,14 +33,14 @@ class MemberSerializer(serializers.ModelSerializer):
     mailing_address_state_id = serializers.IntegerField()
     mailing_address_country_id = serializers.IntegerField()
     managed_account_token = serializers.CharField(required=False)
-    payment_infos = MemberPaymentInfoSerializer(required=False, many=True)
+    payment_info = MemberPaymentInfoSerializer(write_only=True)
     security_hash = serializers.CharField(required=False)
     ssn_token = serializers.CharField(required=False)
     mailing_address_2 = serializers.CharField(required=False)
 
     class Meta:
         model = Member
-        fields = ('id', 'account_id', 'mailing_address_1','mailing_address_2','mailing_address_city', 'mailing_address_state_id', 'mailing_address_zip', 'mailing_address_country_id', 'managed_account_token', 'security_hash', 'ssn_token','payment_infos')
+        fields = ('id', 'account_id', 'mailing_address_1','mailing_address_2','mailing_address_city', 'mailing_address_state_id', 'mailing_address_zip', 'mailing_address_country_id', 'managed_account_token', 'security_hash', 'ssn_token','payment_info')
 
     def create(self, validated_data):
         account = get_object_or_404(Account, pk=validated_data['account_id'])
@@ -60,11 +60,8 @@ class MemberSerializer(serializers.ModelSerializer):
             raise ValidationError(e.json_body['error']['message'])
         
         validated_data['managed_account_token'] = response['id']
-
-        payment_infos = None
-
-        if 'payment_infos' in validated_data:
-            payment_infos = validated_data.pop('payment_infos')
+        
+        payment_info = validated_data.pop('payment_info')
 
         member = Member.objects.create(**validated_data)
 
@@ -98,15 +95,43 @@ class MemberSerializer(serializers.ModelSerializer):
             member.delete()
             raise ValidationError(e.json_body['error']['message'])
 
-        if payment_infos is not None:
-            for payment_info in payment_infos:
-                MemberPaymentInfo.objects.create(member=member, **payment_info)
+        bank_id = None
+        try:
+            response = stripe_account.external_accounts.create(external_account = payment_info['token'])
+            bank_id = response['id']
+        except stripe.error.StripeError as e:
+            stripe_account.delete()
+            member.delete()
+            raise ValidationError(e.json_body['error']['message'])
+
+        payment_info['token'] = bank_id
+
+        print(payment_info)
+
+        MemberPaymentInfo.objects.create(member=member, **payment_info)
 
         return member
 
     def update(self, instance, validated_data):
-        if 'payment_infos' in validated_data:
-            validated_data.pop('payment_infos')
+
+        if 'payment_info' in validated_data:
+            payment_info = validated_data.pop('payment_info')
+            member_payment_info = get_object_or_404(MemberPaymentInfo, member=instance)
+            member_payment_info.text = payment_info['text']
+            member_payment_info.routing_number = payment_info['routing_number']
+
+            bank_id = None
+            try:
+                stripe_account = stripe.Account.retrieve(instance.managed_account_token)
+                response = stripe_account.external_accounts.create(external_account=payment_info['token'])
+                bank_id = response['id']
+            except stripe.error.StripeError as e:
+                raise ValidationError(e.json_body['error']['message'])
+
+            member_payment_info.token = bank_id
+            print(bank_id)
+
+            member_payment_info.save()
 
         for item in validated_data:
             if Member._meta.get_field(item):

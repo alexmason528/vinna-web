@@ -35,7 +35,6 @@ class Member(models.Model):
 class MemberPaymentInfo(models.Model):
     member = models.ForeignKey(Member, on_delete=models.CASCADE)
 
-    type = models.CharField(max_length=10, default='bank') # bank, debit, mail
     text = models.CharField(max_length=15)
     token = models.CharField(max_length=70)
     routing_number = models.CharField(max_length=20)

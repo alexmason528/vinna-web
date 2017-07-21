@@ -33,8 +33,7 @@ class Command(BaseCommand):
             message = e.json_body['error']['message']
 
         if response:
-            print(response)
-            message = "Charge %s %f completed - %s" % (pct, amount, response['id'])
+            message = "Charge %s %d completed - %s" % (pct, amount, response['id'])
 
         self.stdout.write(message)
 

@@ -76,7 +76,7 @@ class BusinessBillingInfoSerializer(serializers.ModelSerializer):
 
 class BusinessSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
-    billing_info = BusinessBillingInfoSerializer(required=False)
+    billing_info = BusinessBillingInfoSerializer(write_only=True)
     account_id = serializers.IntegerField()
     category_id = serializers.IntegerField(write_only=True)
     category = CategorySerializer(read_only=True)
@@ -113,11 +113,9 @@ class BusinessSerializer(serializers.ModelSerializer):
         except stripe.error.StripeError as e:
             raise ValidationError(e.json_body['error']['message'])
         
-        billing_info = None
-        if 'billing_info' in validated_data:
-            billing_info = validated_data.pop('billing_info')
+        billing_info = validated_data.pop('billing_info')
 
-        if customer is not None:
+        if customer:
             validated_data['customer_token'] = customer['id']
 
         business = Business.objects.create(**validated_data)
@@ -133,29 +131,26 @@ class BusinessSerializer(serializers.ModelSerializer):
         role = AccountPartnerRole.objects.create(account_id=validated_data['account_id'], business_id=business.id, role="cashier")
         card_id = None
 
-        if billing_info is not None:
-            try:
-                response = customer.source = billing_info['token']
-                card_id = response['id']
-                customer.save()                
-            except stripe.error.StripeError as e:
-                role.delete()
-                business.delete()
-                customer.delete()
-                raise ValidationError(e.json_body['error']['message'])
+        try:
+            response = customer.sources.create(source=billing_info['token'])
+            card_id = response['id']
+            customer.default_source = card_id
+            customer.save()
+        except stripe.error.StripeError as e:
+            role.delete()
+            business.delete()
+            customer.delete()
+            raise ValidationError(e.json_body['error']['message'])
 
-            billing_info['token'] = card_id
+        billing_info['token'] = card_id
 
-            BusinessBillingInfo.objects.create(business=business, **billing_info)
+        BusinessBillingInfo.objects.create(business=business, **billing_info)
         
         return business
 
     def update(self, instance, validated_data):
-        billing_info = None
         if 'billing_info' in validated_data:
             billing_info = validated_data.pop('billing_info')
-            
-        if billing_info:
             business_billing_info = get_object_or_404(BusinessBillingInfo, business=instance)
             business_billing_info.type = billing_info['type']
             business_billing_info.text = billing_info['text']
@@ -163,7 +158,7 @@ class BusinessSerializer(serializers.ModelSerializer):
             card_id = None
             try:
                 customer = stripe.Customer.retrieve(instance.customer_token)
-                response = customer.sources.create(card = billing_info['token'])
+                response = customer.sources.create(source=billing_info['token'])
                 card_id = response['id']
                 customer.default_source = card_id
                 customer.save()
