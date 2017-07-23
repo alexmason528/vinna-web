@@ -1,5 +1,4 @@
 import jwt
-
 from django.db import models
 
 from core.models import State, Country
@@ -28,9 +27,6 @@ class Member(models.Model):
 
     def __str__(self):
         return self.account.first_name +' '+self.account.last_name
-
-    def get_registration_link(self):
-        return BASE_URL + 'client_member/download/?referral='+jwt.encode({'id': self.id}, 'secret').decode('utf-8')
 
     def get_payment_info(self):
         payment_info = MemberPaymentInfo.objects.get(member=self)

@@ -58,8 +58,11 @@ class AccountSerializer(serializers.ModelSerializer):
         email = validated_data.pop('email')
         password = validated_data.pop('password')
 
-        if User.objects.filter(Q(username=email) | Q(username=validated_data['phone'])).count() > 0:
-            raise ValidationError("This email is already taken by other user")
+        if User.objects.filter(username=email).count() > 0:
+            raise ValidationError("Email is already taken by other account")
+
+        if Account.objects.filter(phone=validated_data['phone']).count() > 0:
+            raise ValidationError("Phone number is already taken by other account")
 
         invitation = None
 
@@ -67,7 +70,6 @@ class AccountSerializer(serializers.ModelSerializer):
             invitation = Invitation.objects.get(email=email)
         except:
             pass
-
         
         user_info = {
             'first_name' : validated_data['first_name'],
@@ -120,7 +122,6 @@ class AccountSerializer(serializers.ModelSerializer):
             email = validated_data.pop('email')
             setattr(user, 'email', email)
             setattr(user, 'username', email)
-            
 
         if 'password' in validated_data:
             setattr(user, 'password', make_password(validated_data.pop('password')))

@@ -2,27 +2,48 @@ import jwt
 
 from calendar import timegm
 
-from django.contrib.auth import authenticate, get_user_model
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
+
+from server.account.models import Account
 
 from rest_framework import serializers
 
 from rest_framework_jwt.settings import api_settings
 from rest_framework_jwt.compat import Serializer, get_username_field, PasswordField
 
-User = get_user_model()
-
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 jwt_decode_handler = api_settings.JWT_DECODE_HANDLER
 jwt_get_username_from_payload = api_settings.JWT_PAYLOAD_GET_USERNAME_HANDLER
 
+def authenticate(email_or_phone, password):
+    user = None
+    try:
+        user_object = User.objects.get(username=email_or_phone)
+        if(user_object.check_password(password)):
+            user = user_object
+    except:
+        pass
+
+    if user:
+        return user
+
+    try:
+        account = Account.objects.get(phone=email_or_phone)
+        if (account.user.check_password(password)):
+            user = account.user
+    except:
+        pass
+
+    return user
+
+
 class CustomJSONWebTokenSerializer(Serializer):
     def __init__(self, *args, **kwargs):
         super(CustomJSONWebTokenSerializer, self).__init__(*args, **kwargs)
 
-        self.fields[self.username_field] = serializers.CharField()
+        self.fields['username'] = serializers.CharField()
         self.fields['password'] = PasswordField(write_only=True)
 
     @property
@@ -31,10 +52,10 @@ class CustomJSONWebTokenSerializer(Serializer):
 
     def validate(self, attrs):
         credentials = {
-            self.username_field: attrs.get(self.username_field),
+            'email_or_phone': attrs.get('username'),
             'password': attrs.get('password')
         }
-
+        
         if all(credentials.values()):
             user = authenticate(**credentials)
 
@@ -52,6 +73,7 @@ class CustomJSONWebTokenSerializer(Serializer):
             else:
                 msg = _('Unable to log in with provided credentials.')
                 raise serializers.ValidationError(msg)
+
         else:
             msg = _('Must include "{username_field}" and "password".')
             msg = msg.format(username_field=self.username_field)

@@ -28,12 +28,13 @@ class Account(models.Model):
 
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    phone = models.CharField(max_length=25, unique=True)
+    phone = models.CharField(max_length=25)
     dob = models.DateField()
     gender = models.CharField(choices=((u'F',u'Female'),(u'M',u'Male')), max_length=1)
     profile_photo_url = models.ImageField(upload_to=upload_profile_image_to)
     referral_account = models.ForeignKey('Account', related_name='account_referral', null=True, blank=True)
     last_modified_date = models.DateTimeField('Last Modified', auto_now=True)
+    verified = models.BooleanField(default=0)
 
     def __str__(self):
         return self.first_name+' '+self.last_name
@@ -62,7 +63,8 @@ class Account(models.Model):
         return base64_encoded_result_str
 
     def get_registration_link(self):
-        return BASE_URL + 'client_member/download/?referral='+jwt.encode({'id': self.id}, 'secret').decode('utf-8')
+        link = short_url.encode_url(self.id)
+        return BASE_URL + 'client_member/download/?referral=' + str(link)
 
 class AccountReferral(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)

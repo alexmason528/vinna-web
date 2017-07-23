@@ -12,6 +12,7 @@ from requests.auth import HTTPBasicAuth
 import re
 from server.account.models import AccountReferral
 import jwt
+import short_url
 from core.models import Language
 
 from .forms import UserForm, AccountForm, DownloadForm
@@ -110,9 +111,9 @@ def download(request):
         resp = requests.post(url, data=data, auth=HTTPBasicAuth('SAMZC0MGI3MTAWNZIXMT', 'ODc5ZDU0ZTVjMjViMjAwOGU4MTQ0NTE3NGRmMWYx'))
         print (resp)
 
-      if member:
+      if account:
         if email:
-          member_data = {
+          account_data = {
             'account_id': account,
             'friend_email_or_phone': email,
             'friend_ip': get_ip(request),
@@ -120,7 +121,7 @@ def download(request):
             'friend_referrer': request.META['HTTP_REFERER']
           }
           
-          account_referral = AccountReferral.objects.create(**member_data)
+          account_referral = AccountReferral.objects.create(**account_data)
 
     else:
       print (form_download._errors)
@@ -133,7 +134,7 @@ def download(request):
       referral = None
 # Verify that referral = None, member_id = None did not break functionality as expected.
     if referral:
-      account_id = jwt.decode(request.GET['referral'], 'secret')
+      account_id = short_url.decode_url(referral)
     else:
       account_id = None
 
@@ -143,11 +144,11 @@ def download(request):
       print ('not authenticated.')
 
     if account_id:
-      form_download = DownloadForm({'account': account_id['id']})
+      form_download = DownloadForm({'account': account_id})
     else:
       form_download = DownloadForm()
 
-  context = { 'form_download': form_download }
+  context = { 'form_download': form_download, 'referral': referral }
   return render(request, 'client_member/download.html', context)
 
 # Member Transactions (View is here, but Model is in Transactions App)
