@@ -1,3 +1,5 @@
+import random
+
 from datetime import date
 from dateutil.relativedelta import relativedelta
 
@@ -5,11 +7,11 @@ from django.utils.decorators import method_decorator
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
-from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate
 from django.db import transaction
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
+from django.core.mail import send_mail
 
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
@@ -73,7 +75,7 @@ class AccountView(APIView):
 				user = authenticate(**credentials)
 
 				if not user:
-					return Response('Current password is wrong', status=status.HTTP_400_BAD_REQUEST)
+					return Response('Current password is not correct', status=status.HTTP_400_BAD_REQUEST)
 
 				request.data.pop('current_password')
 				request.data.pop('username')
@@ -107,3 +109,74 @@ class AccountView(APIView):
 
 		return Response(purchase_info)
 
+	@api_view(['POST'])
+	def verify_email(request, id):
+		if request.method == 'POST':
+			if 'email' in request.data:
+				email = request.data['email']
+				account = get_object_or_404(Account, pk=id)
+
+				if account.email_verified == 0:
+					return Response('Email is already verified', status=status.HTTP_400_BAD_REQUEST)
+				elif account.email_verified != email:
+					return Response('Email verification code is not correct', status=status.HTTP_400_BAD_REQUEST)
+				elif account.email_verified == email:
+					account.email_verified = 0
+					account.save()
+
+					return Response('Verified', status=status.HTTP_200_OK)
+
+
+	@api_view(['POST'])
+	def verify_phone(request, id):
+		if request.method == 'POST':
+			if 'phone' in request.data:
+				phone = request.data['phone']
+				account = get_object_or_404(Account, pk=id)
+
+				if account.phone_verified == 0:
+					return Response('Phone is already verified', status=status.HTTP_400_BAD_REQUEST)
+				elif account.phone_verified != phone:
+					return Response('Phone verification code is not correct', status=status.HTTP_400_BAD_REQUEST)
+				elif account.phone_verified == phone:
+					account.phone_verified = 0
+					account.save()
+
+					return Response('Verified', status=status.HTTP_200_OK)
+
+	@api_view(['POST'])
+	def send_code(request, id):
+		if request.method == 'POST':
+			if 'type' in request.data:
+				verify_type = request.data['type']
+				account = get_object_or_404(Account, pk=id)
+				code = random.randint(1000, 9999)
+
+				if verify_type == 'email':
+					if account.email_verified == 0:
+						return Response('Email is already verified', status=status.HTTP_400_BAD_REQUEST)
+
+					account.email_verified = code
+					account.save()
+
+					mail_content = 'Please verify your email address. Verification code: ' + str(code)
+
+					try:
+						send_mail(
+							'Thanks for using Vinna app',
+							mail_content,
+							'tech@vinna.me',
+							[account.user.email],
+							fail_silently=False,
+						)
+					except:
+						return Response('Failed to send verification code to your email address - ' + account.user.email, status=status.HTTP_400_BAD_REQUEST)
+
+				elif verify_type == 'phone':
+					if account.phone_verified == 0:
+						return Response('Phone is already verified', status=status.HTTP_400_BAD_REQUEST)
+
+					account.phone_verified = code
+					account.save()
+
+				return Response('Code updated', status=status.HTTP_200_OK)

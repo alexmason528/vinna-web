@@ -34,7 +34,8 @@ class Account(models.Model):
     profile_photo_url = models.ImageField(upload_to=upload_profile_image_to)
     referral_account = models.ForeignKey('Account', related_name='account_referral', null=True, blank=True)
     last_modified_date = models.DateTimeField('Last Modified', auto_now=True)
-    verified = models.BooleanField(default=0)
+    email_verified = models.CharField(default='0', max_length=50)
+    phone_verified = models.CharField(default='0', max_length=50)
 
     def __str__(self):
         return self.first_name+' '+self.last_name
@@ -65,6 +66,18 @@ class Account(models.Model):
     def get_registration_link(self):
         link = short_url.encode_url(self.id)
         return BASE_URL + 'client_member/download/?referral=' + str(link)
+
+    def get_email_status(self):
+        if self.email_verified == '0':
+            return True
+        else:
+            return False
+
+    def get_phone_status(self):
+        if self.phone_verified == '0':
+            return True
+        else:
+            return False
 
 class AccountReferral(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)

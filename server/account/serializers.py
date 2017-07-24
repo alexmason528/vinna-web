@@ -1,8 +1,11 @@
+import random
+
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.hashers import make_password
 from django.db.models import Q
 from django.core.exceptions import ValidationError
+from django.core.mail import send_mail
 
 from rest_framework import serializers
 from core.serializers import UserSerializer
@@ -49,10 +52,12 @@ class AccountSerializer(serializers.ModelSerializer):
     qrcode = serializers.CharField(source='get_qrcode', read_only=True)
     profile_photo_url = Base64ImageField(max_length=None, use_url=True)
     registration_link = serializers.CharField(source='get_registration_link', read_only=True)
+    email_status = serializers.BooleanField(source='get_email_status', read_only=True)
+    phone_status = serializers.BooleanField(source='get_phone_status', read_only=True)
 
     class Meta:
         model = Account
-        fields = ('id', 'first_name','last_name', 'email', 'phone', 'dob', 'gender', 'password', 'profile_photo_url', 'qrcode', 'registration_link')
+        fields = ('id', 'first_name','last_name', 'email', 'phone', 'dob', 'gender', 'password', 'profile_photo_url', 'qrcode', 'registration_link', 'email_status', 'phone_status')
 
     def create(self, validated_data):
         email = validated_data.pop('email')
@@ -95,6 +100,12 @@ class AccountSerializer(serializers.ModelSerializer):
         user = User.objects.create(**user_info)
         validated_data['language_id'] = 1
 
+        email_code = random.randint(1000, 9999)
+        phone_code = random.randint(1000, 9999)
+
+        validated_data['email_verified'] = email_code
+        validated_data['phone_verified'] = phone_code
+
         account = Account.objects.create(user_id=user.id, **validated_data)
 
         if invitation:
@@ -105,6 +116,19 @@ class AccountSerializer(serializers.ModelSerializer):
                 'description': 'extra'
             }
             AccountPartnerRole.objects.create(**partner_role_info)
+
+        mail_content = 'Please verify your email address. Verification code: ' + str(email_code)
+
+        try:
+            send_mail(
+                'Thanks for using Vinna app',
+                mail_content,
+                'tech@vinna.me',
+                [email],
+                fail_silently=False,
+            )
+        except:
+            pass
 
         return account
 
