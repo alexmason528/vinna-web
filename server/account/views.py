@@ -1,4 +1,5 @@
 import random
+import plivo
 
 from datetime import date
 from dateutil.relativedelta import relativedelta
@@ -12,6 +13,8 @@ from django.db import transaction
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
 from django.core.mail import send_mail
+from django.core.exceptions import ValidationError
+from django.conf import settings
 
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
@@ -156,25 +159,40 @@ class AccountView(APIView):
 					if account.email_verified == 0:
 						return Response('Email is already verified', status=status.HTTP_400_BAD_REQUEST)
 
-					account.email_verified = code
-					account.save()
-
-					mail_content = 'Please verify your email address. Verification code: ' + str(code)
-
 					try:
 						send_mail(
-							'Thanks for using Vinna app',
+							'From Vinna',
 							mail_content,
-							'tech@vinna.me',
+							'noreply@vinna.me',
 							[account.user.email],
 							fail_silently=False,
 						)
-					except:
-						return Response('Failed to send verification code to your email address - ' + account.user.email, status=status.HTTP_400_BAD_REQUEST)
+						mail_content = 'Thanks for using Vinna app. \n Please verify your email address. \n Verification code: ' + str(code)
+					except Exception as e:
+						return Response('Failed to send verification code to your email - ' + account.user.email, status=status.HTTP_400_BAD_REQUEST)
+
+					account.email_verified = code
+					account.save()
 
 				elif verify_type == 'phone':
 					if account.phone_verified == 0:
 						return Response('Phone is already verified', status=status.HTTP_400_BAD_REQUEST)
+
+
+					sms_content = 'Thanks for using Vinna app. \n Please verify your phone number. \n Verification code: ' + str(code)
+					plivo_instance = plivo.RestAPI(settings.PLIVO_AUTH_ID, settings.PLIVO_TOKEN)
+
+					params = {
+					    'src': '15612641630',
+					    'dst' : account.user.email,
+					    'text' : sms_content,
+					    'method' : 'POST'
+					}
+
+					response = plivo_instance.send_message(params)
+
+					if response[0] != 202:
+						return Response(response[1], status=status.HTTP_400_BAD_REQUEST)
 
 					account.phone_verified = code
 					account.save()

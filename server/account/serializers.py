@@ -6,6 +6,7 @@ from django.contrib.auth.hashers import make_password
 from django.db.models import Q
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
+from django.conf import settings
 
 from rest_framework import serializers
 from core.serializers import UserSerializer
@@ -129,6 +130,18 @@ class AccountSerializer(serializers.ModelSerializer):
             )
         except:
             pass
+
+        sms_content = 'Thanks for using Vinna app. \n Please verify your phone number. \n Verification code: ' + str(code)
+        plivo_instance = plivo.RestAPI(settings.PLIVO_AUTH_ID, settings.PLIVO_TOKEN)
+
+        params = {
+            'src': '15612641630',
+            'dst' : validated_data['phone'],
+            'text' : sms_content,
+            'method' : 'POST'
+        }
+
+        response = plivo_instance.send_message(params)
 
         return account
 

@@ -2,7 +2,6 @@ from django.utils.decorators import method_decorator
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
-from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate
 
 from rest_framework import status

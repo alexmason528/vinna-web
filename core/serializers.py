@@ -12,7 +12,7 @@ class StateSerializer(serializers.ModelSerializer):
 
 	class Meta:
 		model = State
-		fields = ('id', 'country_id', 'text')
+		fields = ('id', 'country_id', 'text', 'abbrev')
 
 class CountrySerializer(serializers.ModelSerializer):
 
@@ -21,7 +21,7 @@ class CountrySerializer(serializers.ModelSerializer):
 
 	class Meta:
 		model = Country
-		fields = ('id', 'english_text', 'states')
+		fields = ('id', 'english_text', 'states', 'abbrev')
 
 
 class UserSerializer(serializers.ModelSerializer):
