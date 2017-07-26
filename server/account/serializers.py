@@ -1,4 +1,5 @@
 import random
+import plivo
 
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
@@ -131,7 +132,7 @@ class AccountSerializer(serializers.ModelSerializer):
         except:
             pass
 
-        sms_content = 'Thanks for using Vinna app. \n Please verify your phone number. \n Verification code: ' + str(code)
+        sms_content = 'Thanks for using Vinna app. \n Please verify your phone number. \n Verification code: ' + str(phone_code)
         plivo_instance = plivo.RestAPI(settings.PLIVO_AUTH_ID, settings.PLIVO_TOKEN)
 
         params = {

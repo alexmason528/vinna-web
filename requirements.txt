@@ -41,4 +41,4 @@ django-storages==1.5.2
 boto3==1.4.4
 qrcode==5.3
 short_url==1.2.2
-plivo=0.11.3
+plivo==0.11.3
