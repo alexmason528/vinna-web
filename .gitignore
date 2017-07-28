@@ -58,3 +58,6 @@ docs/_build/
 target/
 
 .DS_Store
+
+settings.prod.py
+vinna.zip
