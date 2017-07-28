@@ -11,9 +11,12 @@ from django.conf import settings
 
 from rest_framework import serializers
 from core.serializers import UserSerializer
+
 from server.account.partner_model import AccountPartnerRole
 from server.business.invitation_model import Invitation
 from server.account.models import AccountReferral
+from core.models import Country
+
 from .models import Account
 
 class Base64ImageField(serializers.ImageField):
@@ -56,14 +59,17 @@ class AccountSerializer(serializers.ModelSerializer):
     registration_link = serializers.CharField(source='get_registration_link', read_only=True)
     email_status = serializers.BooleanField(source='get_email_status', read_only=True)
     phone_status = serializers.BooleanField(source='get_phone_status', read_only=True)
+    country_id = serializers.IntegerField(required=False)
 
     class Meta:
         model = Account
-        fields = ('id', 'first_name','last_name', 'email', 'phone', 'dob', 'gender', 'password', 'profile_photo_url', 'qrcode', 'registration_link', 'email_status', 'phone_status')
+        fields = ('id', 'first_name','last_name', 'email', 'phone', 'dob', 'gender', 'country_id', 'password', 'profile_photo_url', 'qrcode', 'registration_link', 'email_status', 'phone_status')
 
     def create(self, validated_data):
         email = validated_data.pop('email')
         password = validated_data.pop('password')
+
+        validated_data['country_id'] = 1
 
         if User.objects.filter(username=email).count() > 0:
             raise ValidationError("Email is already taken by other account")
@@ -125,7 +131,7 @@ class AccountSerializer(serializers.ModelSerializer):
             send_mail(
                 'Thanks for using Vinna app',
                 mail_content,
-                'tech@vinna.me',
+                settings.VERIFICATION_SENDER_EMAIL,
                 [email],
                 fail_silently=False,
             )
@@ -135,13 +141,15 @@ class AccountSerializer(serializers.ModelSerializer):
         sms_content = 'Thanks for using Vinna app. \n Please verify your phone number. \n Verification code: ' + str(phone_code)
         plivo_instance = plivo.RestAPI(settings.PLIVO_AUTH_ID, settings.PLIVO_TOKEN)
 
+        country = get_object_or_404(Country, pk=validated_data['country_id'])
+
         params = {
-            'src': '15612641630',
-            'dst' : validated_data['phone'],
+            'src': settings.VERIFICATION_SENDER_PHONE,
+            'dst' : country.phone_country_code + validated_data['phone'],
             'text' : sms_content,
             'method' : 'POST'
         }
-
+        
         response = plivo_instance.send_message(params)
 
         return account

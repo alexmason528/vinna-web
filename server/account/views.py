@@ -26,6 +26,7 @@ from vinna.authentication import CustomJSONWebTokenAuthentication
 
 from server.business.models import Business
 from server.business.serializers import BusinessSerializer
+from server.member.models import Member
 from server.media.models import BusinessImage
 from server.purchase.models import Purchase
 
@@ -119,12 +120,12 @@ class AccountView(APIView):
 				email = request.data['email']
 				account = get_object_or_404(Account, pk=id)
 
-				if account.email_verified == 0:
+				if account.email_verified == 1:
 					return Response('Email is already verified', status=status.HTTP_400_BAD_REQUEST)
 				elif account.email_verified != email:
 					return Response('Email verification code is not correct', status=status.HTTP_400_BAD_REQUEST)
 				elif account.email_verified == email:
-					account.email_verified = 0
+					account.email_verified = 1
 					account.save()
 
 					return Response('Verified', status=status.HTTP_200_OK)
@@ -137,12 +138,12 @@ class AccountView(APIView):
 				phone = request.data['phone']
 				account = get_object_or_404(Account, pk=id)
 
-				if account.phone_verified == 0:
+				if account.phone_verified == 1:
 					return Response('Phone is already verified', status=status.HTTP_400_BAD_REQUEST)
 				elif account.phone_verified != phone:
 					return Response('Phone verification code is not correct', status=status.HTTP_400_BAD_REQUEST)
 				elif account.phone_verified == phone:
-					account.phone_verified = 0
+					account.phone_verified = 1
 					account.save()
 
 					return Response('Verified', status=status.HTTP_200_OK)
@@ -156,14 +157,14 @@ class AccountView(APIView):
 				code = random.randint(1000, 9999)
 
 				if verify_type == 'email':
-					if account.email_verified == 0:
+					if account.email_verified == 1:
 						return Response('Email is already verified', status=status.HTTP_400_BAD_REQUEST)
 
 					try:
 						send_mail(
 							'From Vinna',
 							mail_content,
-							'noreply@vinna.me',
+							settings.VERIFICATION_SENDER_EMAIL,
 							[account.user.email],
 							fail_silently=False,
 						)
@@ -175,16 +176,18 @@ class AccountView(APIView):
 					account.save()
 
 				elif verify_type == 'phone':
-					if account.phone_verified == 0:
+					if account.phone_verified == 1:
 						return Response('Phone is already verified', status=status.HTTP_400_BAD_REQUEST)
 
 
 					sms_content = 'Thanks for using Vinna app. \n Please verify your phone number. \n Verification code: ' + str(code)
 					plivo_instance = plivo.RestAPI(settings.PLIVO_AUTH_ID, settings.PLIVO_TOKEN)
 
+					member = get_object_or_404(Member, account=account)
+
 					params = {
-					    'src': '15612641630',
-					    'dst' : account.user.email,
+					    'src': settings.VERIFICATION_SENDER_PHONE,
+					    'dst' : account.country.phone_country_code + account.user.email,
 					    'text' : sms_content,
 					    'method' : 'POST'
 					}

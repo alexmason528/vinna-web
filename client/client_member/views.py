@@ -100,7 +100,7 @@ def download(request):
         send_mail(
             'Download Vinna App',
             'Downlad the Vinna App to your phone.',
-            'tech@vinna.me',
+            'noreply@vinna.me',
             [form_download.cleaned_data.get('email')],
             fail_silently=False,
         )

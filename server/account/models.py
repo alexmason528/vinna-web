@@ -31,6 +31,7 @@ class Account(models.Model):
     phone = models.CharField(max_length=25)
     dob = models.DateField()
     gender = models.CharField(choices=((u'F',u'Female'),(u'M',u'Male')), max_length=1)
+    country = models.ForeignKey('core.Country', default=1)
     profile_photo_url = models.ImageField(upload_to=upload_profile_image_to)
     referral_account = models.ForeignKey('Account', related_name='account_referral', null=True, blank=True)
     last_modified_date = models.DateTimeField('Last Modified', auto_now=True)
@@ -68,13 +69,13 @@ class Account(models.Model):
         return BASE_URL + 'client_member/download/?referral=' + str(link)
 
     def get_email_status(self):
-        if self.email_verified == '0':
+        if self.email_verified == '1':
             return True
         else:
             return False
 
     def get_phone_status(self):
-        if self.phone_verified == '0':
+        if self.phone_verified == '1':
             return True
         else:
             return False

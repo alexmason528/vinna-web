@@ -85,7 +85,7 @@ class ForgetPasswordView(APIView):
 					send_mail(
 						'From Vinna',
 						mail_content,
-						'noreply@vinna.me',
+						settings.VERIFICATION_SENDER_EMAIL,
 						[email],
 						fail_silently=False,
 					)
@@ -103,17 +103,17 @@ class ForgetPasswordView(APIView):
 				account = Account.objects.get(phone = phone)
 
 				if not account:
-					return Response('Email does not exist', status=status.HTTP_400_BAD_REQUEST)
+					return Response('Phone number does not exist', status=status.HTTP_400_BAD_REQUEST)
 
 				code = random.randint(1000, 9999)
 				sms_content = 'New password: ' + str(code)
 				plivo_instance = plivo.RestAPI(settings.PLIVO_AUTH_ID, settings.PLIVO_TOKEN)
 
 				params = {
-				    'src': '15612641630',
-				    'dst' : account.user.email,
-				    'text' : sms_content,
-				    'method' : 'POST'
+			    'src': settings.VERIFICATION_SENDER_PHONE,
+			    'dst' : phone,
+			    'text' : sms_content,
+			    'method' : 'POST'
 				}
 
 				response = plivo_instance.send_message(params)
