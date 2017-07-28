@@ -71,7 +71,7 @@ class BusinessBillingInfoSerializer(serializers.ModelSerializer):
     country_id = serializers.IntegerField()
     state_id = serializers.IntegerField()
     active = serializers.BooleanField()
-    address2 = serializers.CharField(required=False)
+    address2 = serializers.CharField(required=False, allow_null=True, allow_blank=True)
 
     class Meta:
         model = BusinessBillingInfo
@@ -92,6 +92,7 @@ class BusinessSerializer(serializers.ModelSerializer):
     ssn_token = serializers.CharField(required=False)
     description = serializers.CharField(required=False)
     current_billing_info = BusinessBillingInfoSerializer(source='get_billing_info', read_only=True)
+    address2 = serializers.CharField(required=False, allow_null=True, allow_blank=True)
 
     picture1 = Base64ImageField(max_length=None, use_url=True)
     picture2 = Base64ImageField(required=False, max_length=None, use_url=True, allow_empty_file=True, allow_null=True)

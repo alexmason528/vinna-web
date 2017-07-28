@@ -36,7 +36,7 @@ class MemberSerializer(serializers.ModelSerializer):
     payment_info = MemberPaymentInfoSerializer(write_only=True)
     security_hash = serializers.CharField(required=False)
     ssn_token = serializers.CharField(required=False)
-    mailing_address_2 = serializers.CharField(required=False, allow_blank=True)
+    mailing_address_2 = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     current_payment_info = MemberPaymentInfoSerializer(source='get_payment_info', read_only=True)
 
     class Meta:
