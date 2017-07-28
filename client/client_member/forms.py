@@ -6,7 +6,7 @@ from server.account.models import Account
 
 
 class DownloadForm(forms.Form):
-    email = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': _('Email or Phone #')}))
+    email = forms.CharField(required=False, widget=forms.TextInput(attrs={'placeholder': _('Phone #')}))
     account = forms.CharField(required=False, widget=forms.HiddenInput())
 
     def is_valid(self):
