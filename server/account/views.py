@@ -160,6 +160,8 @@ class AccountView(APIView):
 					if account.email_verified == 1:
 						return Response('Email is already verified', status=status.HTTP_400_BAD_REQUEST)
 
+					mail_content = 'Thanks for using Vinna app. \nPlease verify your email address. \nVerification code: ' + str(code)
+					
 					try:
 						send_mail(
 							'From Vinna',
@@ -168,7 +170,7 @@ class AccountView(APIView):
 							[account.user.email],
 							fail_silently=False,
 						)
-						mail_content = 'Thanks for using Vinna app. \n Please verify your email address. \n Verification code: ' + str(code)
+						
 					except Exception as e:
 						return Response('Failed to send verification code to your email - ' + account.user.email, status=status.HTTP_400_BAD_REQUEST)
 
@@ -179,15 +181,14 @@ class AccountView(APIView):
 					if account.phone_verified == 1:
 						return Response('Phone is already verified', status=status.HTTP_400_BAD_REQUEST)
 
-
-					sms_content = 'Thanks for using Vinna app. \n Please verify your phone number. \n Verification code: ' + str(code)
+					sms_content = 'Thanks for using Vinna app. \nPlease verify your phone number. \nVerification code: ' + str(code)
 					plivo_instance = plivo.RestAPI(settings.PLIVO_AUTH_ID, settings.PLIVO_TOKEN)
-
-					member = get_object_or_404(Member, account=account)
+					
+					account = get_object_or_404(Account, pk=id)
 
 					params = {
 					    'src': settings.VERIFICATION_SENDER_PHONE,
-					    'dst' : account.country.phone_country_code + account.user.email,
+					    'dst' : account.phone,
 					    'text' : sms_content,
 					    'method' : 'POST'
 					}

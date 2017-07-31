@@ -125,7 +125,7 @@ class AccountSerializer(serializers.ModelSerializer):
             }
             AccountPartnerRole.objects.create(**partner_role_info)
 
-        mail_content = 'Please verify your email address. Verification code: ' + str(email_code)
+        mail_content = 'Thanks for using Vinna app. \nPlease verify your email address. \nVerification code: ' + str(email_code)
 
         try:
             send_mail(
@@ -138,7 +138,7 @@ class AccountSerializer(serializers.ModelSerializer):
         except:
             pass
 
-        sms_content = 'Thanks for using Vinna app. \n Please verify your phone number. \n Verification code: ' + str(phone_code)
+        sms_content = 'Thanks for using Vinna app. \nPlease verify your phone number. \nVerification code: ' + str(phone_code)
         plivo_instance = plivo.RestAPI(settings.PLIVO_AUTH_ID, settings.PLIVO_TOKEN)
 
         country = get_object_or_404(Country, pk=validated_data['country_id'])

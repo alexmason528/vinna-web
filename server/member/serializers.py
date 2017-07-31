@@ -35,7 +35,7 @@ class MemberSerializer(serializers.ModelSerializer):
     managed_account_token = serializers.CharField(required=False)
     payment_info = MemberPaymentInfoSerializer(write_only=True)
     security_hash = serializers.CharField(required=False)
-    ssn_token = serializers.CharField(required=False)
+    ssn_token = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     mailing_address_2 = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     current_payment_info = MemberPaymentInfoSerializer(source='get_payment_info', read_only=True)
 
@@ -83,7 +83,10 @@ class MemberSerializer(serializers.ModelSerializer):
 
         stripe_account.legal_entity.first_name = account.first_name
         stripe_account.legal_entity.last_name = account.last_name
-        stripe_account.legal_entity.personal_id_number = member.ssn_token
+
+        if member.ssn_token:
+            stripe_account.legal_entity.personal_id_number = member.ssn_token
+            
         stripe_account.tos_acceptance.date = str(time.time()).split('.')[0]
         stripe_account.tos_acceptance.ip = get_ip(self.context['request'])
         
