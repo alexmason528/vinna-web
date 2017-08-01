@@ -116,89 +116,174 @@ class AccountView(APIView):
 	@api_view(['POST'])
 	def verify_email(request, id):
 		if request.method == 'POST':
-			if 'email' in request.data:
-				email = request.data['email']
+			if 'email_code' in request.data:
+				email_code = request.data['email_code']
 				account = get_object_or_404(Account, pk=id)
 
-				if account.email_verified == 1:
-					return Response('Email is already verified', status=status.HTTP_400_BAD_REQUEST)
-				elif account.email_verified != email:
-					return Response('Email verification code is not correct', status=status.HTTP_400_BAD_REQUEST)
-				elif account.email_verified == email:
-					account.email_verified = 1
-					account.save()
+				if account.new_email and account.new_email_verified != 1:
+					if (account.new_email_verified == email_code):
+						user = account.user
+						user.username = account.new_email
+						user.email = account.new_email
+						user.save()
+						
+						account.email_verified = 1
+						account.new_email_verified = 0
+						account.new_email = ''
 
-					return Response('Verified', status=status.HTTP_200_OK)
+						account.save()
+
+						return Response('new_email_verified', status=status.HTTP_200_OK)
+
+				elif account.email_verified != 1:
+					if account.email_verified == email_code:
+						account.email_verified = 1
+						account.save()
+
+						return Response('current_email_verified', status=status.HTTP_200_OK)
+
+				return Response('Failed to verify your email', status=status.HTTP_400_BAD_REQUEST)
 
 
 	@api_view(['POST'])
 	def verify_phone(request, id):
 		if request.method == 'POST':
+			if 'phone_code' in request.data:
+				phone_code = request.data['phone_code']
+				account = get_object_or_404(Account, pk=id)
+
+				if account.new_phone and account.new_phone_verified != 1:
+					if account.new_phone_verified == phone_code:
+						account.phone = account.new_phone
+						account.phone_verified = 1
+						account.new_phone_verified = 0
+						account.new_phone = ''
+
+						account.save()
+
+						return Response('new_phone_verified', status=status.HTTP_200_OK)
+
+				elif account.phone_verified != 1:
+					if account.phone_verified == phone_code:
+						account.phone_verified = 1
+						account.save()
+
+						return Response('current_phone_verified', status=status.HTTP_200_OK)
+
+				return Response('Failed to verify your email', status=status.HTTP_400_BAD_REQUEST)
+
+	@api_view(['POST'])
+	def update_email(request, id):
+		if request.method == 'POST':
+			if 'email' in request.data:
+				email = request.data['email']
+				account = get_object_or_404(Account, pk=id)
+				account.new_email = email
+
+				code = random.randint(1000, 9999)
+
+				mail_content = 'Thanks for using Vinna app. \nPlease verify your email address. \nVerification code: ' + str(code)
+					
+				try:
+					send_mail(
+						'From Vinna',
+						mail_content,
+						settings.VERIFICATION_SENDER_EMAIL,
+						[email],
+						fail_silently=False,
+					)
+					
+				except Exception as e:
+					return Response('Failed to send verification code to your email - ' + account.user.email, status=status.HTTP_400_BAD_REQUEST)
+
+				account.new_email_verified = code
+				account.save()
+
+				return Response('Email updated', status=status.HTTP_200_OK)
+
+	@api_view(['POST'])
+	def update_phone(request, id):
+		if request.method == 'POST':
 			if 'phone' in request.data:
 				phone = request.data['phone']
 				account = get_object_or_404(Account, pk=id)
+				account.new_phone = phone
 
-				if account.phone_verified == 1:
-					return Response('Phone is already verified', status=status.HTTP_400_BAD_REQUEST)
-				elif account.phone_verified != phone:
-					return Response('Phone verification code is not correct', status=status.HTTP_400_BAD_REQUEST)
-				elif account.phone_verified == phone:
-					account.phone_verified = 1
-					account.save()
-
-					return Response('Verified', status=status.HTTP_200_OK)
-
-	@api_view(['POST'])
-	def send_code(request, id):
-		if request.method == 'POST':
-			if 'type' in request.data:
-				verify_type = request.data['type']
-				account = get_object_or_404(Account, pk=id)
 				code = random.randint(1000, 9999)
 
-				if verify_type == 'email':
-					if account.email_verified == 1:
-						return Response('Email is already verified', status=status.HTTP_400_BAD_REQUEST)
+				sms_content = 'Thanks for using Vinna app. \nPlease verify your phone number. \nVerification code: ' + str(code)
+				plivo_instance = plivo.RestAPI(settings.PLIVO_AUTH_ID, settings.PLIVO_TOKEN)
+				
+				params = {
+				    'src': settings.VERIFICATION_SENDER_PHONE,
+				    'dst' : phone,
+				    'text' : sms_content,
+				    'method' : 'POST'
+				}
 
-					mail_content = 'Thanks for using Vinna app. \nPlease verify your email address. \nVerification code: ' + str(code)
-					
-					try:
-						send_mail(
-							'From Vinna',
-							mail_content,
-							settings.VERIFICATION_SENDER_EMAIL,
-							[account.user.email],
-							fail_silently=False,
-						)
-						
-					except Exception as e:
-						return Response('Failed to send verification code to your email - ' + account.user.email, status=status.HTTP_400_BAD_REQUEST)
+				response = plivo_instance.send_message(params)
 
-					account.email_verified = code
-					account.save()
+				if response[0] != 202:
+					return Response(response[1], status=status.HTTP_400_BAD_REQUEST)
 
-				elif verify_type == 'phone':
-					if account.phone_verified == 1:
-						return Response('Phone is already verified', status=status.HTTP_400_BAD_REQUEST)
+				account.new_phone_verified = code
+				account.save()
 
-					sms_content = 'Thanks for using Vinna app. \nPlease verify your phone number. \nVerification code: ' + str(code)
-					plivo_instance = plivo.RestAPI(settings.PLIVO_AUTH_ID, settings.PLIVO_TOKEN)
-					
-					account = get_object_or_404(Account, pk=id)
+				return Response('Phone updated', status=status.HTTP_200_OK)
+				
 
-					params = {
-					    'src': settings.VERIFICATION_SENDER_PHONE,
-					    'dst' : account.phone,
-					    'text' : sms_content,
-					    'method' : 'POST'
-					}
+	@api_view(['GET'])
+	def send_email_code(request, id):
+		if request.method == 'GET':
+			account = get_object_or_404(Account, pk=id)
+			code = random.randint(1000, 9999)
 
-					response = plivo_instance.send_message(params)
+			if account.email_verified == 1:
+				return Response('Email is already verified', status=status.HTTP_400_BAD_REQUEST)
 
-					if response[0] != 202:
-						return Response(response[1], status=status.HTTP_400_BAD_REQUEST)
+			mail_content = 'Thanks for using Vinna app. \nPlease verify your email address. \nVerification code: ' + str(code)
+			
+			try:
+				send_mail(
+					'From Vinna',
+					mail_content,
+					settings.VERIFICATION_SENDER_EMAIL,
+					[account.user.email],
+					fail_silently=False,
+				)
+				
+			except Exception as e:
+				return Response('Failed to send verification code to your email - ' + account.user.email, status=status.HTTP_400_BAD_REQUEST)
 
-					account.phone_verified = code
-					account.save()
+			account.email_verified = code
+			account.save()
 
-				return Response('Code updated', status=status.HTTP_200_OK)
+			return Response('Code updated', status=status.HTTP_200_OK)
+
+	@api_view(['GET'])
+	def send_phone_code(request, id):
+		if request.method == 'GET':
+			if account.phone_verified == 1:
+				return Response('Phone is already verified', status=status.HTTP_400_BAD_REQUEST)
+
+			sms_content = 'Thanks for using Vinna app. \nPlease verify your phone number. \nVerification code: ' + str(code)
+			plivo_instance = plivo.RestAPI(settings.PLIVO_AUTH_ID, settings.PLIVO_TOKEN)
+			
+			account = get_object_or_404(Account, pk=id)
+
+			params = {
+			    'src': settings.VERIFICATION_SENDER_PHONE,
+			    'dst' : account.phone,
+			    'text' : sms_content,
+			    'method' : 'POST'
+			}
+
+			response = plivo_instance.send_message(params)
+
+			if response[0] != 202:
+				return Response(response[1], status=status.HTTP_400_BAD_REQUEST)
+
+			account.phone_verified = code
+			account.save()
+
+			return Response('Code updated', status=status.HTTP_200_OK)

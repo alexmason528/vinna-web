@@ -37,6 +37,10 @@ class Account(models.Model):
     last_modified_date = models.DateTimeField('Last Modified', auto_now=True)
     email_verified = models.CharField(default='0', max_length=50)
     phone_verified = models.CharField(default='0', max_length=50)
+    new_email = models.CharField(default='', max_length=50)
+    new_phone = models.CharField(default='', max_length=50)
+    new_email_verified = models.CharField(default='0', max_length=50)
+    new_phone_verified = models.CharField(default='0', max_length=50)
 
     def __str__(self):
         return self.first_name+' '+self.last_name
@@ -68,17 +72,20 @@ class Account(models.Model):
         link = short_url.encode_url(self.id)
         return BASE_URL + 'client_member/download/?referral=' + str(link)
 
-    def get_email_status(self):
-        if self.email_verified == '1':
+    def is_email_verified(self):
+        if self.new_email and self.new_email_verified == '1':
             return True
-        else:
-            return False
+        elif not self.new_email and self.email_verified == '1':
+            return True
+        return False
 
-    def get_phone_status(self):
-        if self.phone_verified == '1':
+    def is_phone_verified(self):
+        if self.new_phone and self.new_phone_verified == '1':
             return True
-        else:
-            return False
+        elif not self.new_phone and self.phone_verified == '1':
+            return True
+        return False
+
 
 class AccountReferral(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)

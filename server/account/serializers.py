@@ -57,13 +57,13 @@ class AccountSerializer(serializers.ModelSerializer):
     qrcode = serializers.CharField(source='get_qrcode', read_only=True)
     profile_photo_url = Base64ImageField(max_length=None, use_url=True)
     registration_link = serializers.CharField(source='get_registration_link', read_only=True)
-    email_status = serializers.BooleanField(source='get_email_status', read_only=True)
-    phone_status = serializers.BooleanField(source='get_phone_status', read_only=True)
+    email_verified = serializers.BooleanField(source='is_email_verified', read_only=True)
+    phone_verified = serializers.BooleanField(source='is_phone_verified', read_only=True)
     country_id = serializers.IntegerField(required=False)
 
     class Meta:
         model = Account
-        fields = ('id', 'first_name','last_name', 'email', 'phone', 'dob', 'gender', 'country_id', 'password', 'profile_photo_url', 'qrcode', 'registration_link', 'email_status', 'phone_status')
+        fields = ('id', 'first_name','last_name', 'email', 'phone', 'new_email', 'new_phone', 'dob', 'gender', 'country_id', 'password', 'profile_photo_url', 'qrcode', 'registration_link', 'email_verified', 'phone_verified')
 
     def create(self, validated_data):
         email = validated_data.pop('email')
@@ -163,11 +163,6 @@ class AccountSerializer(serializers.ModelSerializer):
 
         if 'last_name' in validated_data:
             setattr(user, 'last_name', validated_data['last_name'])
-
-        if 'email' in validated_data:
-            email = validated_data.pop('email')
-            setattr(user, 'email', email)
-            setattr(user, 'username', email)
 
         if 'password' in validated_data:
             setattr(user, 'password', make_password(validated_data.pop('password')))
