@@ -22,16 +22,16 @@ class Purchase(models.Model):
     business_percent = models.DecimalField(decimal_places=2, max_digits=9, default=0, blank=True)
     business_amount = models.DecimalField(decimal_places=2, max_digits=9, default=0, blank=True)
     business_amount_processed = models.BooleanField(default=0, blank=True)
-    business_amount_processed_date = models.DateTimeField('Business Amount Processed Date', default=timezone.now, blank=True)
+    business_amount_processed_date = models.DateTimeField('Business Amount Processed Date', null=True, blank=True)
 
     member_percent = models.DecimalField(decimal_places=2, max_digits=9, default=0, blank=True)
     member_amount = models.DecimalField(decimal_places=2, max_digits=9, default=0, blank=True)
     member_amount_processed = models.BooleanField(default=0, blank=True)
-    member_amount_processed_date = models.DateTimeField('Member Amount Processed Date', default=timezone.now, blank=True)
+    member_amount_processed_date = models.DateTimeField('Member Amount Processed Date', null=True, blank=True)
 
     member_ref_percent = models.DecimalField(decimal_places=2, max_digits=9, default=0, blank=True)
     member_ref_amount = models.DecimalField(decimal_places=2, max_digits=9, default=0, blank=True)
     member_ref_amount_processed = models.BooleanField(default=0, blank=True)
-    member_ref_amount_processed_date = models.DateTimeField('Member Referral Amount Processed Date', default=timezone.now, blank=True)
+    member_ref_amount_processed_date = models.DateTimeField('Member Referral Amount Processed Date', null=True, blank=True)
 
-    void_date = models.DateTimeField(default=timezone.now, verbose_name='Void Date')
+    void_date = models.DateTimeField(null=True, blank=True, verbose_name='Void Date')

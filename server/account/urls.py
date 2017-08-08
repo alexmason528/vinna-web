@@ -5,6 +5,7 @@ from . import views
 app_name = 'account'
 
 urlpatterns = [
+    url(r'account/find_phone/$', views.AccountView.find_phone, name='find_phone'),
     url(r'account/(?P<id>[0-9]+)/send_phone_code/$', views.AccountView.send_phone_code, name='send_phone_code'),
     url(r'account/(?P<id>[0-9]+)/send_email_code/$', views.AccountView.send_email_code, name='send_email_code'),
     url(r'account/(?P<id>[0-9]+)/verify_phone/$', views.AccountView.verify_phone, name='verify_phone'),

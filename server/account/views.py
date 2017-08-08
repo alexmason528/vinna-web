@@ -35,6 +35,9 @@ from server.media.serializers import BusinessImageSerializer
 from .models import Account
 from .serializers import AccountSerializer
 
+@permission_classes(IsAuthenticated, )
+@authentication_classes(CustomJSONWebTokenAuthentication, )
+
 class AccountView(APIView):
 
 	@api_view(['GET', 'POST'])
@@ -143,6 +146,29 @@ class AccountView(APIView):
 						return Response('current_email_verified', status=status.HTTP_200_OK)
 
 				return Response('Failed to verify your email', status=status.HTTP_400_BAD_REQUEST)
+
+
+	@api_view(['POST'])
+	@permission_classes([])
+	@authentication_classes([])	
+	def find_phone(request):
+		print ('verifying...')
+
+		print (request.data)
+		
+		if request.method == 'POST':
+			if 'phone' in request.data:
+				phone = request.data['phone']
+				print (phone)
+				phone = ''.join(list(filter(str.isdigit, phone)))
+
+				print (phone)
+				account = get_object_or_404(Account, phone=phone)
+
+				return Response(account.first_name, status=status.HTTP_200_OK)
+
+			return Response('Failed to find phone 1.', status=status.HTTP_400_BAD_REQUEST)
+		return Response('Failed to find phone 2.', status=status.HTTP_400_BAD_REQUEST)
 
 
 	@api_view(['POST'])
