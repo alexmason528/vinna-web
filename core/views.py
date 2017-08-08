@@ -16,7 +16,7 @@ from django.conf import settings
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 
 from server.purchase.models import Purchase
@@ -31,6 +31,16 @@ from .serializers import CountrySerializer, StateSerializer
 @permission_classes(IsAuthenticated, )
 @authentication_classes(CustomJSONWebTokenAuthentication, )
 
+
+
+class Version():
+	@permission_classes(AllowAny, )
+	def version_info(request):
+		return JsonResponse({'versions':[
+			{'0.27':{'expires':'2100-01-01'}},
+			{'0.24':{'expires':'2017-09-01'}},		
+			]})
+		
 class CountryView(APIView):
 
 	@api_view(['GET'])
