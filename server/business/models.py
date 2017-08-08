@@ -59,7 +59,7 @@ class Business(models.Model):
     hours = models.CharField(max_length=1000, default='', blank=True)
 
     category = models.ForeignKey(Category)
-    sub_category = models.ForeignKey(SubCategory)
+    sub_category = models.ForeignKey(SubCategory, null=True, blank=True)
 
     customer_token = models.CharField(max_length=50, default='', blank=True)
     

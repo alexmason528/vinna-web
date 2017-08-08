@@ -184,7 +184,8 @@ class BusinessCashierView(APIView):
 	@transaction.atomic
 	def business_cashier_collection(request, id):
 		if request.method == 'GET':
-			cashiers = AccountPartnerRole.objects.filter(business_id = id)
+			business = Business.objects.get(pk=id)
+			cashiers = AccountPartnerRole.objects.filter(business=business).exclude(account=business.account)
 			serializer = AccountPartnerRoleSerializer(cashiers, many=True)
 			return Response(serializer.data)
 		if request.method == 'POST':

@@ -83,7 +83,7 @@ class BusinessSerializer(serializers.ModelSerializer):
     account_id = serializers.IntegerField()
     category_id = serializers.IntegerField(write_only=True)
     category = CategorySerializer(read_only=True)
-    sub_category_id = serializers.IntegerField()
+    sub_category_id = serializers.IntegerField(required=False, allow_null=True)
     country_id = serializers.IntegerField()
     state_id = serializers.IntegerField()
     customer_token = serializers.CharField(required=False)
@@ -93,6 +93,7 @@ class BusinessSerializer(serializers.ModelSerializer):
     description = serializers.CharField(required=False)
     current_billing_info = BusinessBillingInfoSerializer(source='get_billing_info', read_only=True)
     address2 = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+
 
     picture1 = Base64ImageField(max_length=None, use_url=True)
     picture2 = Base64ImageField(required=False, max_length=None, use_url=True, allow_empty_file=True, allow_null=True)
