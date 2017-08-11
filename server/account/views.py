@@ -280,6 +280,9 @@ class AccountView(APIView):
 	@api_view(['GET'])
 	def send_phone_code(request, id):
 		if request.method == 'GET':
+			account = get_object_or_404(Account, pk=id)
+			code = random.randint(1000, 9999)
+
 			if account.phone_verified == 1:
 				return Response('Phone is already verified', status=status.HTTP_400_BAD_REQUEST)
 
