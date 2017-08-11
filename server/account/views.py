@@ -152,19 +152,10 @@ class AccountView(APIView):
 	@permission_classes([])
 	@authentication_classes([])	
 	def find_phone(request):
-		print ('verifying...')
-
-		print (request.data)
-		
 		if request.method == 'POST':
 			if 'phone' in request.data:
 				phone = request.data['phone']
-				print (phone)
-				phone = ''.join(list(filter(str.isdigit, phone)))
-
-				print (phone)
 				account = get_object_or_404(Account, phone=phone)
-
 				return Response(account.first_name, status=status.HTTP_200_OK)
 
 			return Response('Failed to find phone 1.', status=status.HTTP_400_BAD_REQUEST)
