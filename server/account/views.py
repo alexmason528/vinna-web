@@ -46,12 +46,16 @@ class AccountView(APIView):
 	@transaction.atomic
 	def account_collection(request):
 		if request.method == 'GET':
-			accounts = Account.objects.all()
+			accounts = Account.objects.filter(pk=request.user.id)
 			serializer = AccountSerializer(accounts, many=True)
 			return Response(serializer.data)
 		
 		elif request.method == 'POST':
 			serializer = AccountSerializer(data=request.data)
+			
+			if (serializer.data.id != request.user.id):
+				return Response("Error.", status=status.HTTP_400_BAD_REQUEST)
+
 			if serializer.is_valid():
 				try:
 					serializer.save()
@@ -65,6 +69,9 @@ class AccountView(APIView):
 	@api_view(['PUT','GET'])
 	@transaction.atomic
 	def account_element(request, id):
+		# Overwrite user id with authorized user.
+		id = request.user.id
+
 		if request.method == 'GET':	
 			account = get_object_or_404(Account, pk=id)
 			serializer = AccountSerializer(account)
