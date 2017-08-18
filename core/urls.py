@@ -11,4 +11,5 @@ urlpatterns = [
   url(r'^country/(?P<country_id>[0-9]+)/$', views.CountryView.country_element, name='country_element'),
   url(r'^country/$', views.CountryView.country_collection, name='country_collection'),
   url(r'^forget_password/$', views.ForgetPasswordView.forget_password, name='forget_password'),
+  url(r'^reset_password/$', views.ForgetPasswordView.reset_password, name='reset_password'),
 ]

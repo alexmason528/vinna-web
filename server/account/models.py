@@ -28,7 +28,7 @@ class Account(models.Model):
 
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    phone = models.CharField(max_length=25)
+    phone = models.CharField(default='', max_length=25)
     dob = models.DateField()
     gender = models.CharField(choices=((u'F',u'Female'),(u'M',u'Male')), max_length=1)
     country = models.ForeignKey('core.Country', default=1)

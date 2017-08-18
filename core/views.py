@@ -89,7 +89,7 @@ class ForgetPasswordView(APIView):
 
 				code = random.randint(1000, 9999)
 				
-				mail_content = 'New password: ' + str(code)
+				mail_content = 'Reset code to change your password: ' + str(code)
 
 				try:
 					send_mail(
@@ -100,15 +100,12 @@ class ForgetPasswordView(APIView):
 						fail_silently=False,
 					)
 				except Exception as e:
-					return Response('Failed to send new password to your email address - ' + user.email, status=status.HTTP_400_BAD_REQUEST)
+					return Response('Failed to send reset code to your email address - ' + email, status=status.HTTP_400_BAD_REQUEST)
 
-				user.password = make_password(code)
-				user.save()
-
-				return Response('Password changed', status=status.HTTP_200_OK)
+				return Response(code, status=status.HTTP_200_OK)
 
 			elif 'phone' in request.data:
-				
+				print(request.data['phone'])
 				phone = request.data['phone']
 				account = Account.objects.get(phone = phone)
 
@@ -116,12 +113,12 @@ class ForgetPasswordView(APIView):
 					return Response('Phone number does not exist', status=status.HTTP_400_BAD_REQUEST)
 
 				code = random.randint(1000, 9999)
-				sms_content = 'New password: ' + str(code)
+				sms_content = 'Reset code to change your password: ' + str(code)
 				plivo_instance = plivo.RestAPI(settings.PLIVO_AUTH_ID, settings.PLIVO_TOKEN)
 
 				params = {
 			    'src': settings.VERIFICATION_SENDER_PHONE,
-			    'dst' : phone,
+			    'dst' : account.country.phone_country_code + phone,
 			    'text' : sms_content,
 			    'method' : 'POST'
 				}
@@ -129,9 +126,24 @@ class ForgetPasswordView(APIView):
 				response = plivo_instance.send_message(params)
 
 				if response[0] != 202:
-					return Response(response[1], status=status.HTTP_400_BAD_REQUEST)
+					print(response[1])
+					return Response('Failed to send reset code to your phone -' + str(phone), status=status.HTTP_400_BAD_REQUEST)
+				elif response[0] == 202:
+					return Response(code, status=status.HTTP_200_OK)
 
-				user.password = make_password(code)
-				user.save()
+			return Response('Failed to send reset code', status=status.HTTP_400_BAD_REQUEST)
+
+	@api_view(['POST'])
+	@permission_classes([])
+	@authentication_classes([])		
+	def reset_password(request):
+		if request.method == 'POST':
+			phone = request.data['phone']
+			password = request.data['password']
+
+			account = get_object_or_404(Account, phone=phone)
+			user = account.user
+			user.password = make_password(password)
+			user.save()
 
 			return Response('Password changed', status=status.HTTP_200_OK)

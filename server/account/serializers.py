@@ -60,12 +60,23 @@ class AccountSerializer(serializers.ModelSerializer):
     email_verified = serializers.BooleanField(source='is_email_verified', read_only=True)
     phone_verified = serializers.BooleanField(source='is_phone_verified', read_only=True)
     country_id = serializers.IntegerField(required=False)
+    recreate = serializers.BooleanField(write_only=True)
 
     class Meta:
         model = Account
-        fields = ('id', 'first_name','last_name', 'email', 'phone', 'new_email', 'new_phone', 'dob', 'gender', 'country_id', 'password', 'profile_photo_url', 'qrcode', 'registration_link', 'email_verified', 'phone_verified')
+        fields = ('id', 'first_name','last_name', 'email', 'phone', 'new_email', 'new_phone', 'dob', 'gender', 'country_id', 'password', 'profile_photo_url', 'qrcode', 'registration_link', 'email_verified', 'phone_verified', 'recreate')
 
     def create(self, validated_data):
+        recreate = validated_data.pop('recreate')
+        print(validated_data['phone'])
+        if recreate:
+            try:
+                account = Account.objects.get(phone=validated_data['phone'])
+                account.phone = ''
+                account.save()
+            except:
+                pass
+
         email = validated_data.pop('email')
         password = validated_data.pop('password')
 

@@ -52,9 +52,11 @@ class AccountView(APIView):
 		
 		elif request.method == 'POST':
 			serializer = AccountSerializer(data=request.data)
+			# print(request.data)
+			# return
 			
-			if (serializer.data.id != request.user.id):
-				return Response("Error.", status=status.HTTP_400_BAD_REQUEST)
+			# if (serializer.data.id != request.user.id):
+			# 	return Response("Error.", status=status.HTTP_400_BAD_REQUEST)
 
 			if serializer.is_valid():
 				try:
@@ -165,9 +167,7 @@ class AccountView(APIView):
 				account = get_object_or_404(Account, phone=phone)
 				return Response(account.first_name, status=status.HTTP_200_OK)
 
-			return Response('Failed to find phone 1.', status=status.HTTP_400_BAD_REQUEST)
-		return Response('Failed to find phone 2.', status=status.HTTP_400_BAD_REQUEST)
-
+			return Response('Failed to your phone number', status=status.HTTP_400_BAD_REQUEST)
 
 	@api_view(['POST'])
 	def verify_phone(request, id):
