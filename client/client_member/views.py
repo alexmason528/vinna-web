@@ -74,7 +74,7 @@ def welcome(request):
 
 # Download App
 def download(request):
-  referral = None
+  referral_code = None
 
   if request.user.is_authenticated:
     print ('yay!')
@@ -129,11 +129,11 @@ def download(request):
 
   elif request.method == "GET":
     if 'referral' in request.GET:
-      referral = request.GET['referral']
+      referral_code = request.GET['code']
     else:
-      referral = None
+      referral_code = None
 # Verify that referral = None, member_id = None did not break functionality as expected.
-    if referral:
+    if referral_code:
       account_id = short_url.decode_url(referral)
     else:
       account_id = None
@@ -148,7 +148,7 @@ def download(request):
     else:
       form_download = DownloadForm()
 
-  context = { 'form_download': form_download, 'referral': referral }
+  context = { 'form_download': form_download, 'referral_code': referral_code }
   return render(request, 'client_member/download.html', context)
 
 # Member Transactions (View is here, but Model is in Transactions App)

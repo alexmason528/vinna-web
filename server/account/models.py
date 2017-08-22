@@ -70,7 +70,7 @@ class Account(models.Model):
 
     def get_registration_link(self):
         link = short_url.encode_url(self.id)
-        return BASE_URL + 'client_member/download/?referral=' + str(link)
+        return BASE_URL + 'app/?code=' + str(link)
 
     def is_email_verified(self):
         if self.new_email and self.new_email_verified == '1':

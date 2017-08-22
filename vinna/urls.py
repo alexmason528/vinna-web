@@ -7,6 +7,7 @@ from rest_framework import routers
 from rest_framework_jwt.views import refresh_jwt_token
 
 from .views import custom_obtain_jwt_token, custom_verify_jwt_token
+from client.client_member import views as client_member_views
 
 
 """vinna URL Configuration
@@ -40,6 +41,8 @@ urlpatterns = [
     url(r'^api/purchase/', include('server.purchase.urls')),
     url(r'^api/core/', include('core.urls')),
     url(r'^api/', include('server.account.urls')),
+
+    url(r'^app/', client_member_views.download),
 
     url(r'^purple/admin/', admin.site.urls),
     # url(r'^business/', include('client.client_business.urls')),
