@@ -42,6 +42,7 @@ urlpatterns = [
     url(r'^api/core/', include('core.urls')),
     url(r'^api/', include('server.account.urls')),
 
+    url(r'^downloadapp/', client_member_views.download_redirect),
     url(r'^app/', client_member_views.download),
 
     url(r'^purple/admin/', admin.site.urls),

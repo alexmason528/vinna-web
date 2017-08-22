@@ -1,4 +1,5 @@
 ## TODO Delete Account App - Move to Member App
+import plivo
 
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse,HttpResponseRedirect
@@ -6,6 +7,8 @@ from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.contrib.auth import authenticate,login,logout
+from django.conf import settings as django_settings
+
 import json
 import requests
 from requests.auth import HTTPBasicAuth
@@ -72,9 +75,56 @@ def welcome(request):
   context = {  }
   return render(request, 'client_member/welcome.html', context)
 
+# Redirect to iTunes or Google Play store depending on device.
+def download_redirect(request):
+  """
+  # Let's assume that the visitor uses an iPhone...
+  request.user_agent.is_mobile # returns True
+  request.user_agent.is_tablet # returns False
+  request.user_agent.is_touch_capable # returns True
+  request.user_agent.is_pc # returns False
+  request.user_agent.is_bot # returns False
+
+  # Accessing user agent's browser attributes
+  request.user_agent.browser  # returns Browser(family=u'Mobile Safari', version=(5, 1), version_string='5.1')
+  request.user_agent.browser.family  # returns 'Mobile Safari'
+  request.user_agent.browser.version  # returns (5, 1)
+  request.user_agent.browser.version_string   # returns '5.1'
+
+  # Operating System properties
+  request.user_agent.os  # returns OperatingSystem(family=u'iOS', version=(5, 1), version_string='5.1')
+  request.user_agent.os.family  # returns 'iOS'
+  request.user_agent.os.version  # returns (5, 1)
+  request.user_agent.os.version_string  # returns '5.1'
+
+  # Device properties
+  request.user_agent.device  # returns Device(family='iPhone')
+  request.user_agent.device.family  # returns 'iPhone'
+  """
+  version = '';
+  if request.iPhone:
+    device = 'iPhone'
+  elif request.iPad:
+    device = 'iPad'
+  elif request.iPod:
+    device = 'iPod'
+  elif request.Android:
+    device = 'Android'
+    version = request.Android.version
+  else:
+    device = '---'
+
+  context = { 'device':device, 'version':version }
+  if request.Android:
+    return redirect('https://play.google.com/apps/testing/com.vinna.app')
+  else:
+    return render(request, 'client_member/download_redirect.html', context)
+
+
 # Download App
 def download(request):
   referral_code = None
+  message_sent = False
 
   if request.user.is_authenticated:
     print ('yay!')
@@ -88,6 +138,8 @@ def download(request):
       email = form_download.cleaned_data.get('email')
       phone = form_download.cleaned_data.get('email')
       account = form_download.cleaned_data.get('account')
+      phone = phone.replace("+", "")
+      phone = phone.replace(" ", "")
       phone = phone.replace("-", "")
       phone = phone.replace("(", "")
       phone = phone.replace(")", "")
@@ -95,21 +147,38 @@ def download(request):
       if (not phone.startswith('1')):
         phone = '1' + phone
 
+      print (phone)
+
       if (not re.match("^\d+$", phone)):
         print ('sending email')
         send_mail(
             'Download Vinna App',
             'Downlad the Vinna App to your phone.',
-            'noreply@vinna.me',
+            django_settings.VERIFICATION_SENDER_EMAIL,
             [form_download.cleaned_data.get('email')],
             fail_silently=False,
         )
+        # TODO Check and ensure that email was sent.
+        message_sent = True
       else:
-        data = {'src':'15612641630','dst':phone,'text':'Download link: http://dev.vinna.me/downloadapp'}
+        email = phone
         print ('sending text message')
-        url = 'https://api.plivo.com/v1/Account/SAMZC0MGI3MTAWNZIXMT/Message/'
-        resp = requests.post(url, data=data, auth=HTTPBasicAuth('SAMZC0MGI3MTAWNZIXMT', 'ODc5ZDU0ZTVjMjViMjAwOGU4MTQ0NTE3NGRmMWYx'))
-        print (resp)
+
+        plivo_instance = plivo.RestAPI(django_settings.PLIVO_AUTH_ID, django_settings.PLIVO_TOKEN)
+
+        params = {
+            'src': django_settings.VERIFICATION_SENDER_PHONE,
+            'dst' : phone,
+            'text' : 'Download Vinna App: http://test.vinna.me/downloadapp',
+            'method' : 'POST'
+        }
+
+        response = plivo_instance.send_message(params)
+
+        print (response)
+
+        message_sent = True
+        # TODO Check and ensure that response is good.
 
       if account:
         if email:
@@ -121,20 +190,21 @@ def download(request):
             'friend_referrer': request.META['HTTP_REFERER']
           }
           
-          account_referral = AccountReferral.objects.create(**account_data)
+          if account:
+            account_referral = AccountReferral.objects.create(**account_data)
 
     else:
       print (form_download._errors)
       print ('failed email')
 
   elif request.method == "GET":
-    if 'referral' in request.GET:
+    if 'code' in request.GET:
       referral_code = request.GET['code']
     else:
       referral_code = None
 # Verify that referral = None, member_id = None did not break functionality as expected.
     if referral_code:
-      account_id = short_url.decode_url(referral)
+      account_id = short_url.decode_url(referral_code)
     else:
       account_id = None
 
@@ -148,7 +218,8 @@ def download(request):
     else:
       form_download = DownloadForm()
 
-  context = { 'form_download': form_download, 'referral_code': referral_code }
+  context = { 'form_download': form_download, 'referral': referral_code, 'message_sent':message_sent }
+
   return render(request, 'client_member/download.html', context)
 
 # Member Transactions (View is here, but Model is in Transactions App)

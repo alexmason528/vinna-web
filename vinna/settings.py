@@ -72,6 +72,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'detect.middleware.UserAgentDetectionMiddleware',
 #    'vinna.middleware.basic_auth_middleware',
 ]
 
@@ -269,5 +270,5 @@ CORS_ORIGIN_ALLOW_ALL = True
 PLIVO_AUTH_ID = 'SAMZC0MGI3MTAWNZIXMT'
 PLIVO_TOKEN = 'ODc5ZDU0ZTVjMjViMjAwOGU4MTQ0NTE3NGRmMWYx'
 
-VERIFICATION_SENDER_EMAIL = 'noreply@vinna.me'
+VERIFICATION_SENDER_EMAIL = 'support.noreply@vinna.me'
 VERIFICATION_SENDER_PHONE = '15612641630'
