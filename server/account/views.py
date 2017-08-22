@@ -9,6 +9,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
@@ -165,6 +166,18 @@ class AccountView(APIView):
 			if 'phone' in request.data:
 				phone = request.data['phone']
 				account = get_object_or_404(Account, phone=phone)
+				return Response(account.first_name, status=status.HTTP_200_OK)
+
+			return Response('Failed to your phone number', status=status.HTTP_400_BAD_REQUEST)
+
+	@api_view(['POST'])
+	@permission_classes([])
+	@authentication_classes([])	
+	def find_email(request):
+		if request.method == 'POST':
+			if 'email' in request.data:
+				email = request.data['email'].lower()
+				account = get_object_or_404(User, email=email)
 				return Response(account.first_name, status=status.HTTP_200_OK)
 
 			return Response('Failed to your phone number', status=status.HTTP_400_BAD_REQUEST)
