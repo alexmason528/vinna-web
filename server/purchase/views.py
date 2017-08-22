@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 from vinna.authentication import CustomJSONWebTokenAuthentication
 
 from .models import Purchase
-from .serializers import PurchaseSerializer
+from .serializers import ViewPurchaseSerializer, NewPurchaseSerializer
 
 @permission_classes(IsAuthenticated, )
 @authentication_classes(CustomJSONWebTokenAuthentication, )
@@ -21,14 +21,38 @@ from .serializers import PurchaseSerializer
 class PurchaseView(APIView):
 
 	@api_view(['GET', 'POST'])
-	def purchase_collection(request):
+	def purchase_collection(request, id):
+		if (id == None):
+			return Response('Error', status=status.HTTP_400_BAD_REQUEST) 
+
+		if (int(id) != request.user.id):
+			return Response('Bad Auth', status=status.HTTP_400_BAD_REQUEST)
+
+
 		if request.method == 'GET':
-			puchases = Purchase.objects.all()
-			serializer = PurchaseSerializer(puchases, many=True)
+			purchases = Purchase.objects.filter(account_id=id)
+			serializer = ViewPurchaseSerializer(purchases, many=True)
 			return Response(serializer.data)
 		
 		elif request.method == 'POST':
-			serializer = PurchaseSerializer(data=request.data)
+			serializer = NewPurchaseSerializer(data=request.data)
+			if serializer.is_valid():
+				serializer.save()
+				return Response(serializer.data, status=status.HTTP_201_CREATED)
+			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+	@api_view(['GET', 'POST'])
+	def business_purchase_collection(request, business_id):
+		if (business_id == None):
+			return Response('Error', status=status.HTTP_400_BAD_REQUEST) 
+
+		if request.method == 'GET':
+			purchases = Purchase.objects.filter(business_id=business_id).filter(business_account_id=request.user.id)
+			serializer = ViewPurchaseSerializer(purchases, many=True)
+			return Response(serializer.data)
+		
+		elif request.method == 'POST':
+			serializer = NewPurchaseSerializer(data=request.data)
 			if serializer.is_valid():
 				serializer.save()
 				return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -38,11 +62,11 @@ class PurchaseView(APIView):
 	def purchase_element(request, id):
 		if request.method == 'GET':	
 			account = get_object_or_404(Account, pk=id)
-			serializer = PurchaseSerializer(account)
+			serializer = ViewPurchaseSerializer(account)
 			return Response(serializer.data)
 
 		elif request.method == 'PUT':
-			serializer = PurchaseSerializer(account, data=request.data, partial=True)
+			serializer = NewPurchaseSerializer(account, data=request.data, partial=True)
 			if serializer.is_valid():
 				serializer.save()
 				return Response(serializer.data)

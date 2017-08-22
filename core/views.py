@@ -128,7 +128,7 @@ class ForgetPasswordView(APIView):
 					return Response('Phone number does not exist', status=status.HTTP_400_BAD_REQUEST)
 
 				code = random.randint(1000, 9999)
-				sms_content = 'Reset code to change your password: ' + str(code)
+				sms_content = 'Vinna code: ' + str(code)
 				plivo_instance = plivo.RestAPI(settings.PLIVO_AUTH_ID, settings.PLIVO_TOKEN)
 
 				params = {
