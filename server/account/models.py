@@ -90,7 +90,7 @@ class Account(models.Model):
 class AccountReferral(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     friend_email_or_phone = models.CharField(max_length=40)
-    friend_ip = models.CharField(max_length=15, null=True, blank=True)
+    friend_ip = models.CharField(max_length=45, null=True, blank=True)
     friend_user_agent = models.CharField(max_length=200, null=True, blank=True)
     friend_referrer = models.CharField(max_length=200, null=True, blank=True)
     connected = models.BooleanField(default=0)
