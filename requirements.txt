@@ -42,3 +42,4 @@ boto3==1.4.4
 qrcode==5.3
 short_url==1.2.2
 plivo==0.11.3
+django-detect==1.0.5
