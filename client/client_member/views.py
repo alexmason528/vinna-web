@@ -3,7 +3,7 @@ import plivo
 
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse,HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.contrib.auth import authenticate,login,logout
@@ -176,7 +176,6 @@ def download(request):
         response = plivo_instance.send_message(params)
 
         print (response)
-
         message_sent = True
         # TODO Check and ensure that response is good.
 
@@ -217,7 +216,7 @@ def download(request):
       form_download = DownloadForm({'account': account_id})
     else:
       form_download = DownloadForm()
-
+  
   context = { 'form_download': form_download, 'referral': referral_code, 'message_sent':message_sent }
 
   return render(request, 'client_member/download.html', context)
