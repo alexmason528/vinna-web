@@ -31,15 +31,29 @@ from .serializers import CountrySerializer, StateSerializer
 @permission_classes(IsAuthenticated, )
 @authentication_classes(CustomJSONWebTokenAuthentication, )
 
-
-
 class Version():
-	@permission_classes(AllowAny, )
-	def version_info(request):
-		return JsonResponse({'versions':[
-			{'0.27':{'expires':'2100-01-01'}},
-			{'0.24':{'expires':'2017-09-01'}},		
-			]})
+	
+	@api_view(['GET'])
+	@permission_classes([])
+	@authentication_classes([])
+	def version_info(request, platform):
+		if request.method == 'GET':
+			if platform == 'ios':
+				version_info = {
+					'version': 1.1,
+					'supported': [0.98, 0.95, 0.90],
+					'public_stripe': 'pk_test_vSXaN8PlxDIA9SRDrvPyNllu'
+				}
+				return Response(version_info, status=status.HTTP_200_OK)
+			elif platform == 'android':
+				version_info = {
+					'version': 1.1,
+					'supported': [0.98, 0.95, 0.90],
+					'public_stripe': 'pk_test_vSXaN8PlxDIA9SRDrvPyNllu'
+				}
+				return Response(version_info, status=status.HTTP_200_OK)
+			else:
+				return Response('Unsupported platform', status=status.HTTP_400_BAD_REQUEST)
 		
 class CountryView(APIView):
 
@@ -48,6 +62,7 @@ class CountryView(APIView):
 		if request.method == 'GET':
 			countries = Country.objects.all()
 			serializer = CountrySerializer(countries, many=True)
+			print(serializer.data)
 			return Response(serializer.data)
 
 	@api_view(['GET'])

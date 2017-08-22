@@ -87,7 +87,7 @@ class BusinessSerializer(serializers.ModelSerializer):
     country_id = serializers.IntegerField()
     state_id = serializers.IntegerField()
     customer_token = serializers.CharField(required=False)
-    email = serializers.EmailField()
+    email = serializers.CharField()
     security_hash = serializers.CharField(required=False)
     ssn_token = serializers.CharField(required=False)
     description = serializers.CharField(required=False)
@@ -187,7 +187,7 @@ class BusinessPublicSerializer(serializers.ModelSerializer):
     sub_category_id = serializers.IntegerField()
     country_id = serializers.IntegerField()
     state_id = serializers.IntegerField()
-    email = serializers.EmailField()
+    email = serializers.CharField()
     description = serializers.CharField(required=False)
 
     picture1 = Base64ImageField(max_length=None, use_url=True)

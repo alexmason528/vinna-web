@@ -52,7 +52,7 @@ class Base64ImageField(serializers.ImageField):
 
 class AccountSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
-    email = serializers.EmailField(write_only=True)
+    email = serializers.CharField(write_only=True)
     password = serializers.CharField(write_only=True)
     qrcode = serializers.CharField(source='get_qrcode', read_only=True)
     profile_photo_url = Base64ImageField(max_length=None, use_url=True)
