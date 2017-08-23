@@ -24,7 +24,6 @@ class NotificationView(APIView):
 	@api_view(['GET', 'POST'])
 	def notification_collection(request):
 		if request.method == 'GET':
-			print (datetime.datetime.utcnow())
 			notifications = Notification.objects.filter(end__gte=datetime.datetime.utcnow()).order_by('-start')
 			serializer = NotificationSerializer(notifications, many=True)
 			return Response(serializer.data)
