@@ -73,24 +73,22 @@
     padding:0;margin:0;
     color:#666766;
   }
-  .jumbotron {
+  .jumbotron, .container {
     padding:0;margin:0;
     width:100%;
   }
   .jumbotron .container {
-    padding:0;margin:0;
-    width:100%;
     overflow: hidden;
-    height:56vh;
+    height:50vh;
   }
-  .jumbotron .container .logo {
+  .jumbotron .container .logo-container {
     margin:auto;
     text-align: center;
     width:100%;
     top:21%;
     position:absolute;
   }
-  .jumbotron .container .logo img {
+  .jumbotron .container .logo-container img {
     width:50%;
     max-width:300px;
   }
@@ -129,6 +127,7 @@
     color:#999999;
     border:0;
     border-bottom:.5px solid #ccc;
+    padding:0 6px;
   }
   input::placeholder {
     color:#edeaea;
@@ -156,7 +155,7 @@
     <!-- Main jumbotron for a primary marketing message or call to action -->
     <div class="jumbotron">
       <div class="container">
-        <div class="logo"><img src='/static/images/vinna_logo.svg'></div>
+        <div class="logo-container"><img src='/static/images/vinna_logo.svg'></div>
         <img src='/static/images/app_download_bg.jpg'>
       </div>
     </div>
@@ -174,7 +173,7 @@
      {% if message_sent == False %}
      <div class="row">
         <div class="col-md-12" style="text-align: center;">
-          <p style="margin-top:1%;">Receive a download link on your device</p>
+          <p style="margin-top:1%;">Receive a download link to your device</p>
           <form method="POST" action="?">
             {% csrf_token %}
             {{form_download.account}}
@@ -182,7 +181,7 @@
             {{form_download.email}}
             {% endif %}
             <div>
-            <button class="rounded" style="margin-top:1%;" type="submit">Send</button>
+              <button class="rounded" style="margin-top:1%;" type="submit">Send</button>
             </div>
           </form>         
         </div>
@@ -190,7 +189,7 @@
       {% else %}
       <div class="row">
         <div class="col-md-12" style="text-align: center;">
-          <p style="margin-top:1%;">Check your messages for Vinna link</p>
+          <p style="margin-top:1%;">Check your messages for your Vinna download</p>
         </div>
       </div>
       {% endif %}
@@ -200,13 +199,29 @@
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
-      <script>
-(function(){'use strict';if(navigator.userAgent.match(/IEMobile\/10\.0/)){var msViewportStyle=document.createElement('style')
-msViewportStyle.appendChild(document.createTextNode('@-ms-viewport{width:auto!important}'))
-document.querySelector('head').appendChild(msViewportStyle)}})();        
+    <script>
+    (function(){'use strict';if(navigator.userAgent.match(/IEMobile\/10\.0/)){var msViewportStyle=document.createElement('style')
+    msViewportStyle.appendChild(document.createTextNode('@-ms-viewport{width:auto!important}'))
+    document.querySelector('head').appendChild(msViewportStyle)}})();        
 
-  
-  $( document ).ready(function() {
+    function formatPhone(e, node) {
+      var inputNumbers = $(node).val();
+      inputNumbers = inputNumbers.replace(/[-\(\)\s]/g, '');
+      if (inputNumbers.length > 9) return false;
+
+      var formatted = "";
+      var areaCode = inputNumbers.substring(0, 3);
+      var exchange = inputNumbers.substring(3, 6);
+      var tail = inputNumbers.substring(6);
+      if (areaCode.length > 0) formatted = "(" + areaCode;
+      if (exchange.length > 0) formatted += ") " + exchange;
+      if (tail.length > 0) formatted += "-" + tail;
+      $(node).val(formatted);
+
+      return true;
+    }
+
+    $( document ).ready(function() {
       $("#app-apple").click(function() {
         $("#app-apple").removeClass('none').addClass('selected');
         $("#app-google").removeClass('selected').addClass('none');
@@ -216,55 +231,22 @@ document.querySelector('head').appendChild(msViewportStyle)}})();
         $("#app-apple").removeClass('selected').addClass('none');
       });
 
-      $('#id_email')
-        .keydown(function (e) {
-            var key = e.charCode || e.keyCode || 0;
-            $phone = $(this);
+      var validInput = ["0","1","2","3","4","5","6","7","8","9"];
 
-            // Adding blankspace in 9th, 13th and 17th position. 
-//Change it according to your need
-            if (key == 49 && $phone.val().length === 0) {
-              $phone.val($phone.val() + '(');
-              return false;
-            }
-
-            if (key !== 8 && key !== 9) {
-                if ($phone.val().length === 0) {
-                    $phone.val($phone.val() + '(');
-                }
-                if ($phone.val().length === 4) {
-                    $phone.val($phone.val() + ') ');
-                }
-                if ($phone.val().length === 9) {
-                    $phone.val($phone.val() + '-');
-                }           
-                if ($phone.val().length >= 14) {
-                    return false;
-                }           
-            }
-
-            // Allow numeric number and tab, backspace, delete keys only.
-//Change it according to your need
-            return (key == 8 || 
-                    key == 9 ||
-                    key == 46 ||
-                    (key >= 48 && key <= 57) ||
-                    (key >= 96 && key <= 105)); 
-        })
-
-        .bind('focus click', function () {
-            $phone = $(this);
-
-            if ($phone.val().length === 0) {
-                $phone.val('('); // as your phone number start with '+'
-            }
-            else {
-                var val = $phone.val();
-                $phone.val('').val(val); // Ensure cursor remains at the end
-            }
-        })
+      $(function () {
+        $('#id_email')
+          .keydown(function(e) { 
+            if (e.keyCode == 8 || e.keyCode == 46 || e.keyCode == 37 || e.keyCode == 39) return true;
+            if( !(e.keyCode >= 48 && e.keyCode <= 57) || !$.inArray(e.key, validInput) ) return false;
+            return formatPhone(e, this); 
+          })        
+          .keyup(function(e) { 
+            if (e.keyCode == 8 || e.keyCode == 46 || e.keyCode == 37 || e.keyCode == 39) return true;
+            if( !(e.keyCode >= 48 && e.keyCode <= 57) || !$.inArray(e.key, validInput) ) return false;
+            return formatPhone(e, this);
+          });
+      });
     });
-
     </script>
 
   </body>

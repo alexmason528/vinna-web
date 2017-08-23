@@ -144,10 +144,10 @@ def download(request):
       phone = phone.replace("(", "")
       phone = phone.replace(")", "")
 
+      phone_with_prefix = phone
       if (not phone.startswith('1')):
-        phone = '1' + phone
+        phone_with_prefix = '1' + phone
 
-      print (phone)
 
       if (not re.match("^\d+$", phone)):
         print ('sending email')
@@ -163,20 +163,26 @@ def download(request):
       else:
         email = phone
         print ('sending text message')
+        print (phone_with_prefix)
 
         plivo_instance = plivo.RestAPI(django_settings.PLIVO_AUTH_ID, django_settings.PLIVO_TOKEN)
-
+        sms_content = "Here's your invite: http://test.vinna.me/downloadapp/"
+        #sms_content = 'Hello World'
         params = {
             'src': django_settings.VERIFICATION_SENDER_PHONE,
-            'dst' : phone,
-            'text' : 'Download Vinna App: http://test.vinna.me/downloadapp',
+            'dst' : phone_with_prefix,
+            'text' : sms_content,
             'method' : 'POST'
         }
+
+
 
         response = plivo_instance.send_message(params)
 
         print (response)
-        message_sent = True
+        if (response[0] == 202):
+          message_sent = True
+
         # TODO Check and ensure that response is good.
 
       if account:
@@ -216,7 +222,7 @@ def download(request):
       form_download = DownloadForm({'account': account_id})
     else:
       form_download = DownloadForm()
-  
+
   context = { 'form_download': form_download, 'referral': referral_code, 'message_sent':message_sent }
 
   return render(request, 'client_member/download.html', context)

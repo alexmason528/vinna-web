@@ -248,7 +248,7 @@ class AccountView(APIView):
 
 				code = random.randint(1000, 9999)
 
-				sms_content = 'Thanks for using Vinna app. \nPlease verify your phone number. \nVerification code: ' + str(code)
+				sms_content = 'Vinna code: ' + str(code)
 				plivo_instance = plivo.RestAPI(settings.PLIVO_AUTH_ID, settings.PLIVO_TOKEN)
 				
 				params = {
