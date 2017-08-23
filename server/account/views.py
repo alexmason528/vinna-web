@@ -41,24 +41,14 @@ from .serializers import AccountSerializer
 
 class AccountView(APIView):
 
-	@api_view(['GET', 'POST'])
+	@api_view(['POST'])
 	@permission_classes([])
 	@authentication_classes([])
 	@transaction.atomic
 	def account_collection(request):
-		if request.method == 'GET':
-			accounts = Account.objects.filter(pk=request.user.id)
-			serializer = AccountSerializer(accounts, many=True)
-			return Response(serializer.data)
-		
-		elif request.method == 'POST':
+		if request.method == 'POST':
 			serializer = AccountSerializer(data=request.data)
-			# print(request.data)
-			# return
 			
-			# if (serializer.data.id != request.user.id):
-			# 	return Response("Error.", status=status.HTTP_400_BAD_REQUEST)
-
 			if serializer.is_valid():
 				try:
 					serializer.save()

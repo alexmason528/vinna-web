@@ -22,13 +22,6 @@ class PurchaseView(APIView):
 
 	@api_view(['GET', 'POST'])
 	def purchase_collection(request, id):
-		if (id == None):
-			return Response('Error', status=status.HTTP_400_BAD_REQUEST) 
-
-		if (int(id) != request.user.id):
-			return Response('Bad Auth', status=status.HTTP_400_BAD_REQUEST)
-
-
 		if request.method == 'GET':
 			purchases = Purchase.objects.filter(account_id=id)
 			serializer = ViewPurchaseSerializer(purchases, many=True)
