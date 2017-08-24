@@ -20,14 +20,9 @@ from .serializers import ViewPurchaseSerializer, NewPurchaseSerializer
 
 class PurchaseView(APIView):
 
-	@api_view(['GET', 'POST'])
-	def purchase_collection(request, id):
-		if request.method == 'GET':
-			purchases = Purchase.objects.filter(account_id=id)
-			serializer = ViewPurchaseSerializer(purchases, many=True)
-			return Response(serializer.data)
-		
-		elif request.method == 'POST':
+	@api_view(['POST'])
+	def purchase_collection(request):
+		if request.method == 'POST':
 			serializer = NewPurchaseSerializer(data=request.data)
 			if serializer.is_valid():
 				serializer.save()

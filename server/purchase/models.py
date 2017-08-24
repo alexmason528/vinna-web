@@ -15,7 +15,7 @@ class Purchase(models.Model):
     balance = models.DecimalField(decimal_places=2, max_digits=9, default=0, blank=True)
 
     account = models.ForeignKey(Account, related_name="purchase_member")
-    member_referral = models.ForeignKey(Member, related_name="purchase_member_referral", default='', blank=True)
+    member_referral = models.ForeignKey(Member, related_name="purchase_member_referral", default='', blank=True, null=True)
 
     posted = models.BooleanField(default=0)
 
