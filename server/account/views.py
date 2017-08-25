@@ -32,6 +32,7 @@ from server.media.models import BusinessImage
 from server.purchase.models import Purchase
 
 from server.media.serializers import BusinessImageSerializer
+from server.purchase.serializers import ViewPurchaseSerializer
 
 from .models import Account
 from .serializers import AccountSerializer
@@ -62,9 +63,6 @@ class AccountView(APIView):
 	@api_view(['PUT','GET'])
 	@transaction.atomic
 	def account_element(request, id):
-		# Overwrite user id with authorized user.
-		id = request.user.id
-
 		if request.method == 'GET':	
 			account = get_object_or_404(Account, pk=id)
 			serializer = AccountSerializer(account)
@@ -115,6 +113,14 @@ class AccountView(APIView):
 		}
 
 		return Response(purchase_info)
+
+	@api_view(['GET'])
+	def purchase_collection(request, id):
+		if request.method == 'GET':
+			purchases = Purchase.objects.filter(account_id=id)
+			serializer = ViewPurchaseSerializer(purchases, many=True)
+			return Response(serializer.data)
+
 
 	@api_view(['POST'])
 	def verify_email(request, id):
