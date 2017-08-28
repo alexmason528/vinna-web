@@ -10,6 +10,7 @@ from ipware.ip import get_real_ip, get_ip
 
 from core.models import Country
 
+from core.serializers import CountrySerializer, StateSerializer
 from server.purchase.models import Purchase
 from server.account.partner_model import AccountPartnerRole
 from server.media.models import BusinessImage
@@ -184,7 +185,9 @@ class BusinessPublicSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     sub_category_id = serializers.IntegerField()
     country_id = serializers.IntegerField()
+    country = CountrySerializer(read_only=True)
     state_id = serializers.IntegerField()
+    state = StateSerializer(read_only=True)
     email = serializers.CharField()
     description = serializers.CharField(required=False)
 
@@ -195,7 +198,7 @@ class BusinessPublicSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Business
-        fields = ('id', 'text', 'country_id', 'state_id', 'city', 'zip', 'address1', 'address2','email', 'phone', 'description', 'category', 'sub_category_id', 'picture1', 'picture2', 'picture3', 'picture4', 'hours')
+        fields = ('id', 'text', 'country_id', 'country', 'state_id', 'state', 'city', 'zip', 'address1', 'address2','email', 'phone', 'description', 'category', 'sub_category_id', 'picture1', 'picture2', 'picture3', 'picture4', 'hours')
 
 class BusinessPurchaseSerializer(serializers.ModelSerializer):
     member_id = serializers.IntegerField(write_only=True)
