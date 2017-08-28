@@ -54,7 +54,7 @@ urlpatterns = [
 
     url(r'^downloadapp/', client_member_views.download_redirect),
     url(r'^app/', client_member_views.download),
-    url(r'^/', client_member_views.download),
+    url(r'^/?$', client_member_views.download),
 
 #    url(r'^about/', include('client.client_member.urls')),
 #    url(r'^contact/', include('client.client_member.urls')),
