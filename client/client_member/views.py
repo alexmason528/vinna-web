@@ -116,7 +116,9 @@ def download_redirect(request):
 
   context = { 'device':device, 'version':version }
   if request.Android:
-    return redirect('https://play.google.com/apps/testing/com.vinna.app')
+    return redirect('https://play.google.com/apps/testing/com.vinna.mapp')
+  elif request.iPhone:
+    return redirect('https://itunes.apple.com/us/app/testflight/id899247664?mt=8#')
   else:
     return render(request, 'client_member/download_redirect.html', context)
 

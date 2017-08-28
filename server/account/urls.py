@@ -15,8 +15,10 @@ urlpatterns = [
     url(r'account/(?P<id>[0-9]+)/update_phone/$', views.AccountView.update_phone, name='update_phone'),
     url(r'account/(?P<id>[0-9]+)/update_email/$', views.AccountView.update_email, name='update_email'),
     url(r'account/(?P<id>[0-9]+)/purchase_info/$', views.AccountView.purchase_info, name='purchase_info'),
+    url(r'account/(?P<id>[0-9]+)/purchase_summary/$', views.AccountView.purchase_info, name='purchase_info'),
     url(r'account/(?P<id>[0-9]+)/nearest_partner/$', views.AccountView.nearest_partner, name='nearest_partner'),
-    url(r'account/(?P<id>[0-9]+)/purchases/$', views.AccountView.purchase_collection, name='purchases'),
+    url(r'account/(?P<id>[0-9]+)/purchase/$', views.AccountView.purchase_collection, name='purchase'),
+    url(r'account/purchase/$', views.AccountView.purchase_collection, name='purchase'),
     url(r'account/(?P<id>[0-9]+)/$', views.AccountView.account_element, name='account_element'),
     url(r'account/', views.AccountView.account_collection, name='account_collection'),
 ]

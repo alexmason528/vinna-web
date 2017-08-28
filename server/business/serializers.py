@@ -200,9 +200,10 @@ class BusinessPublicSerializer(serializers.ModelSerializer):
 class BusinessPurchaseSerializer(serializers.ModelSerializer):
     member_id = serializers.IntegerField(write_only=True)
     business_id = serializers.IntegerField(write_only=True)
+
     class Meta:
         model = Purchase
-        fields = ('void_date', 'amount', 'member_id', 'business_id')
+        fields = ('void_date', 'amount', 'member_id', 'business_id', 'post_date', 'business_amount')
 
     def update(self, instance, validated_data):
         setattr(instance, 'void_date', validated_data['void_date'])

@@ -42,9 +42,6 @@ urlpatterns = [
     url(r'^api/core/', include('core.urls')),
     url(r'^api/', include('server.account.urls')),
 
-    url(r'^downloadapp/', client_member_views.download_redirect),
-    url(r'^app/', client_member_views.download),
-
     url(r'^purple/admin/', admin.site.urls),
     # url(r'^business/', include('client.client_business.urls')),
     url(r'^client_member/', include('client.client_member.urls')),
@@ -55,8 +52,12 @@ urlpatterns = [
     url(r'^api-token-refresh/', refresh_jwt_token),
     url(r'^api-token-verify/', custom_verify_jwt_token),
 
+    url(r'^downloadapp/', client_member_views.download_redirect),
+    url(r'^app/', client_member_views.download),
+    url(r'^/', client_member_views.download),
+
 #    url(r'^about/', include('client.client_member.urls')),
 #    url(r'^contact/', include('client.client_member.urls')),
 
-    url(r'^', include('client.client_home.urls')),
+#    url(r'^', include('client.client_home.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)# + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static('/', document_root='angularjs/src')

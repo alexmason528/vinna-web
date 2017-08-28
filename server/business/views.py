@@ -4,6 +4,8 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
 from django.db import transaction
+from django.db.models import Sum, Count
+from django.db.models.functions import Coalesce
 
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
@@ -119,11 +121,26 @@ class BusinessBillingInfoView(APIView):
 			billing_info.delete()
 
 class BusinessPurchaseView(APIView):
-	
+	@api_view(['GET'])
+	def business_purchase_summary(request, id):
+		if request.method == 'GET':
+			purchase_aggregate = Purchase.objects.filter(business_id = id).aggregate(total_sales=Coalesce(Sum('member_amount'), 0), total_customers=Coalesce(Count('member_amount'), 0))
+#			payday = date.today().replace(day=1) + relativedelta(months=1)
+
+#			b_purchases = Purchase.objects.filter(business_id = id).filter(business__account__id = request.user.id)
+
+			purchase_summary = {
+				'total_sales': purchase_aggregate['total_sales'],
+				'total_customers': purchase_aggregate['total_customers'],
+#				'purchases': b_purchases
+			}
+
+			return Response(purchase_summary)
+
 	@api_view(['GET', 'POST'])
 	def business_purchase_collection(request, id):
 		if request.method == 'GET':
-			b_purchases = Purchase.objects.filter(business_id = id)
+			b_purchases = Purchase.objects.filter(business_id = id).filter(business__account__id = request.user.id)
 			serializer = BusinessPurchaseSerializer(b_purchases, many=True)
 			return Response(serializer.data)
 		
@@ -179,6 +196,11 @@ class BusinessInvitationView(APIView):
 			return Response(serializer.data)
 
 class BusinessCashierView(APIView):
+
+	@api_view(['GET', 'POST'])
+	def business_cashier_purchase_summary(request, id):
+		if request.method == 'GET':
+			return;
 
 	@api_view(['GET', 'POST'])
 	@transaction.atomic

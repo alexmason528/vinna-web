@@ -100,8 +100,11 @@ class AccountView(APIView):
 
 			return Response(serializer.data)
 
+	# Summary
 	@api_view(['GET'])
 	def purchase_info(request, id):
+		id = request.user.id
+
 		total_earned = Purchase.objects.filter(account_id=id).aggregate(total_earned=Coalesce(Sum('member_amount'), 0))['total_earned']
 		next_payment = Purchase.objects.filter(account_id=id, member_amount_processed=0).aggregate(next_payment=Coalesce(Sum('member_amount'),0))['next_payment']
 		payday = date.today().replace(day=1) + relativedelta(months=1)
@@ -116,6 +119,7 @@ class AccountView(APIView):
 
 	@api_view(['GET'])
 	def purchase_collection(request, id):
+		id = request.user.id
 		if request.method == 'GET':
 			purchases = Purchase.objects.filter(account_id=id)
 			serializer = ViewPurchaseSerializer(purchases, many=True)
@@ -267,6 +271,8 @@ class AccountView(APIView):
 
 	@api_view(['GET'])
 	def send_email_code(request, id):
+		id = request.user.id
+
 		if request.method == 'GET':
 			account = get_object_or_404(Account, pk=id)
 			code = random.randint(1000, 9999)
@@ -295,6 +301,8 @@ class AccountView(APIView):
 
 	@api_view(['GET'])
 	def send_phone_code(request, id):
+		id = request.user.id
+		
 		if request.method == 'GET':
 			account = get_object_or_404(Account, pk=id)
 			code = random.randint(1000, 9999)
