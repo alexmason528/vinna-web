@@ -70,21 +70,6 @@ class AccountView(APIView):
 
 		elif request.method == 'PUT':
 			account = get_object_or_404(Account, pk=id)
-
-			if ('current_password' in request.data) and ('username' in request.data):
-				credentials = {
-					'username': request.data.pop('current_password'),
-					'password': request.data.pop('username')
-				}
-
-				user = authenticate(**credentials)
-
-				if not user:
-					return Response('Current password is not correct', status=status.HTTP_400_BAD_REQUEST)
-
-				request.data.pop('current_password')
-				request.data.pop('username')
-
 			serializer = AccountSerializer(account, data=request.data, partial=True)
 			if serializer.is_valid():
 				serializer.save()
