@@ -36,9 +36,10 @@ from server.purchase.serializers import ViewPurchaseSerializer
 
 from .models import Account
 from .serializers import AccountSerializer
+from .permissions import IsOwner
 
-@permission_classes(IsAuthenticated, )
 @authentication_classes(CustomJSONWebTokenAuthentication, )
+@permission_classes(IsAuthenticated, )
 
 class AccountView(APIView):
 
@@ -61,15 +62,17 @@ class AccountView(APIView):
 				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 	@api_view(['PUT','GET'])
+	@permission_classes([IsAuthenticated, IsOwner])
 	@transaction.atomic
 	def account_element(request, id):
-		if request.method == 'GET':	
-			account = get_object_or_404(Account, pk=id)
+		account = get_object_or_404(Account, pk=id)
+		if request.user.id != account.user.id:
+			return Response('You are not allowed to perform this action', status=status.HTTP_401_UNAUTHORIZED)
+		if request.method == 'GET':
 			serializer = AccountSerializer(account)
 			return Response(serializer.data)
 
 		elif request.method == 'PUT':
-			account = get_object_or_404(Account, pk=id)
 			serializer = AccountSerializer(account, data=request.data, partial=True)
 			if serializer.is_valid():
 				serializer.save()
@@ -199,6 +202,10 @@ class AccountView(APIView):
 		if request.method == 'POST':
 			if 'email' in request.data:
 				email = request.data['email']
+
+				if User.objects.filter(username=email).count() > 0:
+					return Response('Email is already taken by other account', status=status.HTTP_400_BAD_REQUEST)
+
 				account = get_object_or_404(Account, pk=id)
 				account.new_email = email
 
@@ -228,6 +235,10 @@ class AccountView(APIView):
 		if request.method == 'POST':
 			if 'phone' in request.data:
 				phone = request.data['phone']
+
+				if Account.objects.filter(phone=phone).count() > 0:
+					return Response('Phone number is already taken by other account', status=status.HTTP_400_BAD_REQUEST)
+
 				account = get_object_or_404(Account, pk=id)
 				account.new_phone = phone
 
