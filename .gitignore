@@ -59,5 +59,7 @@ target/
 
 .DS_Store
 
-settings.prod.py
+settings-prod.py
+settings-beta.py
+settings-test.py
 vinna.zip

@@ -26,7 +26,7 @@ BASE_URL = 'https://test.vinna.me/'
 SECRET_KEY = 'wx5(=7^kfbuzw7bxt7a9*72&3^kr4fjp)e6vfm*17+n$$26@h#'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool( os.environ.get('DJANGO_DEBUG', True) )
 
 
 # Application definition
@@ -182,7 +182,7 @@ JWT_AUTH = {
     'JWT_ISSUER': None,
 
     'JWT_ALLOW_REFRESH': True,
-    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=1),
 #    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(weeks=54),
 
     'JWT_AUTH_HEADER_PREFIX': 'JWT',
@@ -271,4 +271,4 @@ PLIVO_AUTH_ID = 'SAMZC0MGI3MTAWNZIXMT'
 PLIVO_TOKEN = 'ODc5ZDU0ZTVjMjViMjAwOGU4MTQ0NTE3NGRmMWYx'
 
 VERIFICATION_SENDER_EMAIL = 'support.noreply@vinna.me'
-VERIFICATION_SENDER_PHONE = '15612641498'
+VERIFICATION_SENDER_PHONE = '17572043520'

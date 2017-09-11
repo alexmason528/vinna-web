@@ -118,7 +118,9 @@ def download_redirect(request):
   if request.Android:
     return redirect('https://play.google.com/apps/testing/com.vinna.mapp')
   elif request.iPhone:
-    return redirect('https://itunes.apple.com/us/app/testflight/id899247664?mt=8#')
+    response = HttpResponse("", status=302)
+    response['Location'] = "itms://itunes.apple.com/us/app/testflight/id899247664?mt=8#"
+    return response
   else:
     return render(request, 'client_member/download_redirect.html', context)
 
@@ -138,71 +140,67 @@ def download(request):
 
     if (form_download.is_valid()):
       email = form_download.cleaned_data.get('email')
-      phone = form_download.cleaned_data.get('email')
+      phone = ''.join(str(x) for x in re.findall(r'\d+', form_download.cleaned_data.get('email')))
       account = form_download.cleaned_data.get('account')
-      phone = phone.replace("+", "")
-      phone = phone.replace(" ", "")
-      phone = phone.replace("-", "")
-      phone = phone.replace("(", "")
-      phone = phone.replace(")", "")
 
+      # normalize phone number
       phone_with_prefix = phone
-      if (not phone.startswith('1')):
-        phone_with_prefix = '1' + phone
-
-
-      if (not re.match("^\d+$", phone)):
-        print ('sending email')
-        send_mail(
-            'Download Vinna App',
-            'Downlad the Vinna App to your phone.',
-            django_settings.VERIFICATION_SENDER_EMAIL,
-            [form_download.cleaned_data.get('email')],
-            fail_silently=False,
-        )
-        # TODO Check and ensure that email was sent.
-        message_sent = True
-      else:
-        email = phone
-        print ('sending text message')
-        print (phone_with_prefix)
-
-        plivo_instance = plivo.RestAPI(django_settings.PLIVO_AUTH_ID, django_settings.PLIVO_TOKEN)
-        sms_content = "Here's your invite: http://test.vinna.me/downloadapp/"
-        #sms_content = 'Hello World'
-        params = {
-            'src': django_settings.VERIFICATION_SENDER_PHONE,
-            'dst' : phone_with_prefix,
-            'text' : sms_content,
-            'method' : 'POST'
-        }
-
-
-
-        response = plivo_instance.send_message(params)
-
-        print (response)
-        if (response[0] == 202):
-          message_sent = True
-
-        # TODO Check and ensure that response is good.
+      if (not phone.startswith('1')): phone_with_prefix = '1' + phone
+      else: phone = phone[1:]
 
       if account:
-        if email:
-          account_data = {
-            'account_id': account,
-            'friend_email_or_phone': email,
-            'friend_ip': get_ip(request),
-            'friend_user_agent': request.META['HTTP_USER_AGENT'],
-            'friend_referrer': request.META['HTTP_REFERER']
-          }
-          
-          if account:
-            account_referral = AccountReferral.objects.create(**account_data)
+        account_data = {
+          'account_id': account,
+          'friend_email_or_phone': email,
+          'friend_ip': get_ip(request),
+          'friend_user_agent': request.META['HTTP_USER_AGENT'],
+          'friend_referrer': request.META['HTTP_REFERER']
+        }
+
+        # if phone number, set phone #          
+        if len(phone) == 10:
+          account_data['friend_email_or_phone'] = phone
+
+        account_referral = AccountReferral.objects.create(**account_data)
+
+      else: # No referral account provided.
+        account_data = {
+          'account_id': 1,
+          'friend_email_or_phone': email,
+          'friend_ip': get_ip(request),
+          'friend_user_agent': request.META['HTTP_USER_AGENT'],
+          'friend_referrer': request.META['HTTP_REFERER']
+        }
+
+        account_referral = AccountReferral.objects.create(**account_data)
+      
+        # TODO Check and ensure that response is good.
+      version = '';
+      if request.iPhone:
+        device = 'iPhone'
+      elif request.iPad:
+        device = 'iPad'
+      elif request.iPod:
+        device = 'iPod'
+      elif request.Android:
+        device = 'Android'
+        version = request.Android.version
+      else:
+        device = '---'
+
+      context = { 'device':device, 'version':version }
+      if request.Android:
+        return redirect('https://play.google.com/apps/testing/com.vinna.mapp')
+      elif request.iPhone:
+        response = HttpResponse("", status=302)
+        response['Location'] = "itms://itunes.apple.com/us/app/testflight/id899247664?mt=8#"
+        return response
+      else:
+        return render(request, 'client_member/download_unsupported_device.html', context)      
 
     else:
       print (form_download._errors)
-      print ('failed email')
+      print ('failed email or phone')
 
   elif request.method == "GET":
     if 'code' in request.GET:

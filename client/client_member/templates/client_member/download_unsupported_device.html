@@ -149,18 +149,35 @@
       <!-- Example row of columns -->
       <div class="row image-row" style="margin:auto;">
           <div style="text-align: center; ">
-            <a href="#"><img id="app-apple" src='/static/images/app-apple.png' class="none rounded"></a>
+            <img id="app-apple" src='/static/images/app-apple.png' class="none rounded">
 
-            <a href="https://play.google.com/apps/testing/com.vinna.mapp"><img id="app-google" src='/static/images/app-googleplay.png' class="none rounded"></a>
+            <img id="app-google" src='/static/images/app-googleplay.png' class="none rounded">
           </div>
        </div>
      </div>
-
+     {% if message_sent == False %}
      <div class="row">
         <div class="col-md-12" style="text-align: center;">
-          <p style="margin-top:1%;">Open store...</p>
+          <p style="margin-top:1%;">Receive a download link to your device</p>
+          <form method="POST" action="?">
+            {% csrf_token %}
+            {{form_download.account}}
+            {% if form_download.account %}
+            {{form_download.email}}
+            {% endif %}
+            <div>
+              <button class="rounded" style="margin-top:1%;" type="submit">Send</button>
+            </div>
+          </form>         
         </div>
       </div>
+      {% else %}
+      <div class="row">
+        <div class="col-md-12" style="text-align: center;">
+          <p style="margin-top:1%;">Open this page from your mobile device.</p>
+        </div>
+      </div>
+      {% endif %}
 {% endblock %}
 
 
@@ -172,8 +189,7 @@
 
     function formatPhone(e, node) {
       var inputNumbers = $(node).val();
-      inputNumbers = inputNumbers.match(/(\d+)/g).join('')
-
+      inputNumbers = inputNumbers.replace(/[-\(\)\s]/g, '');
       if (inputNumbers.length > 9) return false;
 
       var formatted = "";
@@ -183,19 +199,12 @@
       if (areaCode.length > 0) formatted = "(" + areaCode;
       if (exchange.length > 0) formatted += ") " + exchange;
       if (tail.length > 0) formatted += "-" + tail;
-
       $(node).val(formatted);
 
       return true;
     }
 
     $( document ).ready(function() {
-      submitted = false;
-      $("#download_form").submit(function(e){
-        if (submitted) e.preventDefault(e);
-        submitted = true;
-      });      
-
       $("#app-apple").click(function() {
         $("#app-apple").removeClass('none').addClass('selected');
         $("#app-google").removeClass('selected').addClass('none');
@@ -205,18 +214,18 @@
         $("#app-apple").removeClass('selected').addClass('none');
       });
 
-      var validInput = ["0","1","2","3","4","5","6","7","8","9","(",")","-"," "];
+      var validInput = ["0","1","2","3","4","5","6","7","8","9"];
 
       $(function () {
         $('#id_email')
           .keydown(function(e) { 
             if (e.keyCode == 8 || e.keyCode == 46 || e.keyCode == 37 || e.keyCode == 39) return true;
-            if(!$.inArray(e.key, validInput) ) return false;
+            if( !(e.keyCode >= 48 && e.keyCode <= 57) || !$.inArray(e.key, validInput) ) return false;
             return formatPhone(e, this); 
           })        
           .keyup(function(e) { 
             if (e.keyCode == 8 || e.keyCode == 46 || e.keyCode == 37 || e.keyCode == 39) return true;
-            if(!$.inArray(e.key, validInput) ) return false;
+            if( !(e.keyCode >= 48 && e.keyCode <= 57) || !$.inArray(e.key, validInput) ) return false;
             return formatPhone(e, this);
           });
       });
