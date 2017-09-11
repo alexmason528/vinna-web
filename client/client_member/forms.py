@@ -1,3 +1,4 @@
+import re, string
 from django import forms
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
@@ -11,10 +12,24 @@ class DownloadForm(forms.Form):
 
     def is_valid(self):
       valid = super(DownloadForm, self).is_valid()
+
       if valid:
-        return True
-      else:
-        return False
+        cleaned_data = super(DownloadForm, self).clean()
+        
+        email = cleaned_data.get('email')
+        digits = ''.join(str(x) for x in re.findall(r'\d+', email))
+  
+        if len(digits) == 10 and valid: return True 
+        if re.match(r'[^@]+@[^@]+\.[^@]+', email): return True
+        
+        if re.match(r'.*@.*', email):
+          self.add_error('email', "Invalid email address")
+        elif len(digits):
+          self.add_error('email', "Invalid phone #")
+        else: 
+          self.add_error('email', "Invalid input")
+
+      return False
 
 class UserForm(forms.ModelForm):
 
