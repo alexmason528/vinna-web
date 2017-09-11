@@ -8,6 +8,7 @@ import io
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from django.conf import settings
 
 from rest_framework import exceptions
 from rest_framework_jwt.compat import get_username
@@ -157,5 +158,6 @@ def response_payload_handler(token, user=None, request=None):
         'partners': BusinessSerializer(partners, many=True).data,
         'cashiers': BusinessSerializer(cashiers, many=True).data,
         'countries': CountrySerializer(countries, many=True).data,
-        'categories': CategorySerializer(categories, many=True).data
+        'categories': CategorySerializer(categories, many=True).data,
+        'stripe_key': settings.STRIPE_PUBLIC_KEY
     }
