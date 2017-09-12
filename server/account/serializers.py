@@ -120,10 +120,8 @@ class AccountSerializer(serializers.ModelSerializer):
         validated_data['language_id'] = 1
 
         email_code = random.randint(1000, 9999)
-        phone_code = random.randint(1000, 9999)
 
         validated_data['email_verified'] = email_code
-        validated_data['phone_verified'] = phone_code
 
         account = Account.objects.create(user_id=user.id, **validated_data)
 
@@ -148,20 +146,6 @@ class AccountSerializer(serializers.ModelSerializer):
             )
         except:
             pass
-
-        sms_content = 'Thanks for using Vinna app. \nPlease verify your phone number. \nVerification code: ' + str(phone_code)
-        plivo_instance = plivo.RestAPI(settings.PLIVO_AUTH_ID, settings.PLIVO_TOKEN)
-
-        country = get_object_or_404(Country, pk=validated_data['country_id'])
-
-        params = {
-            'src': settings.VERIFICATION_SENDER_PHONE,
-            'dst' : country.phone_country_code + validated_data['phone'],
-            'text' : sms_content,
-            'method' : 'POST'
-        }
-        
-        response = plivo_instance.send_message(params)
 
         return account
 

@@ -36,7 +36,6 @@ class Account(models.Model):
     referral_account = models.ForeignKey('Account', related_name='account_referral', null=True, blank=True)
     last_modified_date = models.DateTimeField('Last Modified', auto_now=True)
     email_verified = models.CharField(default='0', max_length=50)
-    phone_verified = models.CharField(default='0', max_length=50)
     new_email = models.CharField(default='', max_length=50)
     new_phone = models.CharField(default='', max_length=50)
     new_email_verified = models.CharField(default='0', max_length=50)
@@ -81,8 +80,6 @@ class Account(models.Model):
 
     def is_phone_verified(self):
         if self.new_phone and self.new_phone_verified == '1':
-            return True
-        elif not self.new_phone and self.phone_verified == '1':
             return True
         return False
 

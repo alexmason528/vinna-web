@@ -153,10 +153,31 @@ class AccountView(APIView):
 		if request.method == 'POST':
 			if 'phone' in request.data:
 				phone = request.data['phone']
-				account = get_object_or_404(Account, phone=phone)
-				return Response(account.first_name, status=status.HTTP_200_OK)
 
-			return Response('Failed to your phone number', status=status.HTTP_400_BAD_REQUEST)
+				account = None
+				try:
+					account = get_object_or_404(Account, phone=phone)
+				except:
+					pass
+
+				if account:
+					return Response(account.first_name, status=status.HTTP_200_OK)
+				else:
+					code = random.randint(1000, 9999)
+
+					sms_content = 'Vinna code: ' + str(code)
+					plivo_instance = plivo.RestAPI(settings.PLIVO_AUTH_ID, settings.PLIVO_TOKEN)
+					
+					params = {
+					    'src': settings.VERIFICATION_SENDER_PHONE,
+					    'dst' : phone,
+					    'text' : sms_content,
+					    'method' : 'POST'
+					}
+
+					response = plivo_instance.send_message(params)
+
+					return Response(code, status=status.HTTP_400_BAD_REQUEST)
 
 	@api_view(['POST'])
 	@permission_classes([])
