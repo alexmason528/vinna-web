@@ -42,14 +42,12 @@ class Version():
 				version_info = {
 					'version': 1.1,
 					'supported': [0.98, 0.95, 0.90],
-					'public_stripe': 'pk_test_vSXaN8PlxDIA9SRDrvPyNllu'
 				}
 				return Response(version_info, status=status.HTTP_200_OK)
 			elif platform == 'android':
 				version_info = {
 					'version': 1.1,
 					'supported': [0.98, 0.95, 0.90],
-					'public_stripe': 'pk_test_vSXaN8PlxDIA9SRDrvPyNllu'
 				}
 				return Response(version_info, status=status.HTTP_200_OK)
 			else:

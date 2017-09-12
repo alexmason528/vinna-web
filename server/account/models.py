@@ -79,9 +79,9 @@ class Account(models.Model):
         return False
 
     def is_phone_verified(self):
-        if self.new_phone and self.new_phone_verified == '1':
-            return True
-        return False
+        if self.new_phone and self.new_phone_verified != '1':
+            return False
+        return True
 
 
 class AccountReferral(models.Model):
