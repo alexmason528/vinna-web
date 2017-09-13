@@ -85,6 +85,7 @@ class MemberSerializer(serializers.ModelSerializer):
         stripe_account.legal_entity.last_name = account.last_name
 
         if member.ssn_token:
+            stripe_account.legal_entity.ssn_last_4 = member.ssn_token[-4:]
             stripe_account.legal_entity.personal_id_number = member.ssn_token
             
         stripe_account.tos_acceptance.date = str(time.time()).split('.')[0]
