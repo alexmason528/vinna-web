@@ -170,13 +170,11 @@ class AccountView(APIView):
 					
 					params = {
 					    'src': settings.VERIFICATION_SENDER_PHONE,
-					    'dst' : phone,
+					    'dst' : '1' + phone,
 					    'text' : sms_content,
 					    'method' : 'POST'
 					}
-
-					response = plivo_instance.send_message(params)
-
+					response = plivo_instance.send_message(params)					
 					return Response(code, status=status.HTTP_400_BAD_REQUEST)
 
 	@api_view(['POST'])
@@ -270,7 +268,7 @@ class AccountView(APIView):
 				
 				params = {
 				    'src': settings.VERIFICATION_SENDER_PHONE,
-				    'dst' : phone,
+				    'dst' : account.country.phone_country_code + phone,
 				    'text' : sms_content,
 				    'method' : 'POST'
 				}
@@ -334,7 +332,7 @@ class AccountView(APIView):
 
 			params = {
 			    'src': settings.VERIFICATION_SENDER_PHONE,
-			    'dst' : account.phone,
+			    'dst' : account.country.phone_country_code + account.phone,
 			    'text' : sms_content,
 			    'method' : 'POST'
 			}
