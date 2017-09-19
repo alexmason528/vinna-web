@@ -5,6 +5,10 @@ import qrcode
 import base64
 import io
 
+from calendar import timegm
+from datetime import datetime
+from ipware.ip import get_real_ip, get_ip
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
@@ -14,10 +18,6 @@ from rest_framework import exceptions
 from rest_framework_jwt.compat import get_username
 from rest_framework_jwt.compat import get_username_field
 from rest_framework_jwt.settings import api_settings
-
-from calendar import timegm
-from datetime import datetime
-from ipware.ip import get_real_ip, get_ip
 
 from core.models import UserLog, Country, State
 from server.account.models import Account

@@ -14,16 +14,14 @@ from django.db import transaction
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
 from django.core.mail import send_mail
-from django.core.exceptions import ValidationError
+
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from django.conf import settings
 
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-
-from vinna.authentication import CustomJSONWebTokenAuthentication
 
 from server.business.models import Business
 from server.business.serializers import BusinessSerializer
@@ -36,10 +34,6 @@ from server.purchase.serializers import ViewPurchaseSerializer
 
 from .models import Account
 from .serializers import AccountSerializer
-from .permissions import IsOwner
-
-@authentication_classes(CustomJSONWebTokenAuthentication, )
-@permission_classes(IsAuthenticated, )
 
 class AccountView(APIView):
 
@@ -62,17 +56,18 @@ class AccountView(APIView):
 				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 	@api_view(['PUT','GET'])
-	@permission_classes([IsAuthenticated, IsOwner])
 	@transaction.atomic
 	def account_element(request, id):
-		account = get_object_or_404(Account, pk=id)
-		if request.user.id != account.user.id:
-			return Response('You are not allowed to perform this action', status=status.HTTP_401_UNAUTHORIZED)
+		if request.user.account.id != int(id):
+			raise PermissionDenied
+
 		if request.method == 'GET':
+			account = get_object_or_404(Account, pk=id)
 			serializer = AccountSerializer(account)
 			return Response(serializer.data)
 
 		elif request.method == 'PUT':
+			account = get_object_or_404(Account, pk=id)
 			serializer = AccountSerializer(account, data=request.data, partial=True)
 			if serializer.is_valid():
 				serializer.save()
@@ -82,7 +77,11 @@ class AccountView(APIView):
 
 	@api_view(['GET'])
 	def nearest_partner(request, id):
+		if request.user.account.id != int(id):
+			raise PermissionDenied
+
 		if request.method == 'GET':
+			account = get_object_or_404(Account, pk=id)
 			businesses = Business.objects.filter(account_id=id).order_by('-last_modified_date')
 			serializer = BusinessSerializer(businesses, many=True)
 
@@ -91,24 +90,28 @@ class AccountView(APIView):
 	# Summary
 	@api_view(['GET'])
 	def purchase_info(request, id):
-		id = request.user.id
+		if request.method == 'GET':
+			if request.user.account.id != int(id):
+				raise PermissionDenied
 
-		total_earned = Purchase.objects.filter(account_id=id).aggregate(total_earned=Coalesce(Sum('member_amount'), 0))['total_earned']
-		next_payment = Purchase.objects.filter(account_id=id, member_amount_processed=0).aggregate(next_payment=Coalesce(Sum('member_amount'),0))['next_payment']
-		payday = date.today().replace(day=1) + relativedelta(months=1)
+			total_earned = Purchase.objects.filter(account_id=id).aggregate(total_earned=Coalesce(Sum('member_amount'), 0))['total_earned']
+			next_payment = Purchase.objects.filter(account_id=id, member_amount_processed=0).aggregate(next_payment=Coalesce(Sum('member_amount'),0))['next_payment']
+			payday = date.today().replace(day=1) + relativedelta(months=1)
 
-		purchase_info = {
-			'total_earned': total_earned,
-			'next_payment': next_payment,
-			'payday': payday
-		}
+			purchase_info = {
+				'total_earned': total_earned,
+				'next_payment': next_payment,
+				'payday': payday
+			}
 
-		return Response(purchase_info)
+			return Response(purchase_info)
 
 	@api_view(['GET'])
 	def purchase_collection(request, id):
-		id = request.user.id
 		if request.method == 'GET':
+			if request.user.account.id != int(id):
+				raise PermissionDenied
+
 			purchases = Purchase.objects.filter(account_id=id)
 			serializer = ViewPurchaseSerializer(purchases, many=True)
 			return Response(serializer.data)
@@ -117,185 +120,166 @@ class AccountView(APIView):
 	@api_view(['POST'])
 	def verify_email(request, id):
 		if request.method == 'POST':
-			if 'email_code' in request.data:
-				email_code = request.data['email_code']
-				account = get_object_or_404(Account, pk=id)
+			if request.user.account.id != int(id):
+				raise PermissionDenied
 
-				if account.new_email and account.new_email_verified != 1:
-					if (account.new_email_verified == email_code):
-						user = account.user
-						user.username = account.new_email
-						user.email = account.new_email
-						user.save()
-						
-						account.email_verified = 1
-						account.new_email_verified = 0
-						account.new_email = ''
+			if not 'email_code' in request.data:
+				raise ValidationError(detail={'detail': 'Email code is required'})
 
-						account.save()
+			email_code = request.data['email_code']
+			account = get_object_or_404(Account, pk=id)
 
-						return Response('new_email_verified', status=status.HTTP_200_OK)
-
-				elif account.email_verified != 1:
-					if account.email_verified == email_code:
-						account.email_verified = 1
-						account.save()
-
-						return Response('current_email_verified', status=status.HTTP_200_OK)
-
-				return Response('Failed to verify your email', status=status.HTTP_400_BAD_REQUEST)
-
-
-	@api_view(['POST'])
-	@permission_classes([])
-	@authentication_classes([])	
-	def find_phone(request):
-		if request.method == 'POST':
-			if 'phone' in request.data:
-				phone = request.data['phone']
-
-				account = None
-				try:
-					account = get_object_or_404(Account, phone=phone)
-				except:
-					pass
-
-				if account:
-					return Response(account.first_name, status=status.HTTP_200_OK)
-				else:
-					code = random.randint(1000, 9999)
-
-					sms_content = 'Vinna code: ' + str(code)
-					plivo_instance = plivo.RestAPI(settings.PLIVO_AUTH_ID, settings.PLIVO_TOKEN)
+			if account.new_email and account.new_email_verified != 1:
+				if (account.new_email_verified == email_code):
+					user = account.user
+					user.username = account.new_email
+					user.email = account.new_email
+					user.save()
 					
-					params = {
-					    'src': settings.VERIFICATION_SENDER_PHONE,
-					    'dst' : '1' + phone,
-					    'text' : sms_content,
-					    'method' : 'POST'
-					}
-					response = plivo_instance.send_message(params)					
-					return Response(code, status=status.HTTP_400_BAD_REQUEST)
+					account.email_verified = 1
+					account.new_email_verified = 0
+					account.new_email = ''
 
-	@api_view(['POST'])
-	@permission_classes([])
-	@authentication_classes([])	
-	def find_email(request):
-		if request.method == 'POST':
-			if 'email' in request.data:
-				email = request.data['email'].lower()
-				account = get_object_or_404(User, email=email)
-				return Response(account.first_name, status=status.HTTP_200_OK)
+					account.save()
 
-			return Response('Failed to your phone number', status=status.HTTP_400_BAD_REQUEST)
+					return Response('new_email_verified', status=status.HTTP_200_OK)
+
+			elif account.email_verified != 1:
+				if account.email_verified == email_code:
+					account.email_verified = 1
+					account.save()
+
+					return Response('current_email_verified', status=status.HTTP_200_OK)
+
+			raise ValidationError(detail={'detail': 'Failed to verify your email'})
 
 	@api_view(['POST'])
 	def verify_phone(request, id):
 		if request.method == 'POST':
-			if 'phone_code' in request.data:
-				phone_code = request.data['phone_code']
-				account = get_object_or_404(Account, pk=id)
+			if request.user.account.id != int(id):
+				raise PermissionDenied
 
-				if account.new_phone and account.new_phone_verified != 1:
-					if account.new_phone_verified == phone_code:
-						account.phone = account.new_phone
-						account.phone_verified = 1
-						account.new_phone_verified = 0
-						account.new_phone = ''
+			if not 'phone_code' in request.data:
+				raise ValidationError(detail={'detail': 'Phone verification code is required'})
 
-						account.save()
+			phone_code = request.data['phone_code']
+			account = get_object_or_404(Account, pk=id)
 
-						return Response('new_phone_verified', status=status.HTTP_200_OK)
+			if account.new_phone and account.new_phone_verified != 1:
+				if account.new_phone_verified == phone_code:
+					account.phone = account.new_phone
+					account.phone_verified = 1
+					account.new_phone_verified = 0
+					account.new_phone = ''
 
-				elif account.phone_verified != 1:
-					if account.phone_verified == phone_code:
-						account.phone_verified = 1
-						account.save()
+					account.save()
 
-						return Response('current_phone_verified', status=status.HTTP_200_OK)
+					return Response('new_phone_verified', status=status.HTTP_200_OK)
 
-				return Response('Failed to verify your email', status=status.HTTP_400_BAD_REQUEST)
+			elif account.phone_verified != 1:
+				if account.phone_verified == phone_code:
+					account.phone_verified = 1
+					account.save()
+
+					return Response('current_phone_verified', status=status.HTTP_200_OK)
+
+			raise ValidationError(detail={'detail': 'Failed to verify your phone'})
 
 	@api_view(['POST'])
 	def update_email(request, id):
 		if request.method == 'POST':
-			if 'email' in request.data:
-				email = request.data['email']
+			if request.user.account.id != int(id):
+				raise PermissionDenied
 
-				if User.objects.filter(username=email).count() > 0:
-					return Response('Email is already taken by other account', status=status.HTTP_400_BAD_REQUEST)
+			if not 'email' in request.data:
+				raise ValidationError(detail={'detail': 'Email is required'})
 
-				account = get_object_or_404(Account, pk=id)
-				account.new_email = email
+			email = request.data['email']
 
-				code = random.randint(1000, 9999)
+			if User.objects.filter(username=email).count() > 0:
+				raise ValidationError(detail={'detail': 'This email is already taken by other account'})
 
-				mail_content = 'Thanks for using Vinna app. \nPlease verify your email address. \nVerification code: ' + str(code)
-					
-				try:
-					send_mail(
-						'From Vinna',
-						mail_content,
-						settings.VERIFICATION_SENDER_EMAIL,
-						[email],
-						fail_silently=False,
-					)
-					
-				except Exception as e:
-					return Response('Failed to send verification code to your email - ' + account.user.email, status=status.HTTP_400_BAD_REQUEST)
+			account = get_object_or_404(Account, pk=id)
+			account.new_email = email
 
-				account.new_email_verified = code
-				account.save()
+			code = random.randint(1000, 9999)
 
-				return Response('Email updated', status=status.HTTP_200_OK)
+			mail_content = '''Thanks for using Vinna app.
+			Please verify your email address. 
+			Verification code: %d''' % code
+
+			try:
+				send_mail(
+					'From Vinna',
+					mail_content,
+					settings.VERIFICATION_SENDER_EMAIL,
+					[email],
+					fail_silently=False,
+				)
+				
+			except Exception as e:
+				raise ValidationError(detail={'detail': 'Failed to send verification code to your email'})
+
+			account.new_email_verified = code
+			account.save()
+
+			return Response('Email updated', status=status.HTTP_200_OK)
 
 	@api_view(['POST'])
 	def update_phone(request, id):
 		if request.method == 'POST':
-			if 'phone' in request.data:
-				phone = request.data['phone']
+			if request.user.account.id != int(id):
+				raise PermissionDenied
 
-				if Account.objects.filter(phone=phone).count() > 0:
-					return Response('Phone number is already taken by other account', status=status.HTTP_400_BAD_REQUEST)
+			if not 'phone' in request.data:
+				raise ValidationError(detail={'detail': 'Phone number is required'})
 
-				account = get_object_or_404(Account, pk=id)
-				account.new_phone = phone
+			phone = request.data['phone']
 
-				code = random.randint(1000, 9999)
+			if Account.objects.filter(phone=phone).count() > 0:
+				raise ValidationError(detail={'detail': 'Phone number is already taken by other account'})
 
-				sms_content = 'Vinna code: ' + str(code)
-				plivo_instance = plivo.RestAPI(settings.PLIVO_AUTH_ID, settings.PLIVO_TOKEN)
-				
-				params = {
-				    'src': settings.VERIFICATION_SENDER_PHONE,
-				    'dst' : account.country.phone_country_code + phone,
-				    'text' : sms_content,
-				    'method' : 'POST'
-				}
+			account = get_object_or_404(Account, pk=id)
+			account.new_phone = phone
 
-				response = plivo_instance.send_message(params)
+			code = random.randint(1000, 9999)
 
-				if response[0] != 202:
-					return Response(response[1], status=status.HTTP_400_BAD_REQUEST)
+			sms_content = 'Vinna code: ' + str(code)
+			plivo_instance = plivo.RestAPI(settings.PLIVO_AUTH_ID, settings.PLIVO_TOKEN)
+			
+			params = {
+			    'src': settings.VERIFICATION_SENDER_PHONE,
+			    'dst' : account.country.phone_country_code + phone,
+			    'text' : sms_content,
+			    'method' : 'POST'
+			}
 
-				account.new_phone_verified = code
-				account.save()
+			response = plivo_instance.send_message(params)
 
-				return Response('Phone updated', status=status.HTTP_200_OK)
+			if response[0] != 202:
+				return Response(response[1], status=status.HTTP_400_BAD_REQUEST)
+
+			account.new_phone_verified = code
+			account.save()
+
+			return Response('Phone updated', status=status.HTTP_200_OK)
 				
 
 	@api_view(['GET'])
 	def send_email_code(request, id):
-		id = request.user.id
-
 		if request.method == 'GET':
+			if request.user.account.id != int(id):
+				raise PermissionDenied
+
 			account = get_object_or_404(Account, pk=id)
 			code = random.randint(1000, 9999)
 
 			if account.email_verified == 1:
 				return Response('Email is already verified', status=status.HTTP_400_BAD_REQUEST)
 
-			mail_content = 'Thanks for using Vinna app. \nPlease verify your email address. \nVerification code: ' + str(code)
+			mail_content = '''Thanks for using Vinna app.
+				Please verify your email address.
+				Verification code: %d''' % code
 			
 			try:
 				send_mail(
@@ -307,25 +291,29 @@ class AccountView(APIView):
 				)
 				
 			except Exception as e:
-				return Response('Failed to send verification code to your email - ' + account.user.email, status=status.HTTP_400_BAD_REQUEST)
+				raise ValidationError(detail={'detail': 'Failed to send verificatio code to your email'})
 
 			account.email_verified = code
 			account.save()
 
-			return Response('Code updated', status=status.HTTP_200_OK)
+			return Response({'detail': 'Code updated'}, status=status.HTTP_200_OK)
 
 	@api_view(['GET'])
 	def send_phone_code(request, id):
-		id = request.user.id
-		
 		if request.method == 'GET':
+			if request.user.account.id != int(id):
+				raise PermissionDenied
+
 			account = get_object_or_404(Account, pk=id)
 			code = random.randint(1000, 9999)
 
 			if account.phone_verified == 1:
-				return Response('Phone is already verified', status=status.HTTP_400_BAD_REQUEST)
+				raise ValidationError(detail={'detail': 'This email is already verified'})
 
-			sms_content = 'Thanks for using Vinna app. \nPlease verify your phone number. \nVerification code: ' + str(code)
+			sms_content = '''Thanks for using Vinna app.
+			Please verify your phone number.
+			Verification code: %d''' % code
+			
 			plivo_instance = plivo.RestAPI(settings.PLIVO_AUTH_ID, settings.PLIVO_TOKEN)
 			
 			account = get_object_or_404(Account, pk=id)
@@ -345,4 +333,49 @@ class AccountView(APIView):
 			account.phone_verified = code
 			account.save()
 
-			return Response('Code updated', status=status.HTTP_200_OK)
+			return Response({'detail': 'Code updated'}, status=status.HTTP_200_OK)
+
+	@api_view(['POST'])
+	@permission_classes([])
+	@authentication_classes([])	
+	def find_phone(request):
+		if request.method == 'POST':
+			if not 'phone' in request.data:
+				raise ValidationError(detail={'detail': 'Phone number is required'})
+
+			phone = request.data['phone']
+
+			account = None
+			try:
+				account = get_object_or_404(Account, phone=phone)
+			except:
+				pass
+
+			if account:
+				return Response(account.first_name, status=status.HTTP_200_OK)
+			else:
+				code = random.randint(1000, 9999)
+
+				sms_content = 'Vinna code: ' + str(code)
+				plivo_instance = plivo.RestAPI(settings.PLIVO_AUTH_ID, settings.PLIVO_TOKEN)
+				
+				params = {
+				    'src': settings.VERIFICATION_SENDER_PHONE,
+				    'dst' : '1' + phone,
+				    'text' : sms_content,
+				    'method' : 'POST'
+				}
+				response = plivo_instance.send_message(params)
+				return Response(code, status=status.HTTP_400_BAD_REQUEST)
+
+	@api_view(['POST'])
+	@permission_classes([])
+	@authentication_classes([])
+	def find_email(request):
+		if request.method == 'POST':
+			if not 'email' in request.data:
+				raise ValidationError(detail={'detail': 'Email is required'})
+
+			email = request.data['email'].lower()
+			account = get_object_or_404(User, email=email)
+			return Response(account.first_name, status=status.HTTP_200_OK)

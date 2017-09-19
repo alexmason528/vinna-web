@@ -10,10 +10,8 @@ from django.db.models.functions import Coalesce
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-
-from vinna.authentication import CustomJSONWebTokenAuthentication
+from rest_framework.exceptions import PermissionDenied
 
 from server.purchase.models import Purchase
 from server.media.models import BusinessImage
@@ -27,10 +25,6 @@ from server.account.partner_serializer import AccountPartnerRoleSerializer
 from .serializers import BusinessSerializer, BusinessPublicSerializer, BusinessBillingInfoSerializer, BusinessPurchaseSerializer, CategorySerializer
 from .invitation_serializer import InvitationSerializer
 
-
-@permission_classes(IsAuthenticated, )
-@authentication_classes(CustomJSONWebTokenAuthentication, )
-
 class BusinessView(APIView):
 
 	@api_view(['GET', 'POST'])
@@ -41,13 +35,10 @@ class BusinessView(APIView):
 		if request.method == 'GET':
 			businesses = Business.objects.all().order_by('-last_modified_date')
 			serializer = BusinessPublicSerializer(businesses, many=True)
-
 			return Response(serializer.data)
 		
 		elif request.method == 'POST':
-
 			serializer = BusinessSerializer(data=request.data, context={'request': request})
-			
 			if serializer.is_valid():
 				try:
 					serializer.save()
@@ -58,10 +49,12 @@ class BusinessView(APIView):
 			else:
 				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 	@api_view(['PUT','GET'])
 	def business_element(request, id):
-		if request.method == 'GET':	
+		if request.user.account.business_set.all().filter(id=id).count() == 0:
+			raise PermissionDenied
+
+		if request.method == 'GET':		
 			business = get_object_or_404(Business, pk=id)
 			serializer = BusinessSerializer(business)
 			return Response(serializer.data)
@@ -75,14 +68,6 @@ class BusinessView(APIView):
 			else:
 				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-	@api_view(['GET'])
-	def category(request):
-		if request.method == 'GET':
-			categories = Category.objects.all()
-			serializer = CategorySerializer(categories, many=True)
-
-			return Response(serializer.data)
-
 class BusinessBillingInfoView(APIView):
 
 	@api_view(['GET', 'POST'])
@@ -91,6 +76,7 @@ class BusinessBillingInfoView(APIView):
 			billing_infos = BusinessBillingInfo.objects.filter(business_id=id)
 			serializer = BusinessBillingInfoSerializer(billing_infos, many=True)
 			return Response(serializer.data)
+
 		elif request.method == 'POST':
 			request.data['business_id'] = id
 			serializer = BusinessBillingInfoSerializer(data=request.data)

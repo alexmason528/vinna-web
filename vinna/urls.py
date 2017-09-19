@@ -48,9 +48,9 @@ urlpatterns = [
     url(r'^member/', include('client.client_member.urls')),
 
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^api-token-auth/', custom_obtain_jwt_token),
-    url(r'^api-token-refresh/', refresh_jwt_token),
-    url(r'^api-token-verify/', custom_verify_jwt_token),
+    url(r'^api-token-auth', custom_obtain_jwt_token),
+    url(r'^api-token-refresh', refresh_jwt_token),
+    url(r'^api-token-verify', custom_verify_jwt_token),
 
     url(r'^downloadapp/', client_member_views.download_redirect),
     url(r'^app/', client_member_views.download),
