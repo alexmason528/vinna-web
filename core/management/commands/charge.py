@@ -1,10 +1,7 @@
 import stripe
 
-from django.core.management import BaseCommand
 from django.conf import settings
-
-from server.account.models import Account
-from server.business.models import Business, BusinessBillingInfo
+from django.core.management import BaseCommand
 
 stripe.api_key = settings.STRIPE_API_KEY
 

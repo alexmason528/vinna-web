@@ -1,34 +1,29 @@
-import random
 import plivo
+import random
 
 from datetime import date
 from dateutil.relativedelta import relativedelta
 
-from django.utils.decorators import method_decorator
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import get_object_or_404
-from django.contrib.auth import authenticate
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.mail import send_mail
 from django.db import transaction
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
-from django.core.mail import send_mail
-
-from rest_framework.exceptions import PermissionDenied, ValidationError
-from django.conf import settings
+from django.shortcuts import get_object_or_404
 
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from server.business.models import Business
-from server.business.serializers import BusinessSerializer
 from server.member.models import Member
 from server.media.models import BusinessImage
 from server.purchase.models import Purchase
 
+from server.business.serializers import BusinessSerializer
 from server.media.serializers import BusinessImageSerializer
 from server.purchase.serializers import ViewPurchaseSerializer
 
@@ -49,11 +44,11 @@ class AccountView(APIView):
 				try:
 					serializer.save()
 				except Exception as e:
-					return Response(e.message, status=status.HTTP_400_BAD_REQUEST)
+					raise ValidationError(detail={'error': str(e)})
 
 				return Response(serializer.data, status=status.HTTP_201_CREATED)
 			else:
-				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+				raise ValidationError(detail={'error': serializer.errors})
 
 	@api_view(['PUT','GET'])
 	@transaction.atomic
@@ -64,16 +59,16 @@ class AccountView(APIView):
 		if request.method == 'GET':
 			account = get_object_or_404(Account, pk=id)
 			serializer = AccountSerializer(account)
-			return Response(serializer.data)
+			return Response(serializer.data, status=status.HTTP_200_OK)
 
 		elif request.method == 'PUT':
 			account = get_object_or_404(Account, pk=id)
 			serializer = AccountSerializer(account, data=request.data, partial=True)
 			if serializer.is_valid():
 				serializer.save()
-				return Response(serializer.data)
+				return Response(serializer.data, status=status.HTTP_200_OK)
 			else:
-				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+				raise ValidationError(detail={'error': serializer.errors})
 
 	@api_view(['GET'])
 	def nearest_partner(request, id):
@@ -85,7 +80,7 @@ class AccountView(APIView):
 			businesses = Business.objects.filter(account_id=id).order_by('-last_modified_date')
 			serializer = BusinessSerializer(businesses, many=True)
 
-			return Response(serializer.data)
+			return Response(serializer.data, status=status.HTTP_200_OK)
 
 	# Summary
 	@api_view(['GET'])
@@ -104,7 +99,7 @@ class AccountView(APIView):
 				'payday': payday
 			}
 
-			return Response(purchase_info)
+			return Response(purchase_info, status=status.HTTP_200_OK)
 
 	@api_view(['GET'])
 	def purchase_collection(request, id):
@@ -114,7 +109,7 @@ class AccountView(APIView):
 
 			purchases = Purchase.objects.filter(account_id=id)
 			serializer = ViewPurchaseSerializer(purchases, many=True)
-			return Response(serializer.data)
+			return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 	@api_view(['POST'])
@@ -124,7 +119,7 @@ class AccountView(APIView):
 				raise PermissionDenied
 
 			if not 'email_code' in request.data:
-				raise ValidationError(detail={'detail': 'Email code is required'})
+				raise ValidationError(detail={'error': 'Email code is required'})
 
 			email_code = request.data['email_code']
 			account = get_object_or_404(Account, pk=id)
@@ -151,7 +146,7 @@ class AccountView(APIView):
 
 					return Response('current_email_verified', status=status.HTTP_200_OK)
 
-			raise ValidationError(detail={'detail': 'Failed to verify your email'})
+			raise ValidationError(detail={'error': 'Failed to verify your email'})
 
 	@api_view(['POST'])
 	def verify_phone(request, id):
@@ -160,7 +155,7 @@ class AccountView(APIView):
 				raise PermissionDenied
 
 			if not 'phone_code' in request.data:
-				raise ValidationError(detail={'detail': 'Phone verification code is required'})
+				raise ValidationError(detail={'error': 'Phone verification code is required'})
 
 			phone_code = request.data['phone_code']
 			account = get_object_or_404(Account, pk=id)
@@ -183,7 +178,7 @@ class AccountView(APIView):
 
 					return Response('current_phone_verified', status=status.HTTP_200_OK)
 
-			raise ValidationError(detail={'detail': 'Failed to verify your phone'})
+			raise ValidationError(detail={'error': 'Failed to verify your phone'})
 
 	@api_view(['POST'])
 	def update_email(request, id):
@@ -192,12 +187,12 @@ class AccountView(APIView):
 				raise PermissionDenied
 
 			if not 'email' in request.data:
-				raise ValidationError(detail={'detail': 'Email is required'})
+				raise ValidationError(detail={'error': 'Email is required'})
 
 			email = request.data['email']
 
 			if User.objects.filter(username=email).count() > 0:
-				raise ValidationError(detail={'detail': 'This email is already taken by other account'})
+				raise ValidationError(detail={'error': 'This email is already taken by other account'})
 
 			account = get_object_or_404(Account, pk=id)
 			account.new_email = email
@@ -218,7 +213,7 @@ class AccountView(APIView):
 				)
 				
 			except Exception as e:
-				raise ValidationError(detail={'detail': 'Failed to send verification code to your email'})
+				raise ValidationError(detail={'error': 'Failed to send verification code to your email'})
 
 			account.new_email_verified = code
 			account.save()
@@ -232,12 +227,12 @@ class AccountView(APIView):
 				raise PermissionDenied
 
 			if not 'phone' in request.data:
-				raise ValidationError(detail={'detail': 'Phone number is required'})
+				raise ValidationError(detail={'error': 'Phone number is required'})
 
 			phone = request.data['phone']
 
 			if Account.objects.filter(phone=phone).count() > 0:
-				raise ValidationError(detail={'detail': 'Phone number is already taken by other account'})
+				raise ValidationError(detail={'error': 'Phone number is already taken by other account'})
 
 			account = get_object_or_404(Account, pk=id)
 			account.new_phone = phone
@@ -257,12 +252,12 @@ class AccountView(APIView):
 			response = plivo_instance.send_message(params)
 
 			if response[0] != 202:
-				return Response(response[1], status=status.HTTP_400_BAD_REQUEST)
+				raise ValidationError(detail={'error': response[1]})
 
 			account.new_phone_verified = code
 			account.save()
 
-			return Response('Phone updated', status=status.HTTP_200_OK)
+			return Response({'detail': 'Phone updated'}, status=status.HTTP_200_OK)
 				
 
 	@api_view(['GET'])
@@ -275,7 +270,7 @@ class AccountView(APIView):
 			code = random.randint(1000, 9999)
 
 			if account.email_verified == 1:
-				return Response('Email is already verified', status=status.HTTP_400_BAD_REQUEST)
+				raise ValidationError(detail={'error': 'Email is already verified'})
 
 			mail_content = '''Thanks for using Vinna app.
 				Please verify your email address.
@@ -291,7 +286,7 @@ class AccountView(APIView):
 				)
 				
 			except Exception as e:
-				raise ValidationError(detail={'detail': 'Failed to send verificatio code to your email'})
+				raise ValidationError(detail={'error': 'Failed to send verificatio code to your email'})
 
 			account.email_verified = code
 			account.save()
@@ -308,7 +303,7 @@ class AccountView(APIView):
 			code = random.randint(1000, 9999)
 
 			if account.phone_verified == 1:
-				raise ValidationError(detail={'detail': 'This email is already verified'})
+				raise ValidationError(detail={'error': 'This email is already verified'})
 
 			sms_content = '''Thanks for using Vinna app.
 			Please verify your phone number.
@@ -328,7 +323,7 @@ class AccountView(APIView):
 			response = plivo_instance.send_message(params)
 
 			if response[0] != 202:
-				return Response(response[1], status=status.HTTP_400_BAD_REQUEST)
+				raise ValidationError(detail={'error': response[1]})
 
 			account.phone_verified = code
 			account.save()
@@ -341,7 +336,7 @@ class AccountView(APIView):
 	def find_phone(request):
 		if request.method == 'POST':
 			if not 'phone' in request.data:
-				raise ValidationError(detail={'detail': 'Phone number is required'})
+				raise ValidationError(detail={'error': 'Phone number is required'})
 
 			phone = request.data['phone']
 
@@ -366,7 +361,8 @@ class AccountView(APIView):
 				    'method' : 'POST'
 				}
 				response = plivo_instance.send_message(params)
-				return Response(code, status=status.HTTP_400_BAD_REQUEST)
+
+				raise ValidationError(detail={code})
 
 	@api_view(['POST'])
 	@permission_classes([])
@@ -374,7 +370,7 @@ class AccountView(APIView):
 	def find_email(request):
 		if request.method == 'POST':
 			if not 'email' in request.data:
-				raise ValidationError(detail={'detail': 'Email is required'})
+				raise ValidationError(detail={'error': 'Email is required'})
 
 			email = request.data['email'].lower()
 			account = get_object_or_404(User, email=email)

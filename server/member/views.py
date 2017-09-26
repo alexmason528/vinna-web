@@ -1,24 +1,17 @@
-from django.utils.decorators import method_decorator
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import get_object_or_404
-from django.db.models import Q
+
 from django.db import transaction
+from django.db.models import Q
+from django.shortcuts import get_object_or_404
 
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-
-from vinna.authentication import CustomJSONWebTokenAuthentication
 
 from server.purchase.models import Purchase
 from .models import Member, MemberPaymentInfo
 from .serializers import MemberSerializer, MemberPaymentInfoSerializer, MemberPurchaseSerializer
-
-@permission_classes(IsAuthenticated, )
-@authentication_classes(CustomJSONWebTokenAuthentication, )
 
 class MemberView(APIView):
 
@@ -36,11 +29,11 @@ class MemberView(APIView):
 				try:
 					serializer.save()
 				except Exception as e:
-					return Response(e.message, status=status.HTTP_400_BAD_REQUEST)
+					raise ValidationError(detail={'error': str(e)})
 
 				return Response(serializer.data, status=status.HTTP_201_CREATED)
-			else:		
-				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+			else:
+				raise ValidationError(detail={'error': serializer.errors})
 
 	@api_view(['PUT','GET'])
 	@transaction.atomic
@@ -48,7 +41,7 @@ class MemberView(APIView):
 		if request.method == 'GET':	
 			member = get_object_or_404(Member, pk=id)
 			serializer = MemberSerializer(member)
-			return Response(serializer.data)
+			return Response(serializer.data, status=status.HTTP_200_OK)
 
 		elif request.method == 'PUT':
 			member = get_object_or_404(Member, pk=id)
@@ -56,9 +49,9 @@ class MemberView(APIView):
 
 			if serializer.is_valid():
 				serializer.save()
-				return Response(serializer.data)
+				return Response(serializer.data, status=status.HTTP_200_OK)
 			else:
-				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+				raise ValidationError(detail={'error': serializer.errors})
 
 class MemberPaymentInfoView(APIView):
 
@@ -68,7 +61,7 @@ class MemberPaymentInfoView(APIView):
 		if request.method == 'GET':
 			member_payment_infos = MemberPaymentInfo.objects.filter(member_id = id)
 			serializer = MemberPaymentInfoSerializer(member_payment_infos, many=True)
-			return Response(serializer.data)
+			return Response(serializer.data, status=status.HTTP_200_OK)
 		
 		elif request.method == 'POST':
 			request.data['member_id'] = id
@@ -76,7 +69,8 @@ class MemberPaymentInfoView(APIView):
 			if serializer.is_valid():
 				serializer.save()
 				return Response(serializer.data, status=status.HTTP_201_CREATED)
-			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+			else:
+				raise ValidationError(detail={'error': serializer.errors})
 
 	@api_view(['PUT','GET', 'DELETE'])
 	@transaction.atomic
@@ -84,16 +78,16 @@ class MemberPaymentInfoView(APIView):
 		if request.method == 'GET':	
 			member_payment_info = get_object_or_404(MemberPaymentInfo, pk=pinfo_id)
 			serializer = MemberPaymentInfoSerializer(member_payment_info)
-			return Response(serializer.data)
+			return Response(serializer.data, status=status.HTTP_200_OK)
 
 		elif request.method == 'PUT':
 			member_payment_info = get_object_or_404(MemberPaymentInfo, pk=pinfo_id)
 			serializer = MemberPaymentInfoSerializer(member_payment_info, data=request.data, partial=True)
 			if serializer.is_valid():
 				serializer.save()
-				return Response(serializer.data)
+				return Response(serializer.data, status=status.HTTP_200_OK)
 			else:
-				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+				raise ValidationError(detail={'error': serializer.errors})
 
 		elif request.method == 'DELETE':
 			member_payment_info = get_object_or_404(MemberPaymentInfo, pk=pinfo_id)
@@ -105,10 +99,10 @@ class MemberPurchaseView(APIView):
 		if request.method == 'GET':
 			purchases = Purchase.objects.filter(Q(member_id=id) | Q(member_referral_id=id))
 			serializer = MemberPurchaseSerializer(purchases, many=True)
-			return Response(serializer.data)
+			return Response(serializer.data, status=status.HTTP_200_OK)
 
 	@api_view(['GET'])
 	def member_purchase_element(request, id, purchase_id):
 		purchase = get_object_or_404(Purchase, pk=purchase_id)
 		serializer = MemberPurchaseSerializer(purchase)
-		return Response(serializer.data)
+		return Response(serializer.data, status=status.HTTP_200_OK)

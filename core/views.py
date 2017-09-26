@@ -1,38 +1,25 @@
-import random
 import plivo
+import random
 
-from django.utils.decorators import method_decorator
-from django.http import HttpResponse, JsonResponse
-
-from django.utils.decorators import method_decorator
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import get_object_or_404
-from django.contrib.auth.models import User
-from django.contrib.auth.hashers import make_password
-from django.core.mail import send_mail
 from django.conf import settings
+from django.contrib.auth.models import User
+from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404
+
 
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 
-from server.purchase.models import Purchase
 from server.account.models import Account
-
-from vinna.authentication import CustomJSONWebTokenAuthentication
+from server.purchase.models import Purchase
 
 from .models import Country, State
 from .serializers import CountrySerializer, StateSerializer
 
-
-@permission_classes(IsAuthenticated, )
-@authentication_classes(CustomJSONWebTokenAuthentication, )
-
-class Version():
-	
+class Version(APIView):
 	@api_view(['GET'])
 	@permission_classes([])
 	@authentication_classes([])
@@ -51,7 +38,7 @@ class Version():
 				}
 				return Response(version_info, status=status.HTTP_200_OK)
 			else:
-				return Response('Unsupported platform', status=status.HTTP_400_BAD_REQUEST)
+				raise ValidationError(detail={'error': 'Unsupported platform'})
 		
 class CountryView(APIView):
 
@@ -61,14 +48,14 @@ class CountryView(APIView):
 			countries = Country.objects.all()
 			serializer = CountrySerializer(countries, many=True)
 			print(serializer.data)
-			return Response(serializer.data)
+			return Response(serializer.data, status=status.HTTP_200_OK)
 
 	@api_view(['GET'])
 	def country_element(request, country_id):
 		if request.method == 'GET':	
 			country = get_object_or_404(Country, pk=country_id)
 			serializer = CountrySerializer(country)
-			return Response(serializer.data)
+			return Response(serializer.data, status=status.HTTP_200_OK)
 
 class StateView(APIView):
 
@@ -77,14 +64,14 @@ class StateView(APIView):
 		if request.method == 'GET':
 			states = State.objects.filter(country_id=country_id)
 			serializer = StateSerializer(states, many=True)
-			return Response(serializer.data)
+			return Response(serializer.data, status=status.HTTP_200_OK)
 
 	@api_view(['GET'])
 	def state_element(request, country_id, state_id):
 		if request.method == 'GET':
 			state = get_object_or_404(State, pk=state_id)
 			serializer = StateSerializer(state)
-			return Response(serializer.data)
+			return Response(serializer.data, status=status.HTTP_200_OK)
 
 class ForgetPasswordView(APIView):
 	@api_view(['POST'])
@@ -93,12 +80,11 @@ class ForgetPasswordView(APIView):
 	def forget_password(request):
 		if request.method == 'POST':
 			if 'email' in request.data:
-				
 				email = request.data['email']
 				user = User.objects.get(email = email)
 
 				if not user:
-					return Response('Email does not exist', status=status.HTTP_400_BAD_REQUEST)
+					raise ValidationError(detail={'error': 'Email does not exist'})
 
 				code = random.randint(1000, 9999)
 				
@@ -113,17 +99,17 @@ class ForgetPasswordView(APIView):
 						fail_silently=False,
 					)
 				except Exception as e:
-					return Response('Failed to send reset code to your email address - ' + email, status=status.HTTP_400_BAD_REQUEST)
+					raise ValidationError(detail={'error': 'Failed to send reset code to your email address'})
 
 				return Response(code, status=status.HTTP_200_OK)
 
 			elif 'phone' in request.data:
 				print(request.data['phone'])
 				phone = request.data['phone']
-				account = Account.objects.get(phone = phone)
+				account = Account.objects.get(phone=phone)
 
 				if not account:
-					return Response('Phone number does not exist', status=status.HTTP_400_BAD_REQUEST)
+					raise ValidationError(detail={'error': 'Phone number does not exist'})
 
 				code = random.randint(1000, 9999)
 				sms_content = 'Vinna code: ' + str(code)
@@ -139,12 +125,12 @@ class ForgetPasswordView(APIView):
 				response = plivo_instance.send_message(params)
 
 				if response[0] != 202:
-					print(response[1])
-					return Response('Failed to send reset code to your phone -' + str(phone), status=status.HTTP_400_BAD_REQUEST)
+					raise ValidationError(detail={'error': 'Failed to send reset code to your phone'})
 				elif response[0] == 202:
 					return Response(code, status=status.HTTP_200_OK)
-
-			return Response('Failed to send reset code', status=status.HTTP_400_BAD_REQUEST)
+					
+			else:
+				raise ValidationError(detail={'error': 'Failed to send reset code'})
 
 	@api_view(['POST'])
 	@permission_classes([])
@@ -156,7 +142,7 @@ class ForgetPasswordView(APIView):
 
 			account = get_object_or_404(Account, phone=phone)
 			user = account.user
-			user.password = make_password(password)
+			user.set_password(password)
 			user.save()
 
 			return Response('Password changed', status=status.HTTP_200_OK)

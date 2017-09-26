@@ -3,60 +3,62 @@ from rest_framework import serializers
 from .models import Image, Video, BusinessImage, BusinessVideo
 
 class Base64ImageField(serializers.ImageField):
-    def to_internal_value(self, data):
-        from django.core.files.base import ContentFile
-        import base64
-        import six
-        import uuid
+  def to_internal_value(self, data):
+    from django.core.files.base import ContentFile
+    import base64
+    import six
+    import uuid
 
-        if isinstance(data, six.string_types):
-            if 'data:' in data and ';base64,' in data:
-                header, data = data.split(';base64,')
+    if isinstance(data, six.string_types):
+      if 'data:' in data and ';base64,' in data:
+        header, data = data.split(';base64,')
 
-            try:
-                decoded_file = base64.b64decode(data)
-            except TypeError:
-                self.fail('invalid_image')
+      try:
+        decoded_file = base64.b64decode(data)
+      except TypeError:
+        self.fail('invalid_image')
 
-            file_name = str(uuid.uuid4())[:12]
-            file_extension = self.get_file_extension(file_name, decoded_file)
-            complete_file_name = "%s.%s" % (file_name, file_extension, )
-            data = ContentFile(decoded_file, name=complete_file_name)
+      file_name = str(uuid.uuid4())[:12]
+      file_extension = self.get_file_extension(file_name, decoded_file)
+      complete_file_name = "%s.%s" % (file_name, file_extension, )
+      data = ContentFile(decoded_file, name=complete_file_name)
 
-        return super(Base64ImageField, self).to_internal_value(data)
+    return super(Base64ImageField, self).to_internal_value(data)
 
-    def get_file_extension(self, file_name, decoded_file):
-        import imghdr
+  def get_file_extension(self, file_name, decoded_file):
+    import imghdr
 
-        extension = imghdr.what(file_name, decoded_file)
-        extension = "jpg" if extension == "jpeg" else extension
+    extension = imghdr.what(file_name, decoded_file)
+    extension = "jpg" if extension == "jpeg" else extension
 
-        return extension
+    return extension
 
 class ImageSerializer(serializers.ModelSerializer):
-    s3_url = Base64ImageField(max_length=None, use_url=True)
-    class Meta:
-        model = Image
-        fields = ('hash', 's3_url', 'title', 'description')
+  s3_url = Base64ImageField(max_length=None, use_url=True)
+  
+  class Meta:
+    model = Image
+    fields = ('hash', 's3_url', 'title', 'description')
 
 class BusinessImageSerializer(ImageSerializer):
-    business_id = serializers.IntegerField()
-    s3_url = Base64ImageField(max_length=None, use_url=True)
-    title = serializers.CharField(required=False)
-    description = serializers.CharField(required=False)
-    type = serializers.CharField()
+  business_id = serializers.IntegerField()
+  s3_url = Base64ImageField(max_length=None, use_url=True)
+  title = serializers.CharField(required=False)
+  description = serializers.CharField(required=False)
+  type = serializers.CharField()
 
-    class Meta:
-        model = BusinessImage
-        fields = ('business_id', 'hash', 's3_url', 'title', 'description', 'type')
+  class Meta:
+    model = BusinessImage
+    fields = ('business_id', 'hash', 's3_url', 'title', 'description', 'type')
 
 class VideoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Video
-        fields = ('link', 'unique_code', 'platform')
+  class Meta:
+    model = Video
+    fields = ('link', 'unique_code', 'platform')
 
 class BusinessVideoSerializer(VideoSerializer):
-    business_id = serializers.IntegerField(required=True)
-    class Meta:
-        model = BusinessVideo
-        fields = ('business_id', 'link', 'unique_code', 'platform')
+  business_id = serializers.IntegerField(required=True)
+
+  class Meta:
+    model = BusinessVideo
+    fields = ('business_id', 'link', 'unique_code', 'platform')

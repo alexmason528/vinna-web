@@ -1,27 +1,25 @@
 from django.contrib.auth.models import User
-from django.utils.decorators import method_decorator
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import get_object_or_404
 from django.db import transaction
 from django.db.models import Sum, Count
 from django.db.models.functions import Coalesce
+from django.shortcuts import get_object_or_404
 
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.exceptions import PermissionDenied
 
-from server.purchase.models import Purchase
-from server.media.models import BusinessImage
 from server.account.models import Account
 from server.account.partner_model import AccountPartnerRole
+from server.media.models import BusinessImage
+from server.purchase.models import Purchase
+
+from server.account.partner_serializer import AccountPartnerRoleSerializer
+from server.media.serializers import BusinessImageSerializer
+
 from .models import Business, BusinessBillingInfo, Category
 from .invitation_model import Invitation
-
-from server.media.serializers import BusinessImageSerializer
-from server.account.partner_serializer import AccountPartnerRoleSerializer
 from .serializers import BusinessSerializer, BusinessPublicSerializer, BusinessBillingInfoSerializer, BusinessPurchaseSerializer, CategorySerializer
 from .invitation_serializer import InvitationSerializer
 
@@ -43,11 +41,11 @@ class BusinessView(APIView):
 				try:
 					serializer.save()
 				except Exception as e:
-					return Response(e.message, status=status.HTTP_400_BAD_REQUEST)
+					raise ValidationError(detail={'error': str(e)})
 
 				return Response(serializer.data, status=status.HTTP_201_CREATED)
 			else:
-				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+				raise ValidationError(detail={'error': serializer.errors})
 
 	@api_view(['PUT','GET'])
 	def business_element(request, id):
@@ -66,7 +64,7 @@ class BusinessView(APIView):
 				serializer.save()
 				return Response(serializer.data)
 			else:
-				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+				raise ValidationError(detail={'error': serializer.errors})
 
 class BusinessBillingInfoView(APIView):
 
@@ -83,7 +81,8 @@ class BusinessBillingInfoView(APIView):
 			if serializer.is_valid():
 				serializer.save()
 				return Response(serializer.data, status=status.HTTP_201_CREATED)
-			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+			else:
+				raise ValidationError(detail={'error': serializer.errors})
 
 	@api_view(['GET', 'PUT', 'DELETE'])
 	def business_billing_info_element(request, id, binfo_id):
@@ -100,7 +99,7 @@ class BusinessBillingInfoView(APIView):
 				serializer.save()
 				return Response(serializer.data)
 			else:
-				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+				raise ValidationError(detail={'error': serializer.errors})
 
 		elif request.method == 'DELETE':
 			biling_info = get_object_or_404(BusinessBillingInfo, pk=binfo_id)
@@ -136,7 +135,8 @@ class BusinessPurchaseView(APIView):
 			if serializer.is_valid():
 				serializer.save()
 				return Response(serializer.data, status=status.HTTP_201_CREATED)
-			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+			else:
+				raise ValidationError(detail={'error': serializer.errors})
 
 	@api_view(['GET', 'PUT'])
 	def business_purchase_element(request, id, purchase_id):
@@ -152,7 +152,7 @@ class BusinessPurchaseView(APIView):
 				serializer.save()
 				return Response(serializer.data)
 			else:
-				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+				raise ValidationError(detail={'error': serializer.errors})
 
 class BusinessInvitationView(APIView):
 
@@ -171,8 +171,8 @@ class BusinessInvitationView(APIView):
 			if serializer.is_valid():
 				serializer.save()
 				return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+			else:
+				raise ValidationError(detail={'error': serializer.errors})
 
 	@api_view(['GET'])
 	def business_invitation_element(request, id, invitation_id):
@@ -195,7 +195,8 @@ class BusinessCashierView(APIView):
 			business = Business.objects.get(pk=id)
 			cashiers = AccountPartnerRole.objects.filter(business=business).exclude(account=business.account)
 			serializer = AccountPartnerRoleSerializer(cashiers, many=True)
-			return Response(serializer.data)
+			return Response(serializer.data, status=status.HTTP_200_OK)
+
 		if request.method == 'POST':
 			user = None
 			try:
@@ -209,11 +210,12 @@ class BusinessCashierView(APIView):
 					try:
 						serializer.save()
 					except Exception as e:
-						return Response(e.message, status=status.HTTP_400_BAD_REQUEST)
+						raise ValidationError(detail={'error': str(e)})
 
 					return Response(serializer.data, status=status.HTTP_201_CREATED)
 				else:
-					return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+					raise ValidationError(detail={'error': serializer.errors})
+
 			else:
 				account = Account.objects.get(user_id=user.id)
 				partner_role_data = {
@@ -224,7 +226,7 @@ class BusinessCashierView(APIView):
 				}
 
 				if AccountPartnerRole.objects.filter(business_id = id, account_id = account.id).count() > 0:
-					return Response('You already added this user as your cashier', status=status.HTTP_400_BAD_REQUEST)
+					raise ValidationError(detail={'error': 'You already added this user as your cashier'})
 
 				AccountPartnerRole.objects.create(**partner_role_data)
 
@@ -246,4 +248,4 @@ class BusinessCashierView(APIView):
 
 			cashiers = AccountPartnerRole.objects.filter(business_id = id)
 			serializer = AccountPartnerRoleSerializer(cashiers, many=True)
-			return Response(serializer.data)
+			return Response(serializer.data, status=status.HTTP_200_OK)

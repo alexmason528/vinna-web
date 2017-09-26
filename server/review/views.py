@@ -1,21 +1,13 @@
-from django.utils.decorators import method_decorator
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
 
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.decorators import api_view
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-
-from vinna.authentication import CustomJSONWebTokenAuthentication
 
 from .models import Review
 from .serializers import ReviewSerializer
-
-@permission_classes(IsAuthenticated, )
-@authentication_classes(CustomJSONWebTokenAuthentication, )
 
 class ReviewView(APIView):
 
@@ -32,24 +24,26 @@ class ReviewView(APIView):
 				serializer.save()
 				return Response(serializer.data, status=status.HTTP_201_CREATED)
 			else:
-				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+				raise ValidationError(detail={'error': serializer.errors})
 
 	@api_view(['GET','PUT', 'DELETE'])
 	def review_element(request, id):
+		review = get_object_or_404(Review, pk=id)
+		if request.user.account.id != review.account.id:
+			raise PermissionDenied
+		
 		if request.method == 'GET':	
-			review = get_object_or_404(Review, pk=id)
 			serializer = ReviewSerializer(review)
 			return Response(serializer.data)
 
 		elif request.method == 'PUT':
-			review = get_object_or_404(Review, pk=id)
 			serializer = ReviewSerializer(review, data=request.data, partial=True)
 			if serializer.is_valid():
 				serializer.save()
 				return Response(serializer.data)
 			else:
-				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+				raise ValidationError(detail={'error': serializer.errors})
 
 		elif request.method == 'DELETE':
-			review = get_object_or_404(Review, pk=id)
 			review.delete()
+			return Response({'detail': 'Deleted'}, status=status.HTTP_200_OK)

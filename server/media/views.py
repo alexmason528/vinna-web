@@ -1,21 +1,13 @@
-from django.utils.decorators import method_decorator
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
 
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.decorators import api_view
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-
-from vinna.authentication import CustomJSONWebTokenAuthentication
 
 from .models import Image, Video, BusinessImage, BusinessVideo
 from .serializers import ImageSerializer, VideoSerializer, BusinessImageSerializer, BusinessVideoSerializer
-
-@permission_classes(IsAuthenticated, )
-@authentication_classes(CustomJSONWebTokenAuthentication, )
 
 class ImageView(APIView):
 
@@ -31,7 +23,8 @@ class ImageView(APIView):
 			if serializer.is_valid():
 				serializer.save()
 				return Response(serializer.data, status=status.HTTP_201_CREATED)
-			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+			else:
+				raise ValidationError(detail={'error': serializer.errors})
 
 	@api_view(['PUT','GET', 'DELETE'])
 	def image_element(request, id):
@@ -47,11 +40,12 @@ class ImageView(APIView):
 				serializer.save()
 				return Response(serializer.data)
 			else:
-				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+				raise ValidationError(detail={'error': serializer.errors})
 
 		elif request.method == 'DELETE':
 			image = get_object_or_404(Image, pk=id)
 			image.delete()
+			return Response({'detail': 'Deleted'}, status=status.HTTP_200_OK)
 
 class BusinessImageView(APIView):
 
@@ -67,7 +61,8 @@ class BusinessImageView(APIView):
 			if serializer.is_valid():
 				serializer.save()
 				return Response(serializer.data, status=status.HTTP_201_CREATED)
-			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+			else:
+				raise ValidationError(detail={'error': serializer.errors})
 
 	@api_view(['PUT','GET', 'DELETE'])
 	def business_image_element(request, id):
@@ -83,11 +78,12 @@ class BusinessImageView(APIView):
 				serializer.save()
 				return Response(serializer.data)
 			else:
-				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+				raise ValidationError(detail={'error': serializer.errors})
 
 		elif request.method == 'DELETE':
 			bimage = get_object_or_404(BusinessImage, pk=id)
 			bimage.delete()
+			return Response({'detail': 'Deleted'}, status=status.HTTP_200_OK)
 
 
 class VideoView(APIView):
@@ -104,7 +100,8 @@ class VideoView(APIView):
 			if serializer.is_valid():
 				serializer.save()
 				return Response(serializer.data, status=status.HTTP_201_CREATED)
-			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+			else:
+				raise ValidationError(detail={'error': serializer.errors})
 
 	@api_view(['PUT','GET', 'DELETE'])
 	def video_element(request, id):
@@ -120,11 +117,12 @@ class VideoView(APIView):
 				serializer.save()
 				return Response(serializer.data)
 			else:
-				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+				raise ValidationError(detail={'error': serializer.errors})
 
 		elif request.method == 'DELETE':
 			video = get_object_or_404(Video, pk=id)
 			video.delete()
+			return Response({'detail': 'Deleted'}, status=status.HTTP_200_OK)
 
 class BusinessVideoView(APIView):
 
@@ -140,7 +138,8 @@ class BusinessVideoView(APIView):
 			if serializer.is_valid():
 				serializer.save()
 				return Response(serializer.data, status=status.HTTP_201_CREATED)
-			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+			else:
+				raise ValidationError(detail={'error': serializer.errors})
 
 	@api_view(['PUT','GET', 'DELETE'])
 	def business_video_element(request, id):
@@ -156,8 +155,9 @@ class BusinessVideoView(APIView):
 				serializer.save()
 				return Response(serializer.data)
 			else:
-				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+				raise ValidationError(detail={'error': serializer.errors})
 
 		elif request.method == 'DELETE':
 			bvideo = get_object_or_404(BusinessVideo, pk=id)
 			bvideo.delete()
+			return Response({'detail': 'Deleted'}, status=status.HTTP_200_OK)
